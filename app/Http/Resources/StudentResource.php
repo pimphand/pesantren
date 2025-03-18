@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Api\BalanceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -32,7 +33,7 @@ class StudentResource extends JsonResource
             ],
             'balance_histories' => $this->when(
                 $this->relationLoaded('balanceHistories'),
-                fn () => $this->balanceHistories
+                fn () => BalanceHistory::collection($this->balanceHistories->load('order'))
             ),
         ];
     }

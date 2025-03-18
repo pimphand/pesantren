@@ -42,8 +42,8 @@ class PaymentController extends Controller
     public function store(TopUpRequest $request): JsonResponse
     {
         $payment = Payment::create(array_merge($request->all(), [
-            'payment_type' => "Top Up",
-            'user_id' => $this->user->id,
+                'payment_type' => "Top Up",
+                'user_id' => $this->user->id,
             ])
         );
 
@@ -83,7 +83,7 @@ class PaymentController extends Controller
      */
     #[HeaderParameter('Authorization', 'Bearer {token}')]
     #[QueryParameter('search', 'Bank name', null)]
-    public function banks(Request $request)
+    public function banks(Request $request): JsonResponse
     {
         $banks = Bank::where('name', "like", "%$request->search%")->get();
         return response()->json([

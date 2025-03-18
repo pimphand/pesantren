@@ -27,4 +27,8 @@ class BalanceHistory extends Model
     {
         return $this->belongsTo(Student::class);
     }
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Order::class,'reference_id','id');
+    }
 }

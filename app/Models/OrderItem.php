@@ -15,4 +15,14 @@ class OrderItem extends Model
     use HasUuids, SoftDeletes;
 
     protected $guarded = [];
+
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
