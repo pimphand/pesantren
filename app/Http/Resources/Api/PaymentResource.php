@@ -22,7 +22,12 @@ class PaymentResource extends JsonResource
             'payment_type' => $this->payment_type,
             'paid_at' => $this->paid_at,
             'proof_of_payment' => $this->proof_of_payment,
-            'bank' => $this->bank->name,
+            'bank' => [
+                "name" => $this->bank->name,
+                "account_number" => $this->bank->account_number,
+                "account_name" => $this->bank->account_name,
+                'logo' => $this->bank->logo,
+            ]
         ];
     }
 }
