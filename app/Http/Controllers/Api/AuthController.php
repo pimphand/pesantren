@@ -34,7 +34,7 @@ class AuthController extends Controller
     }
 
     /**
-     * User Login.
+     * User logout.
      * @response array{message: string}
      */
     #[HeaderParameter('Authorization', 'Bearer {token}')]
