@@ -85,7 +85,7 @@ class PaymentController extends Controller
     #[QueryParameter('search', 'Bank name', null)]
     public function banks(Request $request): JsonResponse
     {
-        $banks = Bank::where('name', "like", "%$request->search%")->get();
+        $banks = Bank::where('name', "ilike", "%$request->search%")->get();
         return response()->json([
             'message' => 'success',
             'data' => $banks
