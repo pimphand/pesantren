@@ -81,7 +81,10 @@ return [
      * ],
      * ```
      */
-    'servers' => null,
+    'servers' => [
+        'Local' => 'api',
+        'Prod' => env('APP_URL') . '/api',
+    ],
 
     'middleware' => [
         'web',
