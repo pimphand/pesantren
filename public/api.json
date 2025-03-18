@@ -163,14 +163,17 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "`PaymentResource`",
+                        "description": "Array of `PaymentResource`",
                         "content": {
                             "application\/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#\/components\/schemas\/PaymentResource"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#\/components\/schemas\/PaymentResource"
+                                            }
                                         },
                                         "message": {
                                             "type": "string",
@@ -667,7 +670,10 @@
                         "type": "number"
                     },
                     "proof_of_payment": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "format": "binary",
                         "contentMediaType": "application\/octet-stream",
                         "maxLength": 2048

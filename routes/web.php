@@ -10,7 +10,7 @@ Route::get('/', function () {
 
 Route::get('/documentation-api', function () {
     return view('scramble::docs', [
-        'spec' => file_get_contents(base_path('api.json')),
+        'spec' => file_get_contents(base_path('public/api.json')),
         'config' => Scramble::getGeneratorConfig('default'),
     ]);
 })
