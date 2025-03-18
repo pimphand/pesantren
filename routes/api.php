@@ -1,20 +1,29 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\HomeController;
 
-Route::post('login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
+    Route::post('logout', [AuthController::class, 'logout']);
 
-    Route::get('student-parents', [\App\Http\Controllers\Api\StudentController::class, 'index']);
-    Route::get('student-parents/{id}/bank-mutation', [\App\Http\Controllers\Api\StudentController::class, 'bankMutation']);
-    Route::post('student-parents', [\App\Http\Controllers\Api\StudentController::class, 'updateProfile']);
+    // Student Routes
+    Route::prefix('students')->group(function () {
+        Route::get('/', [StudentController::class, 'index']);
+        Route::get('{id}/bank-mutation', [StudentController::class, 'bankMutation']);
+        Route::post('parent-update', [StudentController::class, 'updateProfile']);
+    });
 
-    Route::get('payment-histories', [\App\Http\Controllers\Api\PaymentController::class, 'index']);
-    Route::post('top-up', [\App\Http\Controllers\Api\PaymentController::class, 'store']);
-    Route::get('top-up/{payment}', [\App\Http\Controllers\Api\PaymentController::class, 'show']);
-    Route::get('list-banks', [\App\Http\Controllers\Api\PaymentController::class, 'banks']);
+    // Payment Routes
+    Route::prefix('payments')->group(function () {
+        Route::get('histories', [PaymentController::class, 'index']);
+        Route::post('top-up', [PaymentController::class, 'store']);
+        Route::get('top-up/{payment}', [PaymentController::class, 'show']);
+        Route::get('banks', [PaymentController::class, 'banks']);
+    });
 
-    Route::get('home', [\App\Http\Controllers\Api\HomeController::class, 'index']);
+    Route::get('home', [HomeController::class, 'index']);
 });

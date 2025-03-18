@@ -19,7 +19,7 @@ class StudentController extends Controller
     }
 
     /**
-     * List Student Parents.
+     * Parent-Student List.
      * @response array{data: StudentResource[], message: string}
      */
     #[HeaderParameter('Authorization', 'Bearer {token}')]
