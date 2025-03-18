@@ -10,7 +10,7 @@ Route::get('/', function () {
 
 Route::get('/documentation-api', function () {
     return view('scramble::docs', [
-        'spec' => file_get_contents("https://raw.githubusercontent.com/pimphand/pesantren/refs/heads/main/public/api.json?token=GHSAT0AAAAAAC6DQ2Z74MQF5ZCQTOYNG7SOZ6ZGIAQ"),
+        'spec' => file_get_contents(base_path('public/api.json')),
         'config' => Scramble::getGeneratorConfig('default'),
     ]);
 });
