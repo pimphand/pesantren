@@ -3,7 +3,6 @@
 /public/build
 /public/hot
 /public/api.json
-/public/api.json
 /public/storage
 /storage/*.key
 /storage/pail

@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\HomeController;
 
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->name('api.login')->middleware('throttle:5,1');;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
