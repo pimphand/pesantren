@@ -1,4 +1,4 @@
-<select class="selectpicker {{$name}}" id="{{$name}}" name="{{$name}}" data-live-search="false">
+<select class="form-control {{$name}}" id="{{$name}}" name="{{$name}}" data-live-search="false">
     <option value="">Pilih {{$title}}</option>
     @foreach($options as $item)
         <option

@@ -18,7 +18,9 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        return view('merchant.product_category.index');
+        return view('merchant.category',[
+            'title' => 'Category',
+        ]);
     }
 
     /**
@@ -34,23 +36,13 @@ class ProductCategoryController extends Controller
      */
     public function store(StoreProductCategoryRequest $request)
     {
-        //
-    }
+        ProductCategory::create(array_merge($request->validated(), [
+            'merchant_id' => auth()->user()->merchant->id,
+        ]));
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ProductCategory $productCategory)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProductCategory $productCategory)
-    {
-        //
+        return response()->json([
+            "message" => "Kategori berhasil ditambahkan"
+        ]);
     }
 
     /**
@@ -58,7 +50,19 @@ class ProductCategoryController extends Controller
      */
     public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
     {
-        //
+        if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke produk ini'
+            ], 403);
+        }
+
+        $productCategory->update(array_merge($request->validated(), [
+            'merchant_id' => auth()->user()->merchant->id,
+        ]));
+
+        return response()->json([
+            "message" => "Kategori berhasil diubah"
+        ]);
     }
 
     /**
@@ -66,7 +70,13 @@ class ProductCategoryController extends Controller
      */
     public function destroy(ProductCategory $productCategory)
     {
-        //
+        if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
+            return abort('403', 'Anda tidak memiliki akses ke produk ini');
+        }
+        $productCategory->delete();
+        return response()->json([
+            "message" => "Kategori berhasil dihapus"
+        ]);
     }
 
     /**

@@ -210,7 +210,7 @@ return [
              */
             'abort' => [
                 'code' => 403,
-                'message' => 'User does not have any of the necessary access rights.',
+                'message' => 'Anda tidak memiliki akses ke halaman ini',
             ],
 
             /**

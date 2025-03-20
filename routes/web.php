@@ -26,11 +26,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/products', 'store')->name('store')->middleware('permission:product-create');
         Route::get('/products-data', 'data')->name('data')->middleware('permission:product-read');
         Route::delete('/products/{product}', 'destroy')->name('destroy')->middleware('permission:product-delete');
+        Route::put('/products/{product}', 'update')->name('update')->middleware('permission:product-update');
     });
 
     Route::controller(ProductCategoryController::class)->name('categories.')->group(function () {
         Route::get('/categories', 'index')->name('index')->middleware('permission:product_category-read');
+        Route::post('/categories', 'store')->name('store')->middleware('permission:product_category-create');
         Route::get('/categories-data', 'data')->name('data')->middleware('permission:product_category-read');
-        Route::delete('/categories/{category}', 'destroy')->name('destroy')->middleware('permission:product_category-read');
+        Route::delete('/categories/{productCategory}', 'destroy')->name('destroy')->middleware('permission:product_category-delete');
+        Route::put('/categories/{productCategory}', 'update')->name('update')->middleware('permission:product_category-update');
     });
 });

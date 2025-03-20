@@ -203,7 +203,7 @@
             }
         });
     }
-    function deleteProduct(url) {
+    function deleteData(url) {
         swal({
             title: "Apakah anda yakin?",
             text: "Data yang dihapus tidak bisa dikembalikan!",
@@ -211,12 +211,12 @@
             showCancelButton: true,
             confirmButtonText: "Ya, Hapus!",
         }).then(function () {
-            form(url,'delete',{},function (response) {
+            form(url,'delete',{},function (response, error) {
                 if (response) {
                     getData();
                     swal("Deleted!", "Data berhasil di hapus.", "success");
                 } else {
-                    swal("Failed!", "Data gagal di hapus.", "error");
+                    swal("Gagal!", error.responseJSON.message, "error");
                 }
             });
         });

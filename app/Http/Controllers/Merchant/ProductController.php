@@ -7,6 +7,9 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -17,7 +20,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View
+    public function index(): Factory|Application|View
     {
         return view('merchant.product',[
             'title' => 'Product',
@@ -26,21 +29,13 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request): JsonResponse
     {
         Product::create(array_merge($request->all(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ?  asset('storage/' . $request->file('proof_of_payment')->store('proof-of-payment', 'public')) : null
+            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('products')->store('products/' . auth()->user()->merchant->id, 'public')) : null
         ]));
 
         return response()->json([
@@ -49,34 +44,34 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Product $product)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        if ($product->merchant_id !== auth()->user()->merchant->id) {
+            return abort('403', 'Anda tidak memiliki akses ke produk ini');
+        }
+
+        $product->update(array_merge($request->all(), [
+            'merchant_id' => auth()->user()->merchant->id,
+            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('products/' . auth()->user()->merchant->id, 'public')) : null
+        ]));
+
+        return response()->json([
+            "message" => "Product berhasil ditambahkan"
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy(Product $product): JsonResponse
     {
+        if ($product->merchant_id !== auth()->user()->merchant->id) {
+            return abort('403', 'Anda tidak memiliki akses ke produk ini');
+        }
+
+        $product->delete();
         return response()->json([
             "message" => "Product deleted successfully"
         ]);
@@ -85,7 +80,6 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function data(): AnonymousResourceCollection
     {
         $products = QueryBuilder::for(Product::class)
