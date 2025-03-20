@@ -22,14 +22,14 @@ return [
         ],
         'orang_tua' => [
             'santri' => 'c,r,u,d',
-            'mutasi' => 'r',
+            'mutasi' => 'r','p',
             'pembayaran' => 'c,r',
         ],
         'santri' => [
             'transaksi' => 'c',
         ],
         'kepala_ponpes' => [
-
+            'pembayaran' => 'r,re',
         ],
         'admin' => [
             'users' => 'c,r,u,d',

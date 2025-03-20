@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -25,5 +25,14 @@ class AuthController extends Controller
        return response()->json([
             'message' => 'Login berhasil'
        ]);
+    }
+
+    public function logout(): \Illuminate\Http\JsonResponse
+    {
+        auth()->logout();
+
+        return response()->json([
+            'message' => 'Logout berhasil'
+        ]);
     }
 }

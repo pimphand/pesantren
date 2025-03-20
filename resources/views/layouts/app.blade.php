@@ -55,6 +55,10 @@
     <!-- modernizr JS
 		============================================ -->
     <script src="{{asset('assets')}}/js/vendor/modernizr-2.8.3.min.js"></script>
+
+    <link rel="stylesheet" href="{{asset('assets')}}/css/dialog/sweetalert2.min.css">
+    <link rel="stylesheet" href="{{asset('assets')}}/css/dialog/dialog.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @stack('css')
 </head>
 
@@ -73,7 +77,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="breadcomb-list">
 
-                    <x-breadcrumb></x-breadcrumb>
+                    @yield('breadcrumb')
 
                 </div>
             </div>
@@ -90,8 +94,8 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="footer-copy-right">
-                    <p>Copyright © 2018
-                        . All rights reserved. Template by <a href="https://colorlib.com">Colorlib</a>.</p>
+                    <p>Copyright © {{date('Y')}}
+                        . All rights reserved. </p>
                 </div>
             </div>
         </div>
@@ -148,9 +152,39 @@
 <script src="{{asset('assets')}}/js/plugins.js"></script>
 
 <script src="{{asset('assets')}}/js/main.js"></script>
+<script src="{{asset('assets')}}/js/dialog/sweetalert2.min.js"></script>
+<script src="{{asset('assets')}}/js/dialog/dialog-active.js"></script>
 
 <script>
+    function pagination(response) {
+        $("#pagination").empty();
+        let ul = $("<ul class='pagination'></ul>");
 
+        response.meta.links.forEach(link => {
+            let li = $("<li class='page-item'></li>");
+            if (link.active) {
+                li.addClass("active");
+            }
+            if (!link.url) {
+                li.addClass("disabled");
+            }
+
+            let a = $("<a class='page-link'></a>");
+            a.attr("href", link.url ? link.url : "#");
+            a.html(link.label);
+            a.on("click", function (e) {
+                e.preventDefault();
+                if (link.url) {
+                    fetchData(link.url);
+                }
+            });
+
+            li.append(a);
+            ul.append(li);
+        });
+
+        $("#pagination").append(ul);
+    }
     function form(url,method,data,callback) {
         $.ajax({
             url: url,
@@ -169,6 +203,26 @@
             }
         });
     }
+    function deleteProduct(url) {
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Hapus!",
+        }).then(function () {
+            form(url,'delete',{},function (response) {
+                if (response) {
+                    getData();
+                    swal("Deleted!", "Data berhasil di hapus.", "success");
+                } else {
+                    swal("Failed!", "Data gagal di hapus.", "error");
+                }
+            });
+        });
+    }
+    $('.selectpicker').val('');
+
 </script>
 @stack('js')
 </body>

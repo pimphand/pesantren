@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\UpdateUserRequest;
-use App\Http\Resources\StudentResource;
+use App\Http\Resources\Api\StudentResource;
 use Dedoc\Scramble\Attributes\HeaderParameter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;

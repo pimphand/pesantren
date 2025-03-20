@@ -34,4 +34,9 @@ class ProductCategory extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function scopeName($query, $name)
+    {
+        return $query->where('name', 'ilike', "%$name%");
+    }
 }

@@ -20,4 +20,14 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class);
     }
+
+    public function scopeName($query, $name)
+    {
+        return $query->where('name', 'ilike', "%$name%");
+    }
+
+    public function scopeDescription($query, $name)
+    {
+        return $query->where('description', 'ilike', "%$name%");
+    }
 }

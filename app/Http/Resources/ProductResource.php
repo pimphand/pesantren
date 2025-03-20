@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Api;
+namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BalanceHistory extends JsonResource
+class ProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,12 @@ class BalanceHistory extends JsonResource
     {
         return [
             'id' => $this->id,
-            'balance' => $this->balance,
-            'type' => $this->type,
-            'debit' => $this->debit,
-            'credit' => $this->credit,
+            'name' => $this->name,
+            'price' => $this->price,
+            'photo' => $this->photo,
             'description' => $this->description,
-            'details' => OrderResource::make($this->whenLoaded('order')),
+            'stock' => $this->stock,
+            'category' => $this->whenLoaded('category', fn() => $this->category->name),
         ];
     }
 }

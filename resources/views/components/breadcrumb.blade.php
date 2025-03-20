@@ -10,11 +10,13 @@
             </div>
         </div>
     </div>
-    @if(isset($button_title) && $button_title)
+    @if(isset($buttonTitle) && $buttonTitle)
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="breadcomb-report">
-                <button data-toggle="tooltip" data-placement="left" title="{{$button_title ?? ""}}"
-                        class="btn"><i class="notika-icon {{$icon ?? ""}}"></i></button>
+                <button data-toggle="tooltip"  data-placement="left" title="{{$buttonTitle ?? ""}}"
+                        class="btn _add_button">
+                    <i class="notika-icon notika-plus-symbol"></i>
+                </button>
             </div>
         </div>
     @endif

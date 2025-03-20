@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Merchant;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSkuRequest;
 use App\Http\Requests\UpdateSkuRequest;
 use App\Models\Sku;

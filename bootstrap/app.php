@@ -14,8 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'role' => \Laratrust\Middleware\Role::class,
+            'permission' => \Laratrust\Middleware\Permission::class,
+            'ability' => \Laratrust\Middleware\Ability::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-
+        //
     })->create();

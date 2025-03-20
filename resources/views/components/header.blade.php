@@ -1,4 +1,3 @@
-
 <!-- Start Header Top Area -->
 <div class="header-top-area">
     <div class="container">
@@ -12,15 +11,18 @@
                 <div class="header-top-menu">
                     <ul class="nav navbar-nav notika-top-nav">
                         <li class="nav-item dropdown">
-                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false"
-                               class="nav-link dropdown-toggle"><span><i
-                                        class="notika-icon notika-search"></i></span></a>
-                            <div role="menu" class="dropdown-menu search-dd animated flipInX">
-                                <div class="search-input">
-                                    <i class="notika-icon notika-left-arrow"></i>
-                                    <input type="text"/>
-                                </div>
-                            </div>
+                            {{--                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false"--}}
+                            {{--                               class="nav-link dropdown-toggle"><span><i--}}
+                            {{--                                        class="notika-icon notika-search"></i></span></a>--}}
+                            {{--                            <div role="menu" class="dropdown-menu search-dd animated flipInX">--}}
+                            {{--                                <div class="search-input">--}}
+                            {{--                                    <i class="notika-icon notika-left-arrow"></i>--}}
+                            {{--                                    <input type="text"/>--}}
+                            {{--                                </div>--}}
+                            {{--                            </div>--}}
+                            <a href="#" class="nav-link" id="logout">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -56,3 +58,14 @@
     </div>
 </div>
 <!-- Mobile Menu end -->
+@push('js')
+    <script>
+        $(document).ready(function () {
+            $('#logout').click(function () {
+                $.post('{{route('logout')}}', {_token: '{{csrf_token()}}'}, function (data) {
+                    window.location.href = '{{route('login')}}';
+                });
+            })
+        });
+    </script>
+@endpush

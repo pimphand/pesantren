@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Controllers\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;

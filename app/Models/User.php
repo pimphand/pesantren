@@ -98,4 +98,9 @@ class User extends Authenticatable implements LaratrustUser
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function merchant(): HasOne
+    {
+        return $this->hasOne(Merchant::class);
+    }
 }
