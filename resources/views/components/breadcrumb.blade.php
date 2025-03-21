@@ -15,7 +15,7 @@
             <div class="breadcomb-report">
                 <button data-toggle="tooltip"  data-placement="left" title="{{$buttonTitle ?? ""}}"
                         class="btn _add_button">
-                    <i class="notika-icon notika-plus-symbol"></i>
+                    <i class="notika-icon {{$icon ?? "notika-plus-symbol"}}"></i>
                 </button>
             </div>
         </div>

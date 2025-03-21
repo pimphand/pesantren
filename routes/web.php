@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Merchant\ProductCategoryController;
 use App\Http\Controllers\Merchant\ProductController;
+use App\Http\Controllers\Merchant\TransactionController;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/products/{product}', 'destroy')->name('destroy')->middleware('permission:product-delete');
         Route::put('/products/{product}', 'update')->name('update')->middleware('permission:product-update');
     });
-
     Route::controller(ProductCategoryController::class)->name('categories.')->group(function () {
         Route::get('/categories', 'index')->name('index')->middleware('permission:product_category-read');
         Route::post('/categories', 'store')->name('store')->middleware('permission:product_category-create');
@@ -36,4 +36,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/categories/{productCategory}', 'destroy')->name('destroy')->middleware('permission:product_category-delete');
         Route::put('/categories/{productCategory}', 'update')->name('update')->middleware('permission:product_category-update');
     });
+    Route::controller(TransactionController::class)->name('merchant.transactions.')->group(function () {
+        Route::post('/merchant/transactions', 'store')->name('store')->middleware('permission:transaction-create');
+        Route::get('/merchant/transactions', 'index')->name('index')->middleware('permission:transaction-read');
+        Route::get('/merchant-user-qr-code/{user}', 'qrCode')->name('qr-code')->middleware('permission:transaction-read');
+    });
+    //end merchant routes
 });

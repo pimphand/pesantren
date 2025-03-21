@@ -58,7 +58,33 @@
 
     <link rel="stylesheet" href="{{asset('assets')}}/css/dialog/sweetalert2.min.css">
     <link rel="stylesheet" href="{{asset('assets')}}/css/dialog/dialog.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <style>
+        /* Struktur halaman agar footer tetap di bawah */
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Pastikan halaman setinggi viewport */
+        }
+
+        .content {
+            flex-grow: 1; /* Membuat konten utama berkembang */
+        }
+
+        .footer-copyright-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css">
     @stack('css')
 </head>
 
@@ -89,18 +115,11 @@
 @yield('content')
 <!-- Button area End-->
 <!-- Start Footer area-->
-<div class="footer-copyright-area">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                <div class="footer-copy-right">
-                    <p>Copyright © {{date('Y')}}
-                        . All rights reserved. </p>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="footer-copyright-area  fixed bottom-0 left-0 w-full bg-gray-800 text-white py-3">
+    <p>Copyright © <?php echo date('Y'); ?>. All rights reserved.</p>
 </div>
+
+
 <!-- End Footer area-->
 <!-- jquery============================================ -->
 <script src="{{asset('assets')}}/js/vendor/jquery-1.12.4.min.js"></script>
@@ -154,7 +173,7 @@
 <script src="{{asset('assets')}}/js/main.js"></script>
 <script src="{{asset('assets')}}/js/dialog/sweetalert2.min.js"></script>
 <script src="{{asset('assets')}}/js/dialog/dialog-active.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
 <script>
     function pagination(response) {
         $("#pagination").empty();
@@ -185,7 +204,8 @@
 
         $("#pagination").append(ul);
     }
-    function form(url,method,data,callback) {
+
+    function form(url, method, data, callback) {
         $.ajax({
             url: url,
             type: method,
@@ -195,7 +215,7 @@
             headers: {
                 'X-CSRF-TOKEN': "{{csrf_token()}}"
             },
-            success: function(response){
+            success: function (response) {
                 callback(response, null);
             },
             error: function (error) {
@@ -203,6 +223,7 @@
             }
         });
     }
+
     function deleteData(url) {
         swal({
             title: "Apakah anda yakin?",
@@ -211,7 +232,7 @@
             showCancelButton: true,
             confirmButtonText: "Ya, Hapus!",
         }).then(function () {
-            form(url,'delete',{},function (response, error) {
+            form(url, 'delete', {}, function (response, error) {
                 if (response) {
                     getData();
                     swal("Deleted!", "Data berhasil di hapus.", "success");
@@ -221,8 +242,37 @@
             });
         });
     }
+
     $('.selectpicker').val('');
 
+    function currencyFormat(number) {
+        return number % 1 === 0
+            ? number.toLocaleString()
+            : number.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
+    }
+
+    function toast(message,icon = 'success',heading = 'Berhasil') {
+        $.toast({
+            text: message, // Text that is to be shown in the toast
+            heading: heading, // Optional heading to be shown on the toast
+            icon: icon, // Type of toast icon
+            showHideTransition: 'fade', // fade, slide or plain
+            allowToastClose: true, // Boolean value true or false
+            hideAfter: 3000, // false to make it sticky or number representing the miliseconds as time after which toast needs to be hidden
+            stack: 2, // false if there should be only one toast at a time or a number representing the maximum number of toasts to be shown at a time
+            position: 'top-right', // bottom-left or bottom-right or bottom-center or top-left or top-right or top-center or mid-center or an object representing the left, right, top, bottom values
+
+
+
+            textAlign: 'left',  // Text alignment i.e. left, right or center
+            loader: true,  // Whether to show loader or not. True by default
+            loaderBg: '#9EC600',  // Background color of the toast loader
+            beforeShow: function () {}, // will be triggered before the toast is shown
+            afterShown: function () {}, // will be triggered after the toat has been shown
+            beforeHide: function () {}, // will be triggered before the toast gets hidden
+            afterHidden: function () {}  // will be triggered after the toast has been hidden
+        });
+    }
 </script>
 @stack('js')
 </body>

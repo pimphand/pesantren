@@ -41,7 +41,7 @@ class PaymentController extends Controller
     #[HeaderParameter('Authorization', 'Bearer {token}')]
     public function store(TopUpRequest $request): JsonResponse
     {
-        $payment = Payment::create(array_merge($request->all(), [
+        $payment = Payment::create(array_merge($request->validated(), [
                 'payment_type' => "Top Up",
                 'user_id' => $this->user->id,
             ])
