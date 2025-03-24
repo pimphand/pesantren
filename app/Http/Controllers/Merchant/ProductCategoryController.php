@@ -7,7 +7,9 @@ use App\Http\Requests\StoreProductCategoryRequest;
 use App\Http\Requests\UpdateProductCategoryRequest;
 use App\Http\Resources\ProductCategoryResource;
 use App\Models\ProductCategory;
-use Illuminate\Database\Query\Builder;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -16,7 +18,7 @@ class ProductCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         return view('merchant.category',[
             'title' => 'Category',
@@ -34,7 +36,7 @@ class ProductCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductCategoryRequest $request)
+    public function store(StoreProductCategoryRequest $request): \Illuminate\Http\JsonResponse
     {
         ProductCategory::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
@@ -48,7 +50,7 @@ class ProductCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
+    public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory): \Illuminate\Http\JsonResponse
     {
         if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
             return response()->json([
@@ -68,10 +70,12 @@ class ProductCategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProductCategory $productCategory)
+    public function destroy(ProductCategory $productCategory): \Illuminate\Http\JsonResponse
     {
         if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
-            return abort('403', 'Anda tidak memiliki akses ke produk ini');
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke produk ini'
+            ], 403);
         }
         $productCategory->delete();
         return response()->json([
