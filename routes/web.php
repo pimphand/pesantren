@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(TransactionController::class)->name('merchant.transactions.')->group(function () {
         Route::post('/merchant/transactions', 'store')->name('store')->middleware('permission:transaction-create');
         Route::get('/merchant/transactions', 'index')->name('index')->middleware('permission:transaction-read');
+        Route::get('/merchant/transactions-data', 'data')->name('data')->middleware('permission:transaction-read');
         Route::get('/merchant-user-qr-code/{user}', 'qrCode')->name('qr-code')->middleware('permission:transaction-read');
     });
     //end merchant routes

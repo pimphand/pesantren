@@ -25,7 +25,18 @@ class StoreTransactionRequest extends FormRequest
         return [
             'items' => 'required|array',
             'items.*.product' => 'required|exists:products,id',
-            'items.*.qty' => 'required|integer|min:1',
+            'items.*.qty' => [
+                'required',
+                'integer',
+                'min:1',
+                function ($attribute, $value, $fail) {
+                    $productId = request()->input(str_replace('.qty', '.product', $attribute));
+                    $product = \App\Models\Product::whereId($productId)->first();
+                    if ($product && $value > $product->stock) {
+                        $fail("The quantity requested exceeds available stock.");
+                    }
+                }
+            ],
             'user_id' => 'required|exists:users,uuid',
         ];
     }

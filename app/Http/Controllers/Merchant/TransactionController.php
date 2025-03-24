@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Merchant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class TransactionController extends Controller
 {
@@ -29,8 +32,9 @@ class TransactionController extends Controller
     public function store(StoreTransactionRequest $request)
     {
         return DB::transaction(function () use ($request) {
-            $order = Order::create([
-                'user_id' => $request->user_id,
+            $user = User::where('uuid', $request->user_id)->first();
+            $order = $user->orders()->create([
+                'user_id' => $user->id,
                 'merchant_id' => auth()->user()->merchant->id,
                 'invoice_number' => 'INV/' . time(),
                 'status' => 'success',
@@ -38,19 +42,22 @@ class TransactionController extends Controller
             ]);
             $total = 0;
             foreach ($request->items as $item) {
+                $product = Product::find($item['product']);
                 $order->orderItems()->create([
-                    'product_id' => $item['product'],
+                    'product_id' => $product->id,
                     'quantity' => $item['qty'],
-                    'price' => $item['product']['price'],
+                    'price' => $product->price,
                 ]);
 
-                $total += $item['quantity'] * $item['product']['price'];
+                $total += $item['qty'] * $product->price;
+
+                $product->update([
+                    'stock' => $product->stock - $item['qty']
+                ]);
             }
             $order->update([
                 'total' => $total
             ]);
-
-            $user = User::where('uuid', $request->user_id)->first();
 
             $user->balanceHistories()->create([
                 'type' => 'transaction',
@@ -58,8 +65,13 @@ class TransactionController extends Controller
                 'balance' => $user->balance,
                 'debit' => $total,
                 'reference_type' => Order::class,
-                'reference_id' => $order->id
+                'reference_id' => $order->id,
+                'description' => 'Pembayaran transaksi ' . $order->invoice_number
             ]);
+
+            if ($user->balance < $total){
+                abort(403, 'Saldo tidak mencukupi');
+            }
 
             $user->update([
                 'balance' => $user->balance - $total
@@ -108,5 +120,33 @@ class TransactionController extends Controller
                 'balance' => $user->balance,
             ]
         ]);
+    }
+
+    /**
+     * get data for datatable
+     */
+    public function data(Request $request)
+    {
+        $orders = QueryBuilder::for(Order::class)
+            ->where('merchant_id', auth()->user()->merchant->id)
+            ->allowedFilters([
+                'invoice_number',
+                'status',
+                'payment_status',
+                'created_at',
+                'updated_at',
+            ]);
+        if ($request->create){
+
+            return [
+                'total_order'=>$orders->whereBetween('created_at',[now()->startOfDay(),now()->endOfDay()])->count(),
+                'total_amount'=>$orders->whereBetween('created_at',[now()->startOfDay(),now()->endOfDay()])->sum('total')
+            ];
+        }
+
+        $data= $orders->paginate(10)
+            ->appends($request->all());
+
+        return OrderResource::collection($data);
     }
 }

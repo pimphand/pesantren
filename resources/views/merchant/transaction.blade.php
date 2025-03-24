@@ -2,18 +2,24 @@
 @section('breadcrumb')
     <style>
         .notika-menu-list:before {
-            font-family: 'FontAwesome';
+            font-family: 'FontAwesome', serif;
             content: "\f03a"; /* Ikon daftar (list) dari FontAwesome */
         }
 
         .notika-save:before {
-            font-family: 'FontAwesome';
+            font-family: 'FontAwesome', serif;
             content: "\f0c7"; /* Ikon simpan (save) dari FontAwesome */
         }
 
         .notika-dot-circle-o:before {
-            font-family: 'FontAwesome';
+            font-family: 'FontAwesome', serif;
             content: "\f192"; /* Ikon dot-circle-o */
+        }
+
+        .justify-between {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
         }
     </style>
     <x-breadcrumb :title="$title"
@@ -54,6 +60,10 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                     <div class="view-mail-list sm-res-mg-t-30">
+                        <div class="row mb-5 p-4">
+                            <div class="d-flex justify-between w-100 mb-2" id="_show_order_today"></div>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-lg-6 col-md-6 col-xs-12">
                                 <x-input :name="'search'" :placeholder="'Cari Produk'"></x-input>
@@ -66,19 +76,13 @@
                         <div class="row mt-3" id="_products"></div>
                         <div class="vw-ml-action-ls text-right mg-t-20">
                             <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
-                                <button class="btn btn-default btn-sm waves-effect"><i
-                                        class="notika-icon notika-next"></i> Reply
-                                </button>
-                                <button class="btn btn-default btn-sm waves-effect"><i
-                                        class="notika-icon notika-right-arrow"></i> Forward
-                                </button>
                                 <button class="btn btn-default btn-sm waves-effect">
-                                    <i class="notika-icon notika-save"
+                                    <i class="notika-icon notika-print"
                                        aria-hidden="true">
-                                    </i> Print
+                                    </i> Print Order Terakhir
                                 </button>
                                 <button class="btn btn-default btn-sm waves-effect"><i
-                                        class="notika-icon notika-trash"></i> Batal
+                                        class="notika-icon notika-save"></i> Simpan Ke Draft
                                 </button>
                             </div>
                         </div>
@@ -87,7 +91,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="myModalone" role="dialog" data-backdrop="static">
+    <div class="modal fade" id="myModalone" data-backdrop="static">
         <div class="modal-dialog modals-default">
             <div class="modal-content">
                 <div class="modal-header">
@@ -103,10 +107,13 @@
                             <h2 class="m-2 text-success">Saldo: <span id="balance" class="font-weight-bold"></span></h2>
                             <h2 class="m-2 text-danger">Total Pembayaran: <span class="_total font-weight-bold"></span></h2>
                         </div>
+
+                        <button type="button" class="btn btn-danger" id="removeCustomer">Hapus Customer</button>
                     </form>
+
                 </div>
                 <div class="modal-footer mt-3">
-                    <button type="button" class="btn btn-primary" id="saveTransaction">Simpan Perubahan</button>
+                    <button type="button" class="btn btn-primary" id="saveTransaction">Simpan</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                 </div>
             </div>
@@ -292,23 +299,55 @@
             let cart = getCart();
             let user_id = $('#user_id').val();
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-            let data = {
-                user_id: user_id,
-                total: total,
-                items: cart
-            }
 
-            console.log(data);
-
-            form('{{route('merchant.transactions.store')}}', 'post', data, function (response, error) {
+            let formData = new FormData();
+            formData.append('user_id', user_id);
+            formData.append('total', total);
+            $.each(cart, function (index, item) {
+                formData.append(`items[${index}][product]`, item.id);
+                formData.append(`items[${index}][qty]`, item.qty);
+            });
+            form('{{route('merchant.transactions.store')}}', 'post', formData, function (response, error) {
                 if (response) {
+                    getToday()
                     toast(response.message, 'success', 'Berhasil!');
                     $('#myModalone').modal('hide');
                     saveCart([]);
                     showCart();
+                    getProducts();
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                }else{
+                    toast(error.responseJSON.message, 'error', 'Gagal!');
                 }
             })
         });
+
+        $('#removeCustomer').click(function () {
+            $('#_form').hide();
+            $('#name').text('');
+            $('#balance').text('');
+            $('#user_id').val('');
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        });
+
+        $('#search').on('input', function () {
+            getProducts($(this).val(), $('#category').val());
+        });
+
+        $('#category').on('change', function () {
+            getProducts($('#search').val(), $(this).val());
+        });
+        getToday()
+        function getToday() {
+            let urlCreate = `{{route('merchant.transactions.data')}}?create=1`;
+            $('_show_order_today').html('');
+            form(urlCreate, 'get', null, function (response) {
+                $('#_show_order_today').html(`
+                    <span><strong>Pendapatan: Rp. ${currencyFormat(Number(response.total_amount))}</strong></span>
+                    <span><strong>Dari :  ${response.total_order} Order</strong></span>
+                `);
+            });
+        }
     </script>
 @endpush
 

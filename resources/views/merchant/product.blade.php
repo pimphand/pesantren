@@ -161,7 +161,6 @@
             $('.error').text('').hide();
             let url = $(idForm).attr('action');
             let formData = new FormData($(idForm)[0]);
-            console.log(formData.get('id'))
             if (formData.get('id')) {
                 formData.append('_method', 'PUT');
             }
