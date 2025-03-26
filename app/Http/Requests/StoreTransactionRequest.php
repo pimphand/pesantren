@@ -33,9 +33,9 @@ class StoreTransactionRequest extends FormRequest
                     $productId = request()->input(str_replace('.qty', '.product', $attribute));
                     $product = \App\Models\Product::whereId($productId)->first();
                     if ($product && $value > $product->stock) {
-                        $fail("The quantity requested exceeds available stock.");
+                        $fail('The quantity requested exceeds available stock.');
                     }
-                }
+                },
             ],
             'user_id' => 'required|exists:users,uuid',
         ];

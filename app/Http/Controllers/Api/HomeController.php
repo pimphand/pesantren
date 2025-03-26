@@ -16,7 +16,7 @@ class HomeController extends Controller
     {
         return response()->json([
             'message' => 'success',
-            'data' => 'Welcome to the Home Page'
+            'data' => 'Welcome to the Home Page',
         ]);
     }
 }

@@ -6,13 +6,13 @@
                 <ul class="nav nav-tabs notika-menu-wrap menu-it-icon-pro text-center text-align" id="menu">
                     @if(auth()->user()->hasRole('merchant'))
                         <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
-                        <li><a href="{{route('categories.index')}}"><i class="fa-solid fa-layer-group"></i> Kategori</a>
+                        <li><a href="{{route('merchant.categories.index')}}"><i class="fa-solid fa-layer-group"></i> Kategori</a>
                         </li>
-                        <li><a href="{{route('products.index')}}"><i class="fa-brands fa-product-hunt"></i> Produk</a>
+                        <li><a href="{{route('merchant.products.index')}}"><i class="fa-brands fa-product-hunt"></i> Produk</a>
                         </li>
                         <li><a href="{{route('merchant.transactions.index')}}"><i
                                     class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
-                        <li><a href="/test"><i class="notika-icon notika-support"></i> Profile</a></li>
+                        <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
                     @else
                         <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
                         <li><a data-toggle="tab" href="#pengguna"><i class="notika-icon notika-support"></i>

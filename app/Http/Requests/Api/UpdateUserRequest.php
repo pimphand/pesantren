@@ -31,7 +31,7 @@ class UpdateUserRequest extends FormRequest
             'city' => ['required', 'string'],
             'province' => ['required', 'string'],
             'zip' => ['required', 'numeric'],
-            'photo' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
 }

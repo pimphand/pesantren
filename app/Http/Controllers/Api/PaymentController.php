@@ -11,9 +11,12 @@ use Dedoc\Scramble\Attributes\HeaderParameter;
 use Dedoc\Scramble\Attributes\QueryParameter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    const BEARER_TOKEN_HEADER = 'Bearer {token}';
+
     protected object $user;
 
     public function __construct()
@@ -24,8 +27,8 @@ class PaymentController extends Controller
     /**
      * List Payment.
      */
-    #[HeaderParameter('Authorization', 'Bearer {token}')]
-    public function index()//: PaymentResource
+    #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
+    public function index()// : PaymentResource
     {
         $payment = $this->user->payments()->with('recipient', 'bank')->paginate(10)->appends(request()->query());
 
@@ -36,27 +39,32 @@ class PaymentController extends Controller
 
     /**
      * Payment top up
+     *
      * @response array{data: object, message: string}
      */
-    #[HeaderParameter('Authorization', 'Bearer {token}')]
+    #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
     public function store(TopUpRequest $request): JsonResponse
     {
-        $payment = Payment::create(array_merge($request->validated(), [
-                'payment_type' => "Top Up",
-                'user_id' => $this->user->id,
-            ])
-        );
+        return DB::transaction(function () use ($request) {
+            $payment = Payment::create(array_merge($request->validated(), [
+                    'payment_type' => 'Top Up',
+                    'user_id' => $this->user->id,
+                ])
+            );
 
-        if ($request->hasFile('proof_of_payment')) {
-            $payment->paid_at = now();
-            $payment->proof_of_payment = asset('storage/' . $request->file('proof_of_payment')->store('proof-of-payment', 'public'));
-            $payment->save();
-        }
+            if ($request->hasFile('proof_of_payment')) {
+                $payment->paid_at = now();
+                $payment->proof_of_payment = asset('storage/' . $request->file('proof_of_payment')->store('proof-of-payment', 'public'));
+                $payment->save();
+            }
 
-        return response()->json([
-            'message' => 'success',
-            'data' => $payment
-        ]);
+            $this->createLog('Top Up ', 'Top Up ', $payment, $payment->toArray(), 'create');
+
+            return response()->json([
+                'message' => 'success',
+                'data' => $payment,
+            ]);
+        });
     }
 
     /**
@@ -70,7 +78,7 @@ class PaymentController extends Controller
     /**
      * Show Payment.
      */
-    #[HeaderParameter('Authorization', 'Bearer {token}')]
+    #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
     public function show(Request $request, Payment $payment): PaymentResource
     {
         return PaymentResource::make($payment)->additional([
@@ -81,14 +89,17 @@ class PaymentController extends Controller
     /**
      * list bank
      */
-    #[HeaderParameter('Authorization', 'Bearer {token}')]
+    #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
     #[QueryParameter('search', 'Bank name', null)]
     public function banks(Request $request): JsonResponse
     {
-        $banks = Bank::where('name', "ilike", "%$request->search%")->get();
+        $banks = Bank::where('name', 'ilike', "%$request->search%")->get();
+
         return response()->json([
             'message' => 'success',
-            'data' => $banks
+            'data' => $banks,
         ]);
     }
+
+
 }

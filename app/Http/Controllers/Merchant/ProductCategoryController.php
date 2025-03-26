@@ -7,9 +7,7 @@ use App\Http\Requests\StoreProductCategoryRequest;
 use App\Http\Requests\UpdateProductCategoryRequest;
 use App\Http\Resources\ProductCategoryResource;
 use App\Models\ProductCategory;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -20,7 +18,7 @@ class ProductCategoryController extends Controller
      */
     public function index(): View
     {
-        return view('merchant.category',[
+        return view('merchant.category', [
             'title' => 'Category',
         ]);
     }
@@ -38,12 +36,17 @@ class ProductCategoryController extends Controller
      */
     public function store(StoreProductCategoryRequest $request): \Illuminate\Http\JsonResponse
     {
-        ProductCategory::create(array_merge($request->validated(), [
+        $category = ProductCategory::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
         ]));
 
+        $this->createLog('Product', 'Update Product', $category, [
+            'old_data' => null,
+            'new_data' => $category->toArray(),
+        ], 'create');
+
         return response()->json([
-            "message" => "Kategori berhasil ditambahkan"
+            'message' => 'Kategori berhasil ditambahkan',
         ]);
     }
 
@@ -54,16 +57,21 @@ class ProductCategoryController extends Controller
     {
         if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
             return response()->json([
-                'message' => 'Anda tidak memiliki akses ke produk ini'
+                'message' => 'Anda tidak memiliki akses ke produk ini',
             ], 403);
         }
-
+        $oldCategory = $productCategory->getOriginal();
         $productCategory->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
         ]));
 
+        $this->createLog('Product', 'Update Product', $productCategory, [
+            'old_data' => $oldCategory,
+            'new_data' => $productCategory->toArray(),
+        ], 'update');
+
         return response()->json([
-            "message" => "Kategori berhasil diubah"
+            'message' => 'Kategori berhasil diubah',
         ]);
     }
 
@@ -74,12 +82,18 @@ class ProductCategoryController extends Controller
     {
         if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
             return response()->json([
-                'message' => 'Anda tidak memiliki akses ke produk ini'
+                'message' => 'Anda tidak memiliki akses ke produk ini',
             ], 403);
         }
+        $oldCategory = $productCategory->getOriginal();
         $productCategory->delete();
+        $this->createLog('Product', 'Update Product', $productCategory, [
+            'old_data' => $oldCategory,
+            'new_data' => null,
+        ], 'delete');
+
         return response()->json([
-            "message" => "Kategori berhasil dihapus"
+            'message' => 'Kategori berhasil dihapus',
         ]);
     }
 

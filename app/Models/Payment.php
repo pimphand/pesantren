@@ -27,12 +27,13 @@ class Payment extends Model
         'failed_at',
         'note',
         'verified_at',
-        'verified_by'
+        'verified_by',
+        'type'
     ];
 
     public function recipient(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'to_user_id','uuid');
+        return $this->belongsTo(User::class, 'to_user_id', 'uuid');
     }
 
     public function bank(): BelongsTo

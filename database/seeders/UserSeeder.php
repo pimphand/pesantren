@@ -17,8 +17,8 @@ class UserSeeder extends Seeder
             'admin',
             'kepala_ponpes',
             'pengawas',
-            'santri',
             'orang_tua',
+            'santri',
             'merchant',
         ];
 
@@ -29,8 +29,11 @@ class UserSeeder extends Seeder
                 'email' => $user.'@gmail.com',
                 'password' => bcrypt('password'),
             ]);
+
             if ($user === 'santri') {
                 $create->balance = 1000000;
+                $create->parent_id = 5;
+                $create->pin = bcrypt('123456');
                 $create->save();
             }
 

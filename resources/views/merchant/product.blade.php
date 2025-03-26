@@ -72,7 +72,7 @@
         getData()
         let responseData = null;
         function getData(search = "", category = "") {
-            let url = `{{ route('products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -142,7 +142,7 @@
                 $('#_form').trigger('reset');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('products.store') }}');
+                $('#_form').attr('action', '{{ route('merchant.products.store') }}');
             });
 
             $('#photo').on('change', function () {

@@ -1,27 +1,8 @@
+@php
+$merchant = auth()->user()->merchant;
+@endphp
 @extends('layouts.app')
 @section('breadcrumb')
-    <style>
-        .notika-menu-list:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f03a"; /* Ikon daftar (list) dari FontAwesome */
-        }
-
-        .notika-save:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f0c7"; /* Ikon simpan (save) dari FontAwesome */
-        }
-
-        .notika-dot-circle-o:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f192"; /* Ikon dot-circle-o */
-        }
-
-        .justify-between {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-    </style>
     <x-breadcrumb :title="$title"
                   :icon="'notika-menu-list'"
                   :description="'list '.$title.' dan tambah '.$title.''"
@@ -33,6 +14,11 @@
     <div class="inbox-area">
         <div class="container">
             <div class="row">
+                @if($merchant->is_pin)
+                    <div class="col-lg-12 col-md-12 col-xs-12">
+                        <h5>memerlukan PIN untuk transaksi</h5>
+                    </div>
+                @endif
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="inbox-left-sd">
                         <div class="compose-ml">
@@ -47,8 +33,13 @@
                         <hr>
                         <div class="inbox-status">
                             <ul class="inbox-st-nav">
+                                @if($merchant->is_tax)
+                                    <li>
+                                        <span>Pajak ({{$merchant->tax}}%) </span><span class="pull-right _tax"></span>
+                                    </li>
+                                @endif
                                 <li>
-                                    <span>Total Bayar: </span><span class="pull-right _total"></span>
+                                    <span>Total Bayar </span><span class="pull-right _total"></span>
                                 </li>
                             </ul>
                         </div>
@@ -76,7 +67,7 @@
                         <div class="row mt-3" id="_products"></div>
                         <div class="vw-ml-action-ls text-right mg-t-20">
                             <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
-                                <button class="btn btn-default btn-sm waves-effect">
+                                <button class="btn btn-default btn-sm waves-effect" onclick="printLastTransaction()">
                                     <i class="notika-icon notika-print"
                                        aria-hidden="true">
                                     </i> Print Order Terakhir
@@ -107,7 +98,14 @@
                             <h2 class="m-2 text-success">Saldo: <span id="balance" class="font-weight-bold"></span></h2>
                             <h2 class="m-2 text-danger">Total Pembayaran: <span class="_total font-weight-bold"></span></h2>
                         </div>
-
+                        @if($merchant->is_pin)
+                            <div class="form-group">
+                                <label for="pin">PIN:</label>
+                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)" name="pin" min="100000" max="999999" maxlength="6" placeholder="Masukkan PIN 6 Digit" required>
+                                <small class="form-text text-muted">Hanya angka 6 digit yang diperbolehkan.</small> <br>
+                                <code id="pin_error" class="error" style="display: none"></code>
+                            </div>
+                        @endif
                         <button type="button" class="btn btn-danger" id="removeCustomer">Hapus Customer</button>
                     </form>
 
@@ -119,6 +117,7 @@
             </div>
         </div>
     </div>
+    <div id="printData" style="display: none"></div>
 @endsection
 
 @push('js')
@@ -127,11 +126,11 @@
     <script>
         getProducts();
         function getProducts(search = '', category = '') {
-            let url = `{{ route('products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
             form(url, 'get', null, function (response) {
                 $('#_products').empty();
                 response.data.forEach((product) => {
-                    let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12"
+                    let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12 mb-2"
                     data-id="${product.id}"
                     data-price="${product.price}"
                     data-name="${product.name}"
@@ -234,18 +233,22 @@
         function showCart() {
             let cart = getCart();
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            let tax = 0;
+            @if($merchant->is_tax)
+                 tax = total * ({{(int)$merchant->tax}} / 100);
+            @endif
             $('#_item_list').empty();
 
             cart.forEach((item) => {
-                let li = $(`<li></li>`);
+                let li = $(`<li class="mb-2"></li>`);
                 li.append(`<span>${item.name}</span>`);
                 li.append(`<span class="pull-right">Rp. ${currencyFormat(item.price)} x ${item.qty}</span>`);
                 li.append(`<span class=""><a style="color: red" href="javascript:void(0)" onclick="decrementCart('${item.id}')">Hapus</a></span>`);
                 $('#_item_list').append(li);
             });
 
-            $('._total').text(`Rp. ${currencyFormat(total)}`);
-
+            $('._total').text(`Rp. ${currencyFormat(total + tax)}`);
+            $('._tax').text(`Rp. ${currencyFormat(tax)}`);
             updateStockDisplay();
 
             if (cart.length > 0) {
@@ -291,10 +294,13 @@
                     $('#balance').text("Rp. " +currencyFormat(response.data.balance));
                     $('#user_id').val(response.data.id);
                     html5QrcodeScanner.clear();
+                }else {
+                    $('#_form').hide();
+                    toast(error.responseJSON.message, 'error', 'Gagal!');
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                 }
             })
         }
-
         $('#saveTransaction').click(function () {
             let cart = getCart();
             let user_id = $('#user_id').val();
@@ -302,11 +308,14 @@
 
             let formData = new FormData();
             formData.append('user_id', user_id);
+            formData.append('pin', $('#pin').val());
             formData.append('total', total);
             $.each(cart, function (index, item) {
                 formData.append(`items[${index}][product]`, item.id);
                 formData.append(`items[${index}][qty]`, item.qty);
             });
+
+            $('#pin_error').text('').hide();
             form('{{route('merchant.transactions.store')}}', 'post', formData, function (response, error) {
                 if (response) {
                     getToday()
@@ -315,8 +324,12 @@
                     saveCart([]);
                     showCart();
                     getProducts();
+                    $('#_form').hide();
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    //save to local storage
+                    localStorage.setItem('last_transaction', response.data);
                 }else{
+                    $('#pin_error').text(error.responseJSON.message).show();
                     toast(error.responseJSON.message, 'error', 'Gagal!');
                 }
             })
@@ -348,6 +361,34 @@
                 `);
             });
         }
+
+        function validatePin(input) {
+            input.value = input.value.replace(/\D/g, '');
+
+            if (input.value.length > 6) {
+                input.value = input.value.slice(0, 6);
+            }
+        }
+
+        function printLastTransaction() {
+            let lastTransaction = localStorage.getItem('last_transaction');
+            console.log("Last Transaction ID:", lastTransaction); // Debugging
+
+            if (!lastTransaction) {
+                alert("No last transaction found!");
+                return;
+            }
+
+            let url = `{{route('merchant.transactions.printInvoice',':id')}}`.replace(':id', lastTransaction);
+            console.log("Generated URL:", url); // Debugging
+            const print = '#printData'
+            form(url, 'get', null, function (response) {
+                $(print).html(response);
+                $(document).find('#printInvoice').click();
+                $(print).html('');
+            });
+        }
+
     </script>
 @endpush
 
