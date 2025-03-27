@@ -1,11 +1,12 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\StudentController;
-use App\Http\Controllers\Api\PaymentController;
-use App\Http\Controllers\Api\HomeController;
 
-Route::post('login', [AuthController::class, 'login'])->name('api.login')->middleware('throttle:5,1');;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\StudentController;
+use Illuminate\Support\Facades\Route;
+
+Route::post('login', [AuthController::class, 'login'])->name('api.login')->middleware('throttle:5,1');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);

@@ -56,7 +56,7 @@
         let responseData = null;
 
         function getData(search = "", category = "") {
-            let url = `{{ route('categories.data') }}?filter[name]=${search}`;
+            let url = `{{ route('merchant.categories.data') }}?filter[name]=${search}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -120,7 +120,7 @@
                 $('#_form').trigger('reset');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('categories.store') }}');
+                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
             });
 
             $('#photo').on('change', function () {

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Laratrust\Middleware\Role::class,
             'permission' => \Laratrust\Middleware\Permission::class,
             'ability' => \Laratrust\Middleware\Ability::class,
+            'pin' => \App\Http\Middleware\PinMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

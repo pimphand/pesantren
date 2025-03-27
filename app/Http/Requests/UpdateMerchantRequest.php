@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateMerchantRequest extends FormRequest
@@ -11,18 +12,26 @@ class UpdateMerchantRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15|unique:merchants,phone,'.$this->merchant->id,
+            'address' => 'required|string|max:255',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'description' => 'required|string',
+            'category' => 'required|string',
+            'is_pin' => 'nullable',
+            'is_tax' => 'nullable',
+            'tax' => 'required_if:is_tax,1|numeric|min:1|max:100',
         ];
     }
 }

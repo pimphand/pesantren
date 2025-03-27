@@ -45,7 +45,7 @@ class MerchantSeeder extends Seeder
 
         for ($i = 1; $i <= 5; $i++) {
             $order = Order::create([
-                'user_id' => 5,
+                'user_id' => 6,
                 'merchant_id' => $merchant->id,
                 'status' => 'pending',
                 'total' => $product->price,
@@ -62,8 +62,8 @@ class MerchantSeeder extends Seeder
                 'amount' => $product->price,
                 'status' => 'paid',
                 'payment_type' => 'Transaction',
-                'user_id' => 5,
-                'bank_id' => Bank::first()->id,
+                'user_id' => 6,
+                'payment_method' => 'QRCODE',
             ]);
 
             $order->user->balanceHistories()->create([

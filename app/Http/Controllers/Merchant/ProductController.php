@@ -22,9 +22,9 @@ class ProductController extends Controller
      */
     public function index(): Factory|Application|View
     {
-        return view('merchant.product',[
+        return view('merchant.product', [
             'title' => 'Product',
-            'categories' => auth()->user()->merchant->productCategory->select('name', 'id')
+            'categories' => auth()->user()->merchant->productCategory->select('name', 'id'),
         ]);
     }
 
@@ -33,13 +33,18 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): JsonResponse
     {
-        Product::create(array_merge($request->all(), [
+        $product = Product::create(array_merge($request->all(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('products')->store('products/' . auth()->user()->merchant->id, 'public')) : null
+            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('products')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
         ]));
 
+        $this->createLog('Product', 'Update Product', $product, [
+            'old_data' => null,
+            'new_data' => $product->toArray(),
+        ], 'create');
+
         return response()->json([
-            "message" => "Product berhasil ditambahkan"
+            'message' => 'Product berhasil ditambahkan',
         ]);
     }
 
@@ -48,17 +53,23 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $old = $product->getOriginal();
         if ($product->merchant_id !== auth()->user()->merchant->id) {
             return abort('403', 'Anda tidak memiliki akses ke produk ini');
         }
 
         $product->update(array_merge($request->all(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('products/' . auth()->user()->merchant->id, 'public')) : null
+            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
         ]));
 
+        $this->createLog('Product', 'Update Product', $product, [
+            'old_data' => $old,
+            'new_data' => $product->getChanges(),
+        ], 'update');
+
         return response()->json([
-            "message" => "Product berhasil ditambahkan"
+            'message' => 'Product berhasil ditambahkan',
         ]);
     }
 
@@ -67,13 +78,19 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): JsonResponse
     {
+        $old = $product->getOriginal();
         if ($product->merchant_id !== auth()->user()->merchant->id) {
             return abort('403', 'Anda tidak memiliki akses ke produk ini');
         }
 
         $product->delete();
+
+        $this->createLog('Product', 'Delete Product', $product, [
+            'old_data' => $old,
+            'new_data' => null
+        ], 'delete');
         return response()->json([
-            "message" => "Product deleted successfully"
+            'message' => 'Product deleted successfully',
         ]);
     }
 

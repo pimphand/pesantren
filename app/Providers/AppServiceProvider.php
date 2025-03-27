@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //force https
+        // force https
         // URL::forceScheme('https');
 
         Scramble::configure()

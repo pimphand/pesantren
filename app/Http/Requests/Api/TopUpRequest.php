@@ -23,12 +23,14 @@ class TopUpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bank_id' => ['required', 'exists:banks,id','string'],
+            'bank_id' => ['required', 'exists:banks,id', 'string'],
             'amount' => ['required', 'numeric'],
-            'proof_of_payment' => ['nullable','file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'proof_of_payment' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
             'to_user_id' => ['required', 'exists:users,uuid'],
+            'type' => ['nullable', 'string'],
         ];
     }
+
     public function messages(): array
     {
         return [

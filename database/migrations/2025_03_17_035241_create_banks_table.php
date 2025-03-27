@@ -22,7 +22,8 @@ return new class extends Migration
         });
 
         Schema::table('payments', function (Blueprint $table) {
-            $table->uuid('bank_id');
+            $table->uuid('bank_id')->nullable();
+            $table->string('payment_method')->nullable();
         });
     }
 

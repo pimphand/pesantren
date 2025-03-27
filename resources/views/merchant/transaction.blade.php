@@ -1,27 +1,9 @@
+@php
+$merchant = auth()->user()->merchant;
+$columns = ['Date','Invoice','Total','Pembayaran','Action'];
+@endphp
 @extends('layouts.app')
 @section('breadcrumb')
-    <style>
-        .notika-menu-list:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f03a"; /* Ikon daftar (list) dari FontAwesome */
-        }
-
-        .notika-save:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f0c7"; /* Ikon simpan (save) dari FontAwesome */
-        }
-
-        .notika-dot-circle-o:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f192"; /* Ikon dot-circle-o */
-        }
-
-        .justify-between {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-        }
-    </style>
     <x-breadcrumb :title="$title"
                   :icon="'notika-menu-list'"
                   :description="'list '.$title.' dan tambah '.$title.''"
@@ -32,7 +14,15 @@
 @section('content')
     <div class="inbox-area">
         <div class="container">
-            <div class="row">
+            <div class="row" id="show_transaction" style="display: none">
+                <x-table :title="$title" :id="'table_transaction'" :columns="$columns"></x-table>
+            </div>
+            <div class="row" id="form_transaction">
+                @if($merchant->is_pin)
+                    <div class="col-lg-12 col-md-12 col-xs-12">
+                        <h5>memerlukan PIN untuk transaksi</h5>
+                    </div>
+                @endif
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="inbox-left-sd">
                         <div class="compose-ml">
@@ -47,8 +37,13 @@
                         <hr>
                         <div class="inbox-status">
                             <ul class="inbox-st-nav">
+                                @if($merchant->is_tax)
+                                    <li>
+                                        <span>Pajak ({{$merchant->tax}}%) </span><span class="pull-right _tax"></span>
+                                    </li>
+                                @endif
                                 <li>
-                                    <span>Total Bayar: </span><span class="pull-right _total"></span>
+                                    <span>Total Bayar </span><span class="pull-right _total"></span>
                                 </li>
                             </ul>
                         </div>
@@ -76,7 +71,7 @@
                         <div class="row mt-3" id="_products"></div>
                         <div class="vw-ml-action-ls text-right mg-t-20">
                             <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
-                                <button class="btn btn-default btn-sm waves-effect">
+                                <button class="btn btn-default btn-sm waves-effect" onclick="printLastTransaction()">
                                     <i class="notika-icon notika-print"
                                        aria-hidden="true">
                                     </i> Print Order Terakhir
@@ -90,6 +85,7 @@
                 </div>
             </div>
         </div>
+
     </div>
     <div class="modal fade" id="myModalone" data-backdrop="static">
         <div class="modal-dialog modals-default">
@@ -107,7 +103,14 @@
                             <h2 class="m-2 text-success">Saldo: <span id="balance" class="font-weight-bold"></span></h2>
                             <h2 class="m-2 text-danger">Total Pembayaran: <span class="_total font-weight-bold"></span></h2>
                         </div>
-
+                        @if($merchant->is_pin)
+                            <div class="form-group">
+                                <label for="pin">PIN:</label>
+                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)" name="pin" min="100000" max="999999" maxlength="6" placeholder="Masukkan PIN 6 Digit" required>
+                                <small class="form-text text-muted">Hanya angka 6 digit yang diperbolehkan.</small> <br>
+                                <code id="pin_error" class="error" style="display: none"></code>
+                            </div>
+                        @endif
                         <button type="button" class="btn btn-danger" id="removeCustomer">Hapus Customer</button>
                     </form>
 
@@ -119,19 +122,21 @@
             </div>
         </div>
     </div>
+    <div id="printData" style="display: none"></div>
 @endsection
 
 @push('js')
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="{{ asset('assets/js/bootstrap-select/bootstrap-select.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         getProducts();
         function getProducts(search = '', category = '') {
-            let url = `{{ route('products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
             form(url, 'get', null, function (response) {
                 $('#_products').empty();
                 response.data.forEach((product) => {
-                    let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12"
+                    let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12 mb-2"
                     data-id="${product.id}"
                     data-price="${product.price}"
                     data-name="${product.name}"
@@ -176,7 +181,6 @@
             showCart();
         }
 
-        // Tambah produk ke keranjang (create)
         function addToCart(id, name, price) {
             let cart = getCart();
             let product = cart.find(item => item.id === id);
@@ -190,13 +194,11 @@
             saveCart(cart);
         }
 
-        // Hapus produk dari keranjang (delete)
         function removeFromCart(id) {
             let cart = getCart().filter(item => item.id !== id);
             saveCart(cart);
         }
 
-        // Kurangi jumlah produk (-1)
         function decrementCart(id) {
             let cart = getCart();
             let product = cart.find(item => item.id === id);
@@ -212,7 +214,6 @@
             }
         }
 
-        // Perbarui tampilan stok sesuai isi keranjang
         function updateStockDisplay() {
             let cart = getCart();
 
@@ -234,18 +235,22 @@
         function showCart() {
             let cart = getCart();
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            let tax = 0;
+            @if($merchant->is_tax)
+                 tax = total * ({{(int)$merchant->tax}} / 100);
+            @endif
             $('#_item_list').empty();
 
             cart.forEach((item) => {
-                let li = $(`<li></li>`);
+                let li = $(`<li class="mb-2"></li>`);
                 li.append(`<span>${item.name}</span>`);
                 li.append(`<span class="pull-right">Rp. ${currencyFormat(item.price)} x ${item.qty}</span>`);
                 li.append(`<span class=""><a style="color: red" href="javascript:void(0)" onclick="decrementCart('${item.id}')">Hapus</a></span>`);
                 $('#_item_list').append(li);
             });
 
-            $('._total').text(`Rp. ${currencyFormat(total)}`);
-
+            $('._total').text(`Rp. ${currencyFormat(total + tax)}`);
+            $('._tax').text(`Rp. ${currencyFormat(tax)}`);
             updateStockDisplay();
 
             if (cart.length > 0) {
@@ -291,10 +296,13 @@
                     $('#balance').text("Rp. " +currencyFormat(response.data.balance));
                     $('#user_id').val(response.data.id);
                     html5QrcodeScanner.clear();
+                }else {
+                    $('#_form').hide();
+                    toast(error.responseJSON.message, 'error', 'Gagal!');
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                 }
             })
         }
-
         $('#saveTransaction').click(function () {
             let cart = getCart();
             let user_id = $('#user_id').val();
@@ -302,11 +310,14 @@
 
             let formData = new FormData();
             formData.append('user_id', user_id);
+            formData.append('pin', $('#pin').val());
             formData.append('total', total);
             $.each(cart, function (index, item) {
                 formData.append(`items[${index}][product]`, item.id);
                 formData.append(`items[${index}][qty]`, item.qty);
             });
+
+            $('#pin_error').text('').hide();
             form('{{route('merchant.transactions.store')}}', 'post', formData, function (response, error) {
                 if (response) {
                     getToday()
@@ -315,8 +326,12 @@
                     saveCart([]);
                     showCart();
                     getProducts();
+                    $('#_form').hide();
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                    //save to local storage
+                    localStorage.setItem('last_transaction', response.data);
                 }else{
+                    $('#pin_error').text(error.responseJSON.message).show();
                     toast(error.responseJSON.message, 'error', 'Gagal!');
                 }
             })
@@ -348,6 +363,130 @@
                 `);
             });
         }
+
+        function validatePin(input) {
+            input.value = input.value.replace(/\D/g, '');
+
+            if (input.value.length > 6) {
+                input.value = input.value.slice(0, 6);
+            }
+        }
+
+        function printLastTransaction(id = null) {
+            let lastTransaction = localStorage.getItem('last_transaction');
+
+            let url = `{{route('merchant.transactions.printInvoice',':id')}}`.replace(':id', id ?? lastTransaction);
+            console.log("Generated URL:", url); // Debugging
+            const print = '#printData'
+            form(url, 'get', null, function (response) {
+                $(print).html(response);
+                $(document).find('#printInvoice').click();
+                $(print).html('');
+            });
+        }
+
+        // List Transaksi
+        function getData(url) {
+            form(url, 'get', null, function (response) {
+                $('#table_transaction').html('');
+                pagination(response)
+                let lastDate = null;
+                let totals = {};
+
+                response.data.forEach((item) => {
+                    if (!totals[item.date]) {
+                        totals[item.date] = 0;
+                    }
+                    totals[item.date] += item.total;
+                });
+
+                let currentTotal = 0;
+
+                response.data.forEach((item, index, array) => {
+                    let tr = $(`<tr></tr>`);
+
+                    if (lastDate !== item.date) {
+                        tr.append(`<td>${item.date}</td>`);
+                        lastDate = item.date;
+                        currentTotal = totals[item.date];
+                    } else {
+                        tr.append(`<td></td>`);
+                    }
+
+                    tr.append(`<td>${item.invoice_number}</td>`);
+                    tr.append(`<td>Rp. ${currencyFormat(item.total)}</td>`);
+                    tr.append(`<td>${item.payment.method}</td>`);
+                    tr.append(`<td class="text-right">
+                        <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a></td>`);
+                    let table = $('#table_transaction');
+                    table.append(tr);
+
+                    // Cek apakah ini transaksi terakhir untuk tanggal tersebut
+                    let nextItem = array[index + 1];
+                    if (!nextItem || nextItem.date !== item.date) {
+                        let totalRow = $(`<tr style="font-weight: bold; background-color: #f8f9fa;"></tr>`);
+                        totalRow.append(`<td colspan="2" class="text-right">Total:</td>`);
+                        totalRow.append(`<td>Rp. ${currencyFormat(currentTotal)}</td>`);
+                        totalRow.append(`<td colspan="2"></td>`);
+                        table.append(totalRow);
+                    }
+                });
+            });
+        }
+
+        $('._add_button').click(function (e) {
+            $('#show_transaction').toggle();
+            $('#form_transaction').toggle();
+            let urlTransaksi = `{{ route('merchant.transactions.data') }}`;
+            getData(urlTransaksi)
+        })
+        // function exportTableToExcel(filename = 'data_transaksi.xlsx') {
+        //     let table = document.querySelector('.table-striped'); // Ambil tabel
+        //     let wb = XLSX.utils.book_new(); // Buat workbook baru
+        //     let ws = XLSX.utils.table_to_sheet(table); // Konversi tabel ke sheet
+        //
+        //     // Hapus kolom "Action" berdasarkan header
+        //     let range = XLSX.utils.decode_range(ws['!ref']); // Ambil rentang sel
+        //     let actionColIndex = null;
+        //
+        //     // Temukan kolom "Action"
+        //     for (let col = range.s.c; col <= range.e.c; col++) {
+        //         let cellAddress = XLSX.utils.encode_col(col) + "1"; // Baris pertama (header)
+        //         if (ws[cellAddress] && ws[cellAddress].v.toLowerCase() === 'action') {
+        //             actionColIndex = col;
+        //             break;
+        //         }
+        //     }
+        //
+        //     // Jika ditemukan, hapus semua data di kolom "Action"
+        //     if (actionColIndex !== null) {
+        //         for (let row = range.s.r; row <= range.e.r; row++) {
+        //             let cellAddress = XLSX.utils.encode_col(actionColIndex) + XLSX.utils.encode_row(row);
+        //             delete ws[cellAddress]; // Hapus sel
+        //         }
+        //
+        //         // Perbaiki rentang agar kolom tidak muncul di Excel
+        //         if (actionColIndex === range.e.c) {
+        //             range.e.c--; // Kurangi jumlah kolom
+        //         } else {
+        //             for (let col = actionColIndex; col < range.e.c; col++) {
+        //                 for (let row = range.s.r; row <= range.e.r; row++) {
+        //                     let fromCell = XLSX.utils.encode_col(col + 1) + XLSX.utils.encode_row(row);
+        //                     let toCell = XLSX.utils.encode_col(col) + XLSX.utils.encode_row(row);
+        //                     if (ws[fromCell]) {
+        //                         ws[toCell] = ws[fromCell]; // Geser isi kolom ke kiri
+        //                         delete ws[fromCell]; // Hapus kolom lama
+        //                     }
+        //                 }
+        //             }
+        //             range.e.c--; // Kurangi jumlah kolom
+        //         }
+        //         ws['!ref'] = XLSX.utils.encode_range(range); // Perbarui rentang sel
+        //     }
+        //
+        //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1'); // Tambahkan sheet ke workbook
+        //     XLSX.writeFile(wb, filename); // Simpan sebagai file Excel
+        // }
     </script>
 @endpush
 

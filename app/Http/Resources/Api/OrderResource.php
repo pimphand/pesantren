@@ -15,8 +15,8 @@ class OrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'merchant' => $this->merchant->name ?? "Merchant Terhapus",
-            'merchant_category' => $this->merchant->category ?? "Merchant Terhapus",
+            'merchant' => $this->merchant->name ?? 'Merchant Terhapus',
+            'merchant_category' => $this->merchant->category ?? 'Merchant Terhapus',
             'total' => $this->total,
             'invoice_number' => $this->invoice_number,
             'items' => OrderItemResource::collection($this->orderItems),

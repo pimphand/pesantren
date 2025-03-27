@@ -6,23 +6,32 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Http\Resources\OrderResource;
+use App\Models\Merchant;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class TransactionController extends Controller
 {
+
+    protected mixed $merchant;
+
+    public function __construct() {
+        $this->merchant = auth()->user()->merchant;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View
     {
         return view('merchant.transaction', [
-            'title' => "Transaksi",
-            'categories' => auth()->user()->merchant->productCategory->select('name', 'id')
+            'title' => 'Transaksi',
+            'categories' => $this->merchant->productCategory->select('name', 'id'),
         ]);
     }
 
@@ -33,52 +42,101 @@ class TransactionController extends Controller
     {
         return DB::transaction(function () use ($request) {
             $user = User::where('uuid', $request->user_id)->first();
+
+            if ($this->merchant->is_pin) {
+                if (empty($request->pin)) {
+                    return response()->json([
+                        'message' => 'PIN diperlukan',
+                        'pin' => true,
+                    ], 422);
+                }
+                if (! Hash::check($request->pin, auth()->user()->pin)) {
+                    return response()->json([
+                        'message' => 'PIN yang anda masukkan salah',
+                        'pin' => true,
+                    ], 422);
+                }
+            }
+
+            $taxRate = $this->merchant->is_tax ? ($this->merchant->tax / 100) : 0;
+
             $order = $user->orders()->create([
                 'user_id' => $user->id,
-                'merchant_id' => auth()->user()->merchant->id,
+                'merchant_id' => $this->merchant->id,
                 'invoice_number' => 'INV/' . time(),
                 'status' => 'success',
                 'payment_status' => 'success',
             ]);
+
             $total = 0;
             foreach ($request->items as $item) {
-                $product = Product::find($item['product']);
+                $product = Product::findOrFail($item['product']);
+                $oldStock = $product->stock;
+
                 $order->orderItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $item['qty'],
                     'price' => $product->price,
                 ]);
 
-                $total += $item['qty'] * $product->price;
+                $total += ($item['qty'] * $product->price);
 
                 $product->update([
-                    'stock' => $product->stock - $item['qty']
+                    'stock' => $oldStock - $item['qty'],
                 ]);
+
+                $this->createLog('Product', "Update Stock Dari transaksi $order->invoice_number", $product, [
+                    'stock' => $oldStock,
+                    'new_stock' => $oldStock - $item['qty'],
+                ], 'update');
             }
-            $order->update([
-                'total' => $total
-            ]);
 
-            $user->balanceHistories()->create([
-                'type' => 'transaction',
-                'amount' => $user->balance- $total,
-                'balance' => $user->balance,
-                'debit' => $total,
-                'reference_type' => Order::class,
-                'reference_id' => $order->id,
-                'description' => 'Pembayaran transaksi ' . $order->invoice_number
-            ]);
+            $total_tax = $total * $taxRate;
+            $grandTotal = $total + $total_tax;
 
-            if ($user->balance < $total){
+            if ($user->balance < $grandTotal) {
                 abort(403, 'Saldo tidak mencukupi');
             }
 
-            $user->update([
-                'balance' => $user->balance - $total
+            $order->update([
+                'total' => $grandTotal,
+                'tax' => $total_tax,
             ]);
 
+            $this->createLog('Transaksi', 'Transaksi berhasil', $order, $order->toArray(), 'create');
+
+            $mutation = $user->balanceHistories()->create([
+                'type' => 'transaction',
+                'balance' => $user->balance,
+                'debit' => $grandTotal,
+                'amount' => $user->balance - $grandTotal,
+                'reference_type' => Order::class,
+                'reference_id' => $order->id,
+                'description' => 'Pembayaran transaksi ' . $order->invoice_number,
+            ]);
+
+            $this->createLog('Mutasi', 'Pembayaran transaksi ' . $order->invoice_number, $mutation, $mutation->toArray(), 'create');
+
+            $user->update([
+                'balance' => $user->balance - $grandTotal,
+            ]);
+
+            $order->payment()->create([
+                'amount' => $grandTotal,
+                'status' => 'paid',
+                'payment_type' => 'Transaction',
+                'user_id' => $user->id,
+                'payment_method' => 'QRCODE',
+            ]);
+
+            $this->createLog('User', 'Pengurangan Saldo dari Transaksi ' . $order->invoice_number, $user, [
+                'saldo_awal' => $user->balance + $grandTotal,
+                'saldo_akhir' => $user->balance,
+            ], 'update');
+
             return response()->json([
-                'message' => 'Transaksi berhasil'
+                'message' => 'Transaksi berhasil',
+                'data' => $order->id,
             ]);
         });
     }
@@ -88,7 +146,7 @@ class TransactionController extends Controller
      */
     public function show(string $id)
     {
-        //
+
     }
 
     /**
@@ -113,40 +171,53 @@ class TransactionController extends Controller
     public function qrCode($id): \Illuminate\Http\JsonResponse
     {
         $user = User::where('uuid', $id)->first();
+        if (! $user) {
+            return response()->json([
+                'message' => 'User tidak ditemukan',
+            ], 404);
+        }
         return response()->json([
             'data' => [
                 'id' => $user->uuid,
                 'name' => $user->name,
                 'balance' => $user->balance,
-            ]
+            ],
         ]);
     }
 
     /**
      * get data for datatable
      */
-    public function data(Request $request)
+    public function data(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|array
     {
         $orders = QueryBuilder::for(Order::class)
-            ->where('merchant_id', auth()->user()->merchant->id)
+            ->where('merchant_id', $this->merchant->id)
             ->allowedFilters([
                 'invoice_number',
                 'status',
                 'payment_status',
                 'created_at',
                 'updated_at',
-            ]);
-        if ($request->create){
-
+            ])->orderBy('created_at', 'desc');
+        if ($request->create) {
             return [
-                'total_order'=>$orders->whereBetween('created_at',[now()->startOfDay(),now()->endOfDay()])->count(),
-                'total_amount'=>$orders->whereBetween('created_at',[now()->startOfDay(),now()->endOfDay()])->sum('total')
+                'total_order' => $orders->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])->count(),
+                'total_amount' => $orders->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])->sum('total'),
             ];
         }
 
-        $data= $orders->paginate(10)
+        $data = $orders->paginate($request->per_page ?? 10)
             ->appends($request->all());
-
         return OrderResource::collection($data);
+    }
+
+    /**
+     * print invoice
+     */
+    public function printInvoice(Order $order): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View
+    {
+        return view('merchant.invoice', [
+            'order' => $order->load('orderItems.product'),
+        ]);
     }
 }

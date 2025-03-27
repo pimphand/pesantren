@@ -1,5 +1,5 @@
 <?php
-
+const CRUD = 'c,r,u,d';
 return [
     /**
      * Control if the seeder should create a user per role while seeding the data.
@@ -13,16 +13,16 @@ return [
 
     'roles_structure' => [
         'developer' => [
-            'users' => 'c,r,u,d',
-            'roles' => 'c,r,u,d',
-            'permissions' => 'c,r,u,d',
+            'users' => CRUD,
+            'roles' => CRUD,
+            'permissions' => CRUD,
         ],
         'pengawas' => [
 
         ],
         'orang_tua' => [
-            'santri' => 'c,r,u,d',
-            'mutasi' => 'r','p',
+            'santri' => CRUD,
+            'mutasi' => 'r,p',
             'pembayaran' => 'c,r',
         ],
         'santri' => [
@@ -32,14 +32,15 @@ return [
             'pembayaran' => 'r,re',
         ],
         'admin' => [
-            'users' => 'c,r,u,d',
-            'roles' => 'c,r,u,d',
-            'permissions' => 'c,r,u,d',
+            'users' => CRUD,
+            'roles' => CRUD,
+            'permissions' => CRUD,
         ],
         'merchant' => [
-            'product' => 'c,r,u,d',
-            'product_category' => 'c,r,u,d',
-            'transaction' => 'c,r,u,d',
+            'product' => CRUD,
+            'product_category' => CRUD,
+            'transaction' => 'c,r,u,d,p',
+            'merchant' => 'r,u',
         ],
     ],
 

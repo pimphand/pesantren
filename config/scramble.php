@@ -80,8 +80,7 @@ return [
      * ```
      */
     'servers' => [
-        'Local' => 'api',
-        'Prod' => env('APP_URL') . '/api',
+        'Dev' => env('APP_URL').'/api',
     ],
 
     'middleware' => [

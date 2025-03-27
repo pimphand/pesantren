@@ -8,6 +8,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransactionHistory extends Model
 {
-    //
     use HasUuids, SoftDeletes;
 }

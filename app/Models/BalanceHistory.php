@@ -10,7 +10,17 @@ class BalanceHistory extends Model
 {
     use HasUuids, SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'balance',
+        'amount',
+        'type',
+        'debit',
+        'credit',
+        'reference_id',
+        'reference_type',
+        'description',
+    ];
 
     protected $hidden = [
         'deleted_at',
@@ -27,8 +37,9 @@ class BalanceHistory extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
     public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Order::class,'reference_id','id');
+        return $this->belongsTo(Order::class, 'reference_id', 'id');
     }
 }
