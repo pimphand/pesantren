@@ -1,6 +1,6 @@
 @php
 $merchant = auth()->user()->merchant;
-$columns = ['Date','Invoice','Total','Pembayaran','Action'];
+$columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
 @endphp
 @extends('layouts.app')
 @section('breadcrumb')
@@ -414,6 +414,7 @@ $columns = ['Date','Invoice','Total','Pembayaran','Action'];
                     }
 
                     tr.append(`<td>${item.invoice_number}</td>`);
+                    tr.append(`<td>${item.customer.name}</td>`);
                     tr.append(`<td>Rp. ${currencyFormat(item.total)}</td>`);
                     tr.append(`<td>${item.payment.method}</td>`);
                     tr.append(`<td class="text-right">
@@ -425,7 +426,7 @@ $columns = ['Date','Invoice','Total','Pembayaran','Action'];
                     let nextItem = array[index + 1];
                     if (!nextItem || nextItem.date !== item.date) {
                         let totalRow = $(`<tr style="font-weight: bold; background-color: #f8f9fa;"></tr>`);
-                        totalRow.append(`<td colspan="2" class="text-right">Total:</td>`);
+                        totalRow.append(`<td colspan="3" class="text-right">Total:</td>`);
                         totalRow.append(`<td>Rp. ${currencyFormat(currentTotal)}</td>`);
                         totalRow.append(`<td colspan="2"></td>`);
                         table.append(totalRow);
@@ -440,53 +441,25 @@ $columns = ['Date','Invoice','Total','Pembayaran','Action'];
             let urlTransaksi = `{{ route('merchant.transactions.data') }}`;
             getData(urlTransaksi)
         })
-        // function exportTableToExcel(filename = 'data_transaksi.xlsx') {
-        //     let table = document.querySelector('.table-striped'); // Ambil tabel
-        //     let wb = XLSX.utils.book_new(); // Buat workbook baru
-        //     let ws = XLSX.utils.table_to_sheet(table); // Konversi tabel ke sheet
-        //
-        //     // Hapus kolom "Action" berdasarkan header
-        //     let range = XLSX.utils.decode_range(ws['!ref']); // Ambil rentang sel
-        //     let actionColIndex = null;
-        //
-        //     // Temukan kolom "Action"
-        //     for (let col = range.s.c; col <= range.e.c; col++) {
-        //         let cellAddress = XLSX.utils.encode_col(col) + "1"; // Baris pertama (header)
-        //         if (ws[cellAddress] && ws[cellAddress].v.toLowerCase() === 'action') {
-        //             actionColIndex = col;
-        //             break;
-        //         }
-        //     }
-        //
-        //     // Jika ditemukan, hapus semua data di kolom "Action"
-        //     if (actionColIndex !== null) {
-        //         for (let row = range.s.r; row <= range.e.r; row++) {
-        //             let cellAddress = XLSX.utils.encode_col(actionColIndex) + XLSX.utils.encode_row(row);
-        //             delete ws[cellAddress]; // Hapus sel
-        //         }
-        //
-        //         // Perbaiki rentang agar kolom tidak muncul di Excel
-        //         if (actionColIndex === range.e.c) {
-        //             range.e.c--; // Kurangi jumlah kolom
-        //         } else {
-        //             for (let col = actionColIndex; col < range.e.c; col++) {
-        //                 for (let row = range.s.r; row <= range.e.r; row++) {
-        //                     let fromCell = XLSX.utils.encode_col(col + 1) + XLSX.utils.encode_row(row);
-        //                     let toCell = XLSX.utils.encode_col(col) + XLSX.utils.encode_row(row);
-        //                     if (ws[fromCell]) {
-        //                         ws[toCell] = ws[fromCell]; // Geser isi kolom ke kiri
-        //                         delete ws[fromCell]; // Hapus kolom lama
-        //                     }
-        //                 }
-        //             }
-        //             range.e.c--; // Kurangi jumlah kolom
-        //         }
-        //         ws['!ref'] = XLSX.utils.encode_range(range); // Perbarui rentang sel
-        //     }
-        //
-        //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1'); // Tambahkan sheet ke workbook
-        //     XLSX.writeFile(wb, filename); // Simpan sebagai file Excel
-        // }
+
+        // search
+        $(document).ready(function () {
+            $("#search_form").append(`
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                        <div class="form-example-int form-example-st">
+                            <div class="form-group">
+                                <div class="nk-int-st">
+                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `);
+        });
+        //End List Transaksi
     </script>
 @endpush
 
