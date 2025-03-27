@@ -67,16 +67,24 @@ class StudentController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $this->user->password,
         ]);
 
-        if ($request->hasFile('photo')) {
-            if ($this->user->parentDetail && $this->user->parentDetail->photo) {
-                $photoPath = str_replace(asset('storage/'), '', $this->user->parentDetail->photo);
-                $fullPath = public_path('storage/' . $photoPath);
-                if (File::exists($fullPath)) {
-                    File::delete($fullPath);
-                }
+        $path ="storage/";
+        if ($request->hasFile('photo') && $this->user->parentDetail && $this->user->parentDetail->photo) {
+            $photoPath = str_replace(asset($path), '', $this->user->parentDetail->photo);
+            $fullPath = public_path($path . $photoPath);
+            if (File::exists($fullPath)) {
+                File::delete($fullPath);
             }
         }
+
         $oldParent = $this->user->parentDetail->getOriginal();
+        $photoPath = null;
+
+        if ($request->hasFile('photo')) {
+            $photoPath = asset($path . $request->file('photo')->store('parent-student', 'public'));
+        } elseif ($this->user->parentDetail) {
+            $photoPath = $this->user->parentDetail->photo;
+        }
+
         $parent = $this->user->parentDetail()->updateOrCreate(
             ['user_id' => $this->user->id], // Condition to find the record
             [
@@ -84,11 +92,10 @@ class StudentController extends Controller
                 'city' => $request->city,
                 'state' => $request->province,
                 'zip' => $request->zip,
-                'photo' => $request->hasFile('photo')
-                    ? asset('storage/' . $request->file('photo')->store('parent-student', 'public'))
-                    : ($this->user->parentDetail ? $this->user->parentDetail->photo : null), // Retains existing photo
+                'photo' => $photoPath, // Using extracted variable
             ]
         );
+
 
         if ($user->getChanges()) {
             foreach ($user->getChanges() as $key => $value) {

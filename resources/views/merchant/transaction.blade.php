@@ -1,5 +1,6 @@
 @php
 $merchant = auth()->user()->merchant;
+$columns = ['Date','Invoice','Total','Pembayaran','Action'];
 @endphp
 @extends('layouts.app')
 @section('breadcrumb')
@@ -13,7 +14,10 @@ $merchant = auth()->user()->merchant;
 @section('content')
     <div class="inbox-area">
         <div class="container">
-            <div class="row">
+            <div class="row" id="show_transaction" style="display: none">
+                <x-table :title="$title" :id="'table_transaction'" :columns="$columns"></x-table>
+            </div>
+            <div class="row" id="form_transaction">
                 @if($merchant->is_pin)
                     <div class="col-lg-12 col-md-12 col-xs-12">
                         <h5>memerlukan PIN untuk transaksi</h5>
@@ -81,6 +85,7 @@ $merchant = auth()->user()->merchant;
                 </div>
             </div>
         </div>
+
     </div>
     <div class="modal fade" id="myModalone" data-backdrop="static">
         <div class="modal-dialog modals-default">
@@ -123,6 +128,7 @@ $merchant = auth()->user()->merchant;
 @push('js')
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="{{ asset('assets/js/bootstrap-select/bootstrap-select.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         getProducts();
         function getProducts(search = '', category = '') {
@@ -175,7 +181,6 @@ $merchant = auth()->user()->merchant;
             showCart();
         }
 
-        // Tambah produk ke keranjang (create)
         function addToCart(id, name, price) {
             let cart = getCart();
             let product = cart.find(item => item.id === id);
@@ -189,13 +194,11 @@ $merchant = auth()->user()->merchant;
             saveCart(cart);
         }
 
-        // Hapus produk dari keranjang (delete)
         function removeFromCart(id) {
             let cart = getCart().filter(item => item.id !== id);
             saveCart(cart);
         }
 
-        // Kurangi jumlah produk (-1)
         function decrementCart(id) {
             let cart = getCart();
             let product = cart.find(item => item.id === id);
@@ -211,7 +214,6 @@ $merchant = auth()->user()->merchant;
             }
         }
 
-        // Perbarui tampilan stok sesuai isi keranjang
         function updateStockDisplay() {
             let cart = getCart();
 
@@ -370,16 +372,10 @@ $merchant = auth()->user()->merchant;
             }
         }
 
-        function printLastTransaction() {
+        function printLastTransaction(id = null) {
             let lastTransaction = localStorage.getItem('last_transaction');
-            console.log("Last Transaction ID:", lastTransaction); // Debugging
 
-            if (!lastTransaction) {
-                alert("No last transaction found!");
-                return;
-            }
-
-            let url = `{{route('merchant.transactions.printInvoice',':id')}}`.replace(':id', lastTransaction);
+            let url = `{{route('merchant.transactions.printInvoice',':id')}}`.replace(':id', id ?? lastTransaction);
             console.log("Generated URL:", url); // Debugging
             const print = '#printData'
             form(url, 'get', null, function (response) {
@@ -389,6 +385,108 @@ $merchant = auth()->user()->merchant;
             });
         }
 
+        // List Transaksi
+        function getData(url) {
+            form(url, 'get', null, function (response) {
+                $('#table_transaction').html('');
+                pagination(response)
+                let lastDate = null;
+                let totals = {};
+
+                response.data.forEach((item) => {
+                    if (!totals[item.date]) {
+                        totals[item.date] = 0;
+                    }
+                    totals[item.date] += item.total;
+                });
+
+                let currentTotal = 0;
+
+                response.data.forEach((item, index, array) => {
+                    let tr = $(`<tr></tr>`);
+
+                    if (lastDate !== item.date) {
+                        tr.append(`<td>${item.date}</td>`);
+                        lastDate = item.date;
+                        currentTotal = totals[item.date];
+                    } else {
+                        tr.append(`<td></td>`);
+                    }
+
+                    tr.append(`<td>${item.invoice_number}</td>`);
+                    tr.append(`<td>Rp. ${currencyFormat(item.total)}</td>`);
+                    tr.append(`<td>${item.payment.method}</td>`);
+                    tr.append(`<td class="text-right">
+                        <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a></td>`);
+                    let table = $('#table_transaction');
+                    table.append(tr);
+
+                    // Cek apakah ini transaksi terakhir untuk tanggal tersebut
+                    let nextItem = array[index + 1];
+                    if (!nextItem || nextItem.date !== item.date) {
+                        let totalRow = $(`<tr style="font-weight: bold; background-color: #f8f9fa;"></tr>`);
+                        totalRow.append(`<td colspan="2" class="text-right">Total:</td>`);
+                        totalRow.append(`<td>Rp. ${currencyFormat(currentTotal)}</td>`);
+                        totalRow.append(`<td colspan="2"></td>`);
+                        table.append(totalRow);
+                    }
+                });
+            });
+        }
+
+        $('._add_button').click(function (e) {
+            $('#show_transaction').toggle();
+            $('#form_transaction').toggle();
+            let urlTransaksi = `{{ route('merchant.transactions.data') }}`;
+            getData(urlTransaksi)
+        })
+        // function exportTableToExcel(filename = 'data_transaksi.xlsx') {
+        //     let table = document.querySelector('.table-striped'); // Ambil tabel
+        //     let wb = XLSX.utils.book_new(); // Buat workbook baru
+        //     let ws = XLSX.utils.table_to_sheet(table); // Konversi tabel ke sheet
+        //
+        //     // Hapus kolom "Action" berdasarkan header
+        //     let range = XLSX.utils.decode_range(ws['!ref']); // Ambil rentang sel
+        //     let actionColIndex = null;
+        //
+        //     // Temukan kolom "Action"
+        //     for (let col = range.s.c; col <= range.e.c; col++) {
+        //         let cellAddress = XLSX.utils.encode_col(col) + "1"; // Baris pertama (header)
+        //         if (ws[cellAddress] && ws[cellAddress].v.toLowerCase() === 'action') {
+        //             actionColIndex = col;
+        //             break;
+        //         }
+        //     }
+        //
+        //     // Jika ditemukan, hapus semua data di kolom "Action"
+        //     if (actionColIndex !== null) {
+        //         for (let row = range.s.r; row <= range.e.r; row++) {
+        //             let cellAddress = XLSX.utils.encode_col(actionColIndex) + XLSX.utils.encode_row(row);
+        //             delete ws[cellAddress]; // Hapus sel
+        //         }
+        //
+        //         // Perbaiki rentang agar kolom tidak muncul di Excel
+        //         if (actionColIndex === range.e.c) {
+        //             range.e.c--; // Kurangi jumlah kolom
+        //         } else {
+        //             for (let col = actionColIndex; col < range.e.c; col++) {
+        //                 for (let row = range.s.r; row <= range.e.r; row++) {
+        //                     let fromCell = XLSX.utils.encode_col(col + 1) + XLSX.utils.encode_row(row);
+        //                     let toCell = XLSX.utils.encode_col(col) + XLSX.utils.encode_row(row);
+        //                     if (ws[fromCell]) {
+        //                         ws[toCell] = ws[fromCell]; // Geser isi kolom ke kiri
+        //                         delete ws[fromCell]; // Hapus kolom lama
+        //                     }
+        //                 }
+        //             }
+        //             range.e.c--; // Kurangi jumlah kolom
+        //         }
+        //         ws['!ref'] = XLSX.utils.encode_range(range); // Perbarui rentang sel
+        //     }
+        //
+        //     XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1'); // Tambahkan sheet ke workbook
+        //     XLSX.writeFile(wb, filename); // Simpan sebagai file Excel
+        // }
     </script>
 @endpush
 

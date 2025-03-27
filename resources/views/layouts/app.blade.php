@@ -208,7 +208,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
 <script>
     function pagination(response) {
-        $("#pagination").empty();
+        let pagination = $('#pagination');
+       pagination.empty();
         let ul = $("<ul class='pagination'></ul>");
 
         response.meta.links.forEach(link => {
@@ -226,7 +227,7 @@
             a.on("click", function (e) {
                 e.preventDefault();
                 if (link.url) {
-                    fetchData(link.url);
+                    getData(link.url);
                 }
             });
 
@@ -234,7 +235,7 @@
             ul.append(li);
         });
 
-        $("#pagination").append(ul);
+       pagination.append(ul);
     }
 
     function form(url, method, data, callback) {

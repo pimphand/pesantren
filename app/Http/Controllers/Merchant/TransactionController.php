@@ -188,7 +188,7 @@ class TransactionController extends Controller
     /**
      * get data for datatable
      */
-    public function data(Request $request)
+    public function data(Request $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection|array
     {
         $orders = QueryBuilder::for(Order::class)
             ->where('merchant_id', $this->merchant->id)
@@ -198,18 +198,16 @@ class TransactionController extends Controller
                 'payment_status',
                 'created_at',
                 'updated_at',
-            ]);
+            ])->orderBy('created_at', 'desc');
         if ($request->create) {
-
             return [
                 'total_order' => $orders->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])->count(),
                 'total_amount' => $orders->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])->sum('total'),
             ];
         }
 
-        $data = $orders->paginate(10)
+        $data = $orders->paginate($request->per_page ?? 10)
             ->appends($request->all());
-
         return OrderResource::collection($data);
     }
 

@@ -40,7 +40,7 @@ class ProductCategoryController extends Controller
             'merchant_id' => auth()->user()->merchant->id,
         ]));
 
-        $this->createLog('Product', 'Update Product', $category, [
+        $this->createLog('Product', 'Create Product', $category, [
             'old_data' => null,
             'new_data' => $category->toArray(),
         ], 'create');
@@ -87,7 +87,7 @@ class ProductCategoryController extends Controller
         }
         $oldCategory = $productCategory->getOriginal();
         $productCategory->delete();
-        $this->createLog('Product', 'Update Product', $productCategory, [
+        $this->createLog('Product', 'Delete Product', $productCategory, [
             'old_data' => $oldCategory,
             'new_data' => null,
         ], 'delete');
