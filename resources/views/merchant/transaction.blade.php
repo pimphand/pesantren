@@ -1,6 +1,6 @@
 @php
-$merchant = auth()->user()->merchant;
-$columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
+    $merchant = auth()->user()->merchant;
+    $columns = ['Date','Invoice','Customer','Total','Item','Pembayaran','Action'];
 @endphp
 @extends('layouts.app')
 @section('breadcrumb')
@@ -101,12 +101,15 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
                         <div class="info-box p-5 rounded shadow-sm">
                             <h2 class="m-2 text-primary">Nama: <span id="name" class="font-weight-bold"></span></h2>
                             <h2 class="m-2 text-success">Saldo: <span id="balance" class="font-weight-bold"></span></h2>
-                            <h2 class="m-2 text-danger">Total Pembayaran: <span class="_total font-weight-bold"></span></h2>
+                            <h2 class="m-2 text-danger">Total Pembayaran: <span class="_total font-weight-bold"></span>
+                            </h2>
                         </div>
                         @if($merchant->is_pin)
                             <div class="form-group">
                                 <label for="pin">PIN:</label>
-                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)" name="pin" min="100000" max="999999" maxlength="6" placeholder="Masukkan PIN 6 Digit" required>
+                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)"
+                                       name="pin" min="100000" max="999999" maxlength="6"
+                                       placeholder="Masukkan PIN 6 Digit" required>
                                 <small class="form-text text-muted">Hanya angka 6 digit yang diperbolehkan.</small> <br>
                                 <code id="pin_error" class="error" style="display: none"></code>
                             </div>
@@ -131,6 +134,7 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         getProducts();
+
         function getProducts(search = '', category = '') {
             let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
             form(url, 'get', null, function (response) {
@@ -237,7 +241,7 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
             let tax = 0;
             @if($merchant->is_tax)
-                 tax = total * ({{(int)$merchant->tax}} / 100);
+                tax = total * ({{(int)$merchant->tax}} / 100);
             @endif
             $('#_item_list').empty();
 
@@ -293,16 +297,17 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
                 if (response) {
                     $('#_form').show();
                     $('#name').text(response.data.name);
-                    $('#balance').text("Rp. " +currencyFormat(response.data.balance));
+                    $('#balance').text("Rp. " + currencyFormat(response.data.balance));
                     $('#user_id').val(response.data.id);
                     html5QrcodeScanner.clear();
-                }else {
+                } else {
                     $('#_form').hide();
                     toast(error.responseJSON.message, 'error', 'Gagal!');
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                 }
             })
         }
+
         $('#saveTransaction').click(function () {
             let cart = getCart();
             let user_id = $('#user_id').val();
@@ -330,7 +335,7 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                     //save to local storage
                     localStorage.setItem('last_transaction', response.data);
-                }else{
+                } else {
                     $('#pin_error').text(error.responseJSON.message).show();
                     toast(error.responseJSON.message, 'error', 'Gagal!');
                 }
@@ -353,6 +358,7 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
             getProducts($('#search').val(), $(this).val());
         });
         getToday()
+
         function getToday() {
             let urlCreate = `{{route('merchant.transactions.data')}}?create=1`;
             $('_show_order_today').html('');
@@ -389,7 +395,7 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
         function getData(url) {
             form(url, 'get', null, function (response) {
                 $('#table_transaction').html('');
-                pagination(response)
+                pagination(response);
                 let lastDate = null;
                 let totals = {};
 
@@ -401,7 +407,6 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
                 });
 
                 let currentTotal = 0;
-
                 response.data.forEach((item, index, array) => {
                     let tr = $(`<tr></tr>`);
 
@@ -416,31 +421,90 @@ $columns = ['Date','Invoice','Customer','Total','Pembayaran','Action'];
                     tr.append(`<td>${item.invoice_number}</td>`);
                     tr.append(`<td>${item.customer.name}</td>`);
                     tr.append(`<td>Rp. ${currencyFormat(item.total)}</td>`);
+                    tr.append(`<td class="${item.id}"></td>`);
                     tr.append(`<td>${item.payment.method}</td>`);
                     tr.append(`<td class="text-right">
-                        <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a></td>`);
+                <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a>
+            </td>`);
+
+                    let quantity = 0;
                     let table = $('#table_transaction');
                     table.append(tr);
 
+                    // Tambahkan baris tersembunyi untuk menampilkan detail item dalam tabel
+                    let itemRow = $(`<tr class="item-row" id="items-${item.id}" style="display: none;"></tr>`);
+                    let itemDetails = `<td colspan="7">
+                                <strong>Detail Items: ${item.invoice_number}</strong>
+                                <table class="table table-bordered mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Item</th>
+                                            <th>Harga</th>
+                                            <th>Jumlah</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+                    item.items.forEach((itm) => {
+                        quantity+=itm.quantity;
+                        itemDetails += `<tr>
+                                    <td>${itm.name}</td>
+                                    <td>Rp. ${currencyFormat(itm.price)}</td>
+                                    <td>${itm.quantity}</td>
+                                    <td>Rp. ${currencyFormat(itm.price * itm.quantity)}</td>
+                                </tr>`;
+                        if(item.tax){
+                            itemDetails += `<tr>
+                                    <td>Pajak </td>
+                                    <td>Rp. ${currencyFormat(item.tax)}</td>
+                                    <td>1</td>
+                                    <td>Rp. ${currencyFormat(item.tax)}</td>
+                                </tr>`;
+                        }
+                    });
+                    itemDetails += `</tbody>
+                                </table>
+                            </td>`;
+                    itemRow.append(itemDetails);
+                    table.append(itemRow);
+                    $('.' + item.id).html(`<button class="btn btn-success notika-btn-success waves-effect item-btn" data-id="${item.id}">${quantity} Item</button>`);
                     // Cek apakah ini transaksi terakhir untuk tanggal tersebut
                     let nextItem = array[index + 1];
                     if (!nextItem || nextItem.date !== item.date) {
                         let totalRow = $(`<tr style="font-weight: bold; background-color: #f8f9fa;"></tr>`);
                         totalRow.append(`<td colspan="3" class="text-right">Total:</td>`);
                         totalRow.append(`<td>Rp. ${currencyFormat(currentTotal)}</td>`);
-                        totalRow.append(`<td colspan="2"></td>`);
+                        totalRow.append(`<td colspan="3"></td>`);
                         table.append(totalRow);
                     }
                 });
+
+                // Tambahkan event listener untuk tombol item
+                $('.item-btn').on('click', function () {
+                    let itemId = $(this).data('id');
+
+                    // Tutup semua detail item sebelum membuka yang baru
+                    $('.item-row').hide();
+
+                    // Toggle hanya untuk item yang diklik
+                    $(`#items-${itemId}`).toggle();
+                });
+
             });
         }
 
+
         $('._add_button').click(function (e) {
-            $('#show_transaction').toggle();
-            $('#form_transaction').toggle();
             let urlTransaksi = `{{ route('merchant.transactions.data') }}`;
-            getData(urlTransaksi)
-        })
+
+            // Jika #show_transaction sedang tersembunyi (akan ditampilkan), maka load data
+            if ($('#show_transaction').is(':hidden')) {
+                getData(urlTransaksi);
+            }
+
+            $('#show_transaction, #form_transaction').toggle();
+        });
+
 
         // search
         $(document).ready(function () {
