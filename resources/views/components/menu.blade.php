@@ -13,6 +13,15 @@
                         <li><a href="{{route('merchant.transactions.index')}}"><i
                                     class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
                         <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
+                    @elseif(auth()->user()->hasRole('developer'))
+                        <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
+                        <li><a href="{{route('developer.merchant.index')}}"><i class="fa-solid fa-layer-group"></i> Merchant</a>
+                        </li>
+                        <li><a href="{{route('merchant.products.index')}}"><i class="fa-brands fa-product-hunt"></i> Santri</a>
+                        </li>
+                        <li><a href="{{route('merchant.transactions.index')}}"><i
+                                    class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
+                        <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
                     @else
                         <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
                         <li><a data-toggle="tab" href="#pengguna"><i class="notika-icon notika-support"></i>

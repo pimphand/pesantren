@@ -33,7 +33,7 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): JsonResponse
     {
-        $product = Product::create(array_merge($request->all(), [
+        $product = Product::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
             'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('products')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
         ]));
@@ -58,7 +58,7 @@ class ProductController extends Controller
             return abort('403', 'Anda tidak memiliki akses ke produk ini');
         }
 
-        $product->update(array_merge($request->all(), [
+        $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
             'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
         ]));
