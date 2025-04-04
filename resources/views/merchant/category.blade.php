@@ -77,7 +77,7 @@
                 let actionTd = $("<td class='text-right'></td>");
 
                 actionTd.append(`<button class="btn btn-info edit" data-id="${product.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/categories/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -182,10 +182,11 @@
         $(document).on('click', '.edit', function (e) {
             e.preventDefault();
             let id = $(this).data('id');
+            console.log(id);
             let data = responseData.find((item) => item.id == id);
             $('#_form').toggle();
             $('#table').toggle();
-            $('#_form').attr('action', `/categories/${id}`);
+            $('#_form').attr('action', `/merchant/categories/${id}`);
             $('#name').val(data.name)
             $('#id').val(data.id)
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');

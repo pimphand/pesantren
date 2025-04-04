@@ -6,6 +6,7 @@ use App\Http\Controllers\Merchant\ProductCategoryController;
 use App\Http\Controllers\Merchant\ProductController;
 use App\Http\Controllers\Merchant\ProfileController;
 use App\Http\Controllers\Merchant\TransactionController;
+use App\Http\Controllers\Developer\MerchantController;
 use App\Http\Controllers\UserController;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Support\Facades\Artisan;
@@ -63,4 +64,15 @@ Route::middleware(['auth'])->group(function () {
         });
     });
     // end merchant routes
+
+    // developer routes
+    Route::group(['prefix' => 'developer', 'as' => 'developer.'], function() {
+        Route::controller(MerchantController::class)->name('merchant.')->group(function () {
+            Route::get('/merchant', 'index')->name('index')->middleware('permission:merchant-read');
+            Route::post('/merchant', 'store')->name('store')->middleware('permission:merchant-create');
+            Route::get('/merchant-data', 'data')->name('data')->middleware('permission:merchant-read');
+            Route::delete('/merchant/{productCategory}', 'destroy')->name('destroy')->middleware('permission:product_category-delete');
+            Route::put('/merchant/{productCategory}', 'update')->name('update')->middleware('permission:product_category-update');
+        });
+    });
 });

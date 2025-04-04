@@ -1,12 +1,7 @@
 @php
-    $columns = ['No', 'Kategori', 'Nama Produk', 'Harga', 'Stok', 'Action'];
+    $columns = ['No', 'Nama', 'Action'];
     $form = [
-        'category_id' => ['type' => 'select','title' => "Kategori"],
-        'name' => ['type' => 'text','title' => "Nama Produk"],
-        'price' => ['type' => 'number','title' => "Harga"],
-        'stock' => ['type' => 'number','title' => "Stok"],
-         'photo' => ['type' => 'file','title' => "Foto"],
-        'description' => ['type' => 'textarea','title' => "Deskripsi"],
+        'name' => ['type' => 'text','title' => "Nama Merchant"],
     ];
 @endphp
 
@@ -14,8 +9,8 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list produk dan tambah produk'"
-                  :buttonTitle="'Tambah Produk'">
+                  :description="'list Merchant dan tambah Merchant'"
+                  :buttonTitle="'Tambah Merchant'">
     </x-breadcrumb>
 @endsection
 
@@ -29,27 +24,15 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="form-element-list">
                             <div class="basic-tb-hd">
-                                <h2>Input Produk</h2>
+                                <h2>Input Merchant</h2>
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
                                 @foreach($form as $key => $value)
-                                    @if($value['type'] == 'select')
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-select :name="$key" :title="'Kategori'" :options="$categories"/>
-                                        </div>
-                                    @elseif($value['type'] == 'textarea')
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <textarea class="form-control" name="{{$key}}" id="{{$key}}"
-                                                      style="height: 100px;"
-                                                      placeholder="{{$value['title']}}"></textarea>
-                                        </div>
-                                    @else
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-input :type="$value['type']" :name="$key"
-                                                     :placeholder="$value['title']"/>
-                                        </div>
-                                    @endif
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <x-input :type="$value['type']" :name="$key"
+                                                 :placeholder="$value['title']"/>
+                                    </div>
                                 @endforeach
                                 <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
                                     <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
@@ -71,8 +54,9 @@
     <script>
         getData()
         let responseData = null;
+
         function getData(search = "", category = "") {
-            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+            let url = `{{ route('developer.merchant.data') }}?filter[name]=${search}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -89,14 +73,11 @@
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
                 tr.append(`<td>${product.name}</td>`);
-                tr.append(`<td>${product.category}</td>`);
-                tr.append(`<td>${product.price}</td>`);
-                tr.append(`<td>${product.stock}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");
 
                 actionTd.append(`<button class="btn btn-info edit" data-id="${product.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/products/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -114,9 +95,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <x-select :name="'category_search'" :title="'Kategori'" :options="$categories"/>
                     </div>
                 </div>
             </div>
@@ -142,7 +120,7 @@
                 $('#_form').trigger('reset');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('merchant.products.store') }}');
+                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
             });
 
             $('#photo').on('change', function () {
@@ -161,11 +139,13 @@
             $('.error').text('').hide();
             let url = $(idForm).attr('action');
             let formData = new FormData($(idForm)[0]);
+            console.log(formData.get('id'))
             if (formData.get('id')) {
                 formData.append('_method', 'PUT');
             }
-            form(url,'post', formData, function (response, error) {
+            form(url, 'post', formData, function (response, error) {
                 if (error) {
+
                     swal("Gagal!", error.responseJSON.message, "error");
                     $.each(error.responseJSON.errors, function (key, value) {
                         $('#' + key + '_error').text(value[0]).show();
@@ -199,21 +179,16 @@
             $('#table').toggle();
         });
 
-        $(document).on('click','.edit',function (e) {
+        $(document).on('click', '.edit', function (e) {
             e.preventDefault();
             let id = $(this).data('id');
+            console.log(id);
             let data = responseData.find((item) => item.id == id);
             $('#_form').toggle();
             $('#table').toggle();
-            $('#_form').attr('action', `/merchant/products/${id}`);
+            $('#_form').attr('action', `/merchant/categories/${id}`);
             $('#name').val(data.name)
-            $('#price').val(data.price)
-            $('#stock').val(data.stock)
-            $('#category_id').val(data.category_id)
-            $('#description').val(data.description)
             $('#id').val(data.id)
-            $('#show_image').attr('src', data.photo)
-            //add method
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
     </script>
