@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Developer;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Models\Merchant;
 use App\Http\Resources\MerchantResource;
+use App\Http\Requests\StoreMerchantRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Models\Merchant;
+use App\Models\User;
 
 class MerchantController extends Controller
 {
@@ -17,7 +20,7 @@ class MerchantController extends Controller
      */
     public function index(): View
     {
-        return view('developer.merchant', [
+        return view('merchant', [
             'title' => 'Merchant',
         ]);
     }
@@ -33,9 +36,23 @@ class MerchantController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMerchantRequest $merchantRequest, StoreUserRequest $userRequest): \Illuminate\Http\JsonResponse
     {
-        //
+        $user = User::insertGetId(array_merge($userRequest->validate()));
+        dd($user);
+
+        $merchant = Merchant::create(array_merge($merchantRequest->validated(), [
+            'user_id' => $user->id,
+        ]));
+
+        $this->createLog('Product', 'Create Product', $merchant, [
+            'old_data' => null,
+            'new_data' => $merchant->toArray(),
+        ], 'create');
+
+        return response()->json([
+            'message' => 'Kategori berhasil ditambahkan',
+        ]);
     }
 
     /**
