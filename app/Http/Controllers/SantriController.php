@@ -1,24 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Developer;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
-use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Models\Merchant;
-use App\Http\Resources\MerchantResource;
+use App\Models\User;
 
-class MerchantController extends Controller
+class SantriController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index()
     {
-        return view('developer.merchant', [
-            'title' => 'Merchant',
+        return view('santri', [
+            'title' => 'Santri'
         ]);
     }
 
@@ -68,17 +63,5 @@ class MerchantController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-    
-    public function data(): AnonymousResourceCollection
-    {
-        $categories = QueryBuilder::for(Merchant::class)
-            ->allowedSorts(['name'])
-            ->allowedFilters(['name'])
-            ->defaultSort('-name')
-            ->paginate(request()->input('per_page') ?? 10)
-            ->appends(request()->query());
-
-        return MerchantResource::collection($categories);
     }
 }

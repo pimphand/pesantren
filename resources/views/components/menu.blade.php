@@ -1,3 +1,10 @@
+@php
+    $menus = \App\Models\Menu::whereNull('menu_id')
+            ->where('status', true)
+            ->orderBy('order_menu')
+            ->with('permission')
+            ->get();
+@endphp
 <div class="main-menu-area mg-tb-40">
     <div class="container">
         <div class="row">
@@ -13,59 +20,56 @@
                         <li><a href="{{route('merchant.transactions.index')}}"><i
                                     class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
                         <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
-                    @elseif(auth()->user()->hasRole('developer'))
-                        <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
-                        <li><a href="{{route('developer.merchant.index')}}"><i class="fa-solid fa-layer-group"></i> Merchant</a>
-                        </li>
-                        <li><a href="{{route('merchant.products.index')}}"><i class="fa-brands fa-product-hunt"></i> Santri</a>
-                        </li>
-                        <li><a href="{{route('merchant.transactions.index')}}"><i
-                                    class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
-                        <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
                     @else
-                        <li><a href="{{route('dashboard')}}"><i class="notika-icon notika-house"></i> Dashboard</a></li>
-                        <li><a data-toggle="tab" href="#pengguna"><i class="notika-icon notika-support"></i>
-                                Pengguna</a></li>
-                        <li><a data-toggle="tab" href="#merchant"><i class="notika-icon notika-edit"></i> Merchant</a>
+                        <li>
+                            <a href="{{ route('dashboard') }}">
+                                <i class="notika-icon notika-house"></i> Dashboard
+                            </a>
                         </li>
-                        <li><a data-toggle="tab" href="#transaksi"><i class="notika-icon notika-bar-chart"></i>Transaksi</a>
-                        </li>
-                        <li><a data-toggle="tab" href="#settings"><i class="notika-icon notika-windows"></i> Pengaturan</a>
-                        </li>
+                
+                        @foreach ($menus as $menu)
+                            @php
+                                $permissionName = $menu->permission->name ?? null;
+                            @endphp
+                
+                            @if ($permissionName && auth()->user()->isAbleTo($permissionName))
+                                <li>
+                                    <a 
+                                        data-toggle="{{ $menu->children->isNotEmpty() ? 'tab' : '' }}"
+                                        href="{{ $menu->children->isNotEmpty() ? '#menu-' . $menu->id : URL($menu->url) }}">
+                                        <i class="{{ $menu->icon ?? 'fa-solid fa-layer-group' }}"></i> {{ $menu->name }}
+                                    </a>
+                                </li>
+                            @endif
+                        @endforeach
                     @endif
                 </ul>
+                {{-- Tab Content (Child Menu) --}}
                 <div class="tab-content custom-menu-content">
-                    <div id="pengguna" class="tab-pane notika-tab-menu-bg animated flipInX">
-                        <ul class="notika-main-menu-dropdown">
-                            <li><a href="inbox.html">Admin</a></li>
-                            <li><a href="view-email.html">Pengawas</a></li>
-                            <li><a href="compose-email.html">Santri</a></li>
-                            <li><a href="compose-email.html">Orang Tua</a></li>
-                        </ul>
-                    </div>
-                    <div id="merchant" class="tab-pane notika-tab-menu-bg animated flipInX">
-                        <ul class="notika-main-menu-dropdown">
-                            <li><a href="animations.html">List Merchant</a>
-                            </li>
-                            <li><a href="google-map.html">Category Merchant</a>
-                            </li>
-                            <li><a href="data-map.html">Product Merchant</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="transaksi" class="tab-pane notika-tab-menu-bg animated flipInX">
-                        <ul class="notika-main-menu-dropdown">
-                            <li><a href="flot-charts.html">Transaksi</a></li>
-                            <li><a href="bar-charts.html">Top Up</a></li>
-                        </ul>
-                    </div>
-                    <div id="settings" class="tab-pane notika-tab-menu-bg animated flipInX">
-                        <ul class="notika-main-menu-dropdown">
-                            <li><a href="normal-table.html">Data Pondok</a></li>
-                            <li><a href="data-table.html">Tugas dan Hak Akses</a>
-                            </li>
-                        </ul>
-                    </div>
+                    @foreach ($menus as $menu)
+                        @php
+                            $permissionName = $menu->permission->name ?? null;
+                        @endphp
+            
+                        @if ($permissionName && auth()->user()->isAbleTo($permissionName) && $menu->children->isNotEmpty())
+                            <div id="menu-{{ $menu->id }}" class="tab-pane notika-tab-menu-bg animated flipInX">
+                                <ul class="notika-main-menu-dropdown">
+                                    @foreach ($menu->children as $child)
+                                        @php
+                                            $childPermission = $child->permission->name ?? null;
+                                            // dd($childPermission);
+                                        @endphp
+            
+                                        @if ($childPermission && auth()->user()->isAbleTo($childPermission))
+                                            <li>
+                                                <a href="{{ URL($child->url) }}">{{ $child->name }}</a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    @endforeach
                 </div>
             </div>
         </div>

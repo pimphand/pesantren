@@ -1,7 +1,8 @@
 @php
-    $columns = ['No', 'Nama', 'Action'];
+    $columns = ['No', 'Nama', 'Url' ,'Action'];
     $form = [
-        'name' => ['type' => 'text','title' => "Nama Merchant"],
+        'name' => ['type' => 'text','title' => "Nama"],
+        'url' => ['type' => 'text','title' => "Url"],
     ];
 @endphp
 
@@ -9,8 +10,8 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list Merchant dan tambah Merchant'"
-                  :buttonTitle="'Tambah Merchant'">
+                  :description="'list Sub Menu dan tambah Sub Menu'"
+                  :buttonTitle="'Tambah Sub Menu'">
     </x-breadcrumb>
 @endsection
 
@@ -24,7 +25,7 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="form-element-list">
                             <div class="basic-tb-hd">
-                                <h2>Input Merchant</h2>
+                                <h2>Input Menu</h2>
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
@@ -43,7 +44,7 @@
                         </div>
                     </div>
                 </form>
-                <x-table :title="$title" :id="'table_product'" :columns="$columns"></x-table>
+                <x-table :title="$title" :id="'table_menu'" :columns="$columns"></x-table>
             </div>
         </div>
     </div>
@@ -56,7 +57,7 @@
         let responseData = null;
 
         function getData(search = "", category = "") {
-            let url = `{{ route('developer.merchant.data') }}?filter[name]=${search}`;
+            let url = `{{ route('menu.subMenu-data', $id) }}?filter[name]=${search}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -67,17 +68,18 @@
         }
 
         function updateTable(response) {
-            let table = $("#table_product");
+            let table = $("#table_menu");
             table.empty();
-            response.data.forEach((product, index) => {
+            response.data.forEach((menu, index) => {
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
-                tr.append(`<td>${product.name}</td>`);
+                tr.append(`<td>${menu.name}</td>`);
+                tr.append(`<td>${menu.url}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");
 
-                actionTd.append(`<button class="btn btn-info edit" data-id="${product.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append(`<button class="btn btn-info edit" data-id="${menu.id}"><i class="notika-icon notika-edit"></i></button>`);
+                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/menu/${menu.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -120,7 +122,7 @@
                 $('#_form').trigger('reset');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
+                $('#_form').attr('action', '{{ route('menu.store') }}');
             });
 
             $('#photo').on('change', function () {
@@ -186,8 +188,9 @@
             let data = responseData.find((item) => item.id == id);
             $('#_form').toggle();
             $('#table').toggle();
-            $('#_form').attr('action', `/merchant/categories/${id}`);
+            $('#_form').attr('action', `/menu/${id}`);
             $('#name').val(data.name)
+            $('#url').val(data.url)
             $('#id').val(data.id)
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
