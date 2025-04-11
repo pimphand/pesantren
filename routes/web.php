@@ -11,14 +11,19 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SantriController;
 use Dedoc\Scramble\Scramble;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/documentation-api', function () {
+Route::get('/documentation-api', function (Request $request) {
     $apiJsonPath = base_path('public/api.json');
 
     if (! File::exists($apiJsonPath)) {
+        Artisan::call('scramble:export');
+    }
+
+    if ($request->has('force')) {
         Artisan::call('scramble:export');
     }
 
@@ -68,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
     // end merchant routes
 
     // menu routes
-    Route::controller(MenuController::class)->name('menu.')->group(function() {
+    Route::controller(MenuController::class)->name('menu.')->group(function () {
         Route::get('/menu', 'index')->name('index')->middleware('permission:menu-read');
         Route::post('/menu', 'store')->name('store')->middleware('permission:menu-create');
         Route::get('/menu-data', 'data')->name('data')->middleware('permission:menu-read');
@@ -81,7 +86,7 @@ Route::middleware(['auth'])->group(function () {
     // end menu routes
 
     // Santri Routes
-    Route::controller(SantriController::class)->name('santri')->group(function() {
+    Route::controller(SantriController::class)->name('santri')->group(function () {
         Route::get('/santri', 'index')->name('index')->middleware('permission:santri-read');
         Route::post('/santri', 'store')->name('store')->middleware('permission:santri-create');
         Route::get('/santri-data', 'data')->name('data')->middleware('permission:santri-read');
