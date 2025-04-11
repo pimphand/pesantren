@@ -11,7 +11,7 @@ class UpdateMenuRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,9 +21,10 @@ class UpdateMenuRequest extends FormRequest
      */
     public function rules(): array
     {
+        $menus = $this->route('menu');
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'url' => ['required', 'string', 'max:255']
+            'name' => ['required', 'string', 'max:255', 'unique:menus,name,' . $menus->id],
+            'url' => ['required', 'string', 'max:255', 'unique:menus,url,'. $menus->id],
         ];
     }
 }

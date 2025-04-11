@@ -22,6 +22,14 @@ class MenuController extends Controller
         ]);
     }
 
+    public function subMenu(Menu $menu)
+    {
+        return view('sub_menu', [
+            'title' => 'Sub Menu',
+            'id' => $menu->id,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -35,14 +43,39 @@ class MenuController extends Controller
      */
     public function store(StoreMenuRequest $request)
     {
-        return DB::transaction(function () use ($request) {
+        $permission = Permission::where('name', 'ILIKE', '%read%')
+                ->where('name', 'ILIKE', "%$request->name%")
+                ->first();
+                // dd($permission);
+        if($permission) {
             $menu = Menu::create(array_merge($request->validated(), [
-                'status' => $request->has('active') ?? 0,
-                'permission' => '',
-                'order_menus' => 99,
-                'parent_id' => $request->parent_id ?? null,1
+                'permission_id' => $permission->id,
+                'order_menu' => 99,
             ]));
-        });
+            
+            $this->createLog('Menu', 'Create Menu', $menu, [
+                'old_data' => null,
+                'new_data' => $menu->toArray(),
+            ], 'update');
+                    
+            return response()->json([
+                'message' => 'Menu berhasil ditambah',
+            ]);
+        } else {
+            Menu::create(array_merge($request->validated(),[
+                'permission_id' => $permissionId,
+                'menu_id' => NULL,
+                'order_menu'=> 99
+            ]));
+            
+            return response()->json([
+                'message' => 'Menu berhasil ditambah',
+            ]);
+        }
+    }
+
+    public function store_sub_menu() {
+
     }
 
     /**
@@ -64,7 +97,7 @@ class MenuController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMenuRequest $request, Menu $menu)//: \Illuminate\Http\JsonResponse
+    public function update(UpdateMenuRequest $request, Menu $menu)
     {
         $oldMenu = $menu->getOriginal();
         $menu->update(array_merge($request->validated()));
@@ -75,7 +108,7 @@ class MenuController extends Controller
         ], 'update');
         
         return response()->json([
-            'message' => 'Kategori berhasil diubah',
+            'message' => 'Menu berhasil diubah',
         ]);
     }
 
@@ -84,12 +117,35 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
-        //
+        $oldMenu = $menu->getOriginal();
+        $menu->delete();
+
+        $this->createLog('Menu', 'Delete Menu', $menu, [
+            'old_data' => $oldMenu,
+            'new_data' => $menu->toArray(),
+        ], 'delete');
+
+        return response()->json([
+            'message' => 'Menu berhasil dihapus',
+        ]);
     }
 
     public function data(): AnonymousResourceCollection
     {
         $categories = QueryBuilder::for(Menu::class)
+            ->whereNull('menu_id')
+            ->allowedSorts(['name'])
+            ->allowedFilters(['name'])
+            ->defaultSort('-name')
+            ->paginate(request()->input('per_page') ?? 10)
+            ->appends(request()->query());
+
+        return MenuResurce::collection($categories);
+    }
+    public function dataSubmenu($menu): AnonymousResourceCollection
+    {
+        $categories = QueryBuilder::for(Menu::class)
+            ->where('menu_id', $menu)
             ->allowedSorts(['name'])
             ->allowedFilters(['name'])
             ->defaultSort('-name')

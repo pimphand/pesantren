@@ -9,6 +9,7 @@ use App\Http\Controllers\Merchant\TransactionController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SantriController;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -70,12 +71,24 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(MenuController::class)->name('menu.')->group(function() {
         Route::get('/menu', 'index')->name('index')->middleware('permission:menu-read');
         Route::post('/menu', 'store')->name('store')->middleware('permission:menu-create');
-        Route::get('/menu/{menu}', 'subMenu')->name('subMenu')->middleware('permission:menu-read');
         Route::get('/menu-data', 'data')->name('data')->middleware('permission:menu-read');
         Route::put('/menu/{menu}', 'update')->name('update')->middleware('permission:menu-read');
         Route::delete('/menu/{menu}', 'destroy')->name('destroy')->middleware('permission:menu-delete');
+        // Sub Menu Routes
+        Route::get('/menu/{menu}', 'subMenu')->name('subMenu')->middleware('permission:menu-read');
+        Route::get('/menu-data/{menu}', 'dataSubmenu')->name('subMenu-data')->middleware('permission:menu-read');
     });
     // end menu routes
+
+    // Santri Routes
+    Route::controller(SantriController::class)->name('santri')->group(function() {
+        Route::get('/santri', 'index')->name('index')->middleware('permission:santri-read');
+        Route::post('/santri', 'store')->name('store')->middleware('permission:santri-create');
+        Route::get('/santri-data', 'data')->name('data')->middleware('permission:santri-read');
+        Route::put('/santri/{santri}', 'update')->name('update')->middleware('permission:santri-update');
+        Route::delete('/santri/{santri}', 'destroy')->name('destroy')->middleware('permission:santri-delete');
+    });
+    // End Santri Routes
 
     // merchant routes
     Route::controller(MerchantController::class)->name('merchant_list.')->group(function () {

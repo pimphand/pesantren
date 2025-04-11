@@ -10,8 +10,8 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list Menu dan tambah Menu'"
-                  :buttonTitle="'Tambah Menu'">
+                  :description="'list Sub Menu dan tambah Sub Menu'"
+                  :buttonTitle="'Tambah Sub Menu'">
     </x-breadcrumb>
 @endsection
 
@@ -57,7 +57,7 @@
         let responseData = null;
 
         function getData(search = "", category = "") {
-            let url = `{{ route('menu.data') }}?filter[name]=${search}`;
+            let url = `{{ route('menu.subMenu-data', $id) }}?filter[name]=${search}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -73,7 +73,7 @@
             response.data.forEach((menu, index) => {
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
-                tr.append(`<td><a href="/menu/${menu.id}">${menu.name}</td>`);
+                tr.append(`<td>${menu.name}</td>`);
                 tr.append(`<td>${menu.url}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");

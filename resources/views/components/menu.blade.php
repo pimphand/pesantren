@@ -36,7 +36,7 @@
                                 <li>
                                     <a 
                                         data-toggle="{{ $menu->children->isNotEmpty() ? 'tab' : '' }}"
-                                        href="{{ $menu->children->isNotEmpty() ? '#menu-' . $menu->id : $menu->url }}">
+                                        href="{{ $menu->children->isNotEmpty() ? '#menu-' . $menu->id : URL($menu->url) }}">
                                         <i class="{{ $menu->icon ?? 'fa-solid fa-layer-group' }}"></i> {{ $menu->name }}
                                     </a>
                                 </li>
@@ -62,7 +62,7 @@
             
                                         @if ($childPermission && auth()->user()->isAbleTo($childPermission))
                                             <li>
-                                                <a href="{{ $child->url }}">{{ $child->name }}</a>
+                                                <a href="{{ URL($child->url) }}">{{ $child->name }}</a>
                                             </li>
                                         @endif
                                     @endforeach

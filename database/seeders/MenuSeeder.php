@@ -19,7 +19,7 @@ class MenuSeeder extends Seeder
             'Santri',
             'Transaction',
             'Mutasi',
-            'Panel Configuration',
+            'Panel_Configuration',
             'Menu',
         ];
         
@@ -42,14 +42,14 @@ class MenuSeeder extends Seeder
                         'icon' => null,
                     ]);
                 } else {
-                    $pemrissionId = Permission::insertGetId([
+                    $permissionId = Permission::insertGetId([
                         'name'  => strtolower(str_replace(' ', '_', $value)) . '-read',
                         'display_name'  => 'Read ' . $value,
                         'description'   => 'Read ' . $value,
                     ]);
 
                     Menu::create([
-                        'permission_id' => $pemrissionId,
+                        'permission_id' => $permissionId,
                         'name' => $value,
                         'url' => strtolower(str_replace(' ', '_', $value)),
                         'menu_id' => ($value == 'Menu') ? 5 : null,

@@ -16,6 +16,10 @@ return [
             'users' => CRUD,
             'roles' => CRUD,
             'permissions' => CRUD,
+            'santri' => CRUD,
+            'merchant' => CRUD,
+            'panel_configuration' => 'r',
+            'menu'  => 'c,r,u',
         ],
         'pengawas' => [
 
@@ -35,6 +39,8 @@ return [
             'users' => CRUD,
             'roles' => CRUD,
             'permissions' => CRUD,
+            'panel_configuration' => 'r',
+            'menu'  => 'c,r,u',
         ],
         'merchant' => [
             'product' => CRUD,
