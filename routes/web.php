@@ -17,15 +17,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/documentation-api', function (Request $request) {
-    $apiJsonPath = base_path('public/api.json');
-
-    if (! File::exists($apiJsonPath)) {
-        Artisan::call('scramble:export');
-    }
-
     if ($request->has('force')) {
-        Artisan::call('scramble:export');
+        Artisan::call('scramble:export --path=public/api.json');
     }
+    $apiJsonPath = public_path('api.json');
 
     return view('scramble::docs', [
         'spec' => file_get_contents($apiJsonPath),

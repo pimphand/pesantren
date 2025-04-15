@@ -32,7 +32,13 @@ class LoginRequest extends FormRequest
             /**
              * @example password
              */
-            'password' => ['required'],
+            'password' => ['required', 'min:6'],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'email.exists' => 'Email Salah.',
         ];
     }
 }
