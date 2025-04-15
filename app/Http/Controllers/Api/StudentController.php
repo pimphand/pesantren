@@ -8,6 +8,7 @@ use App\Http\Resources\Api\StudentResource;
 use App\Models\User;
 use Dedoc\Scramble\Attributes\HeaderParameter;
 use Illuminate\Support\Facades\File;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class StudentController extends Controller
 {
@@ -116,6 +117,22 @@ class StudentController extends Controller
         return response()->json([
             'message' => 'success',
             'data' => $this->user->load('parentDetail'),
+        ]);
+    }
+
+    /**
+     * qrCode.
+     *
+     * @response array{data: object, message: string}
+     * [HeaderParameter('Authorization', 'Bearer {token}')]
+     */
+    #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
+    public function qrCode(String $id) {
+        $qrCode = QrCode::size(120)->generate($user->id);
+
+        return response()->json([
+            'message' => 'success',
+            'data' => $qrCode,
         ]);
     }
 }

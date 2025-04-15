@@ -52,8 +52,11 @@ class AuthController extends Controller
     #[HeaderParameter('Authorization', 'Bearer {token}')]
     public function logout(): \Illuminate\Http\JsonResponse
     {
-        $this->createLog('Logout Api', 'Logout Api', null, null, 'logout');
-        request()->user()->tokens()->delete();
+        $user = auth()->user();
+        if($user) {
+            $this->createLog('Logout Api', 'Logout Api', $user, [$user->email], 'logout');
+            request()->user()->tokens()->delete();
+        }
 
         return response()->json([
             'message' => 'logout berhasil',

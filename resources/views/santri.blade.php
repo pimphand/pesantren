@@ -1,9 +1,9 @@
 @php
-    $columns = ['No', 'Nama', 'Action'];
+    $columns = ['No', 'Nama', 'username', 'email', 'parent', 'Action'];
     $form = [
-        'name' => ['type' => 'text','title' => "Nama Merchant"],
-        'username' => ['type' => 'text','title' => "Username Merchant"],
-        'email'=> ['type' => 'email', 'title' => "Email merchant"]
+        'name' => ['type' => 'text','title' => "Nama Santri"],
+        'username' => ['type' => 'text','title' => "Username Santri"],
+        'email'=> ['type' => 'email', 'title' => "Email Santri"]
     ];
 @endphp
 
@@ -11,8 +11,8 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list Merchant dan tambah Merchant'"
-                  :buttonTitle="'Tambah Merchant'">
+                  :description="'list Santri dan tambah Santri'"
+                  :buttonTitle="'Tambah Santri'">
     </x-breadcrumb>
 @endsection
 
@@ -26,117 +26,16 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="form-element-list">
                             <div class="basic-tb-hd">
-                                <h2>Input Merchant</h2>
+                                <h2>Input Santri</h2>
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
-                                <!-- Name -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="name"type="text"
-                                                class="form-control" placeholder="Nama Lengkap">
-                                        </div>
+                                @foreach($form as $key => $value)
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <x-input :type="$value['type']" :name="$key"
+                                                 :placeholder="$value['title']"/>
                                     </div>
-                                </div>
-                                <!-- Username -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-username"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="username" type="text"
-                                                   class="form-control"
-                                                   placeholder="Username">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Email -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-mail"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="email" type="text" 
-                                                class="form-control" placeholder="Email">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Phone -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-phone"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="phone" type="text"
-                                                   class="form-control"
-                                                   placeholder="Nomor telepon">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Address -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-address"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="pin" placeholder="Masukkan Alamat Lengkap"
-                                                   type="text" class="form-control">
-                                            </div>
-                                    </div>
-                                </div>
-                                <!-- Pin -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-key"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input oninput="validatePin(this)" name="pin"
-                                                   min="100000" max="999999" maxlength="6"
-                                                   placeholder="Masukkan PIN 6 Digit"
-                                                   type="text" class="form-control">
-                                            </div>
-                                            <small style="color: red">*kosongkan pin jika
-                                                tidak di rubah</small>
-                                    </div>
-                                </div>
-                                <!-- Password -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-key"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="password" maxlength="6"
-                                                   placeholder="Password" type="text"
-                                                   class="form-control">
-                                            </div>
-                                            <small style="color: red">*kosongkan password
-                                                jika tidak di rubah</small>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-key"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="confirmation_password"
-                                                   maxlength="6"
-                                                   placeholder="Konfirmasi Password"
-                                                   type="text" class="form-control">
-                                            <small style="color: red"></small>
-                                        </div>
-                                    </div>
-                                </div>
+                                @endforeach
                                 <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
                                     <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
                                 </div>
@@ -146,7 +45,7 @@
                         </div>
                     </div>
                 </form>
-                <x-table :title="$title" :id="'table_merchant'" :columns="$columns"></x-table>
+                <x-table :title="$title" :id="'table_santri'" :columns="$columns"></x-table>
             </div>
         </div>
     </div>
@@ -159,7 +58,7 @@
         let responseData = null;
 
         function getData(search = "", category = "") {
-            let url = `{{ route('merchant_list.data') }}?filter[name]=${search}`;
+            let url = `{{ route('santri.data') }}?filter[name]=${search}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -170,17 +69,21 @@
         }
 
         function updateTable(response) {
-            let table = $("#table_merchant");
+            let table = $("#table_santri");
             table.empty();
-            response.data.forEach((merchant, index) => {
+            response.data.forEach((santri, index) => {
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
-                tr.append(`<td>${merchant.name}</td>`);
+                tr.append(`<td>${santri.name}</td>`);
+                tr.append(`<td>${santri.username}</td>`);
+                tr.append(`<td>${santri.email}</td>`);
+                tr.append(`<td>${santri.parent}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");
 
-                actionTd.append(`<button class="btn btn-info edit" data-id="${merchant.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${merchant.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append(`<button class="btn btn-success edit" data-id="${santri.id}"><i class="notika-icon notika-print"></i></button>`);
+                actionTd.append(`<button class="btn btn-info edit" data-id="${santri.id}"><i class="notika-icon notika-edit"></i></button>`);
+                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/santri/${santri.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -223,7 +126,7 @@
                 $('#_form').trigger('reset');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
+                $('#_form').attr('action', '{{ route('santri.store') }}');
             });
 
             $('#photo').on('change', function () {
@@ -289,8 +192,10 @@
             let data = responseData.find((item) => item.id == id);
             $('#_form').toggle();
             $('#table').toggle();
-            $('#_form').attr('action', `/merchant/categories/${id}`);
+            $('#_form').attr('action', `/santri/${id}`);
             $('#name').val(data.name)
+            $('#username').val(data.username)
+            $('#email').val(data.email)
             $('#id').val(data.id)
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
