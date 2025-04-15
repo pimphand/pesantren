@@ -38,7 +38,7 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.exists' => 'Email Invalid.',
+            'email.exists' => 'Email tidak terdaftar.',
         ];
     }
 }
