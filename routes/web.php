@@ -86,7 +86,7 @@ Route::middleware(['auth'])->group(function () {
     // end menu routes
 
     // Santri Routes
-    Route::controller(SantriController::class)->name('santri')->group(function () {
+    Route::controller(SantriController::class)->name('santri.')->group(function () {
         Route::get('/santri', 'index')->name('index')->middleware('permission:santri-read');
         Route::post('/santri', 'store')->name('store')->middleware('permission:santri-create');
         Route::get('/santri-data', 'data')->name('data')->middleware('permission:santri-read');

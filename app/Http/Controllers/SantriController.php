@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use App\Http\Resources\SantriResource;
+use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Santri;
 
 class SantriController extends Controller
 {
@@ -30,7 +34,7 @@ class SantriController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -63,5 +67,18 @@ class SantriController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function data(): AnonymousResourceCollection
+    {
+        $santri = QueryBuilder::for(User::class)
+            ->whereNotNull('parent_id')
+            ->allowedSorts(['name'])
+            ->allowedFilters(['name'])
+            ->defaultSort('-name')
+            ->paginate(request()->input('per_page') ?? 10)
+            ->appends(request()->query());
+
+        return SantriResource::collection($santri);
     }
 }
