@@ -1,11 +1,11 @@
 @php
-    $columns = ['No', 'Kategori', 'Nama Produk', 'Harga', 'Stok', 'Action'];
+    $columns = ['No', 'Kategori', 'Nama Produk', 'Harga', 'Stok', 'Tindakan'];
     $form = [
         'category_id' => ['type' => 'select','title' => "Kategori"],
         'name' => ['type' => 'text','title' => "Nama Produk"],
         'price' => ['type' => 'number','title' => "Harga"],
         'stock' => ['type' => 'number','title' => "Stok"],
-         'photo' => ['type' => 'file','title' => "Foto"],
+        'photo' => ['type' => 'file','title' => "Foto"],
         'description' => ['type' => 'textarea','title' => "Deskripsi"],
     ];
 @endphp
@@ -14,7 +14,7 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list produk dan tambah produk'"
+                  :description="'Daftar produk dan tambah produk'"
                   :buttonTitle="'Tambah Produk'">
     </x-breadcrumb>
 @endsection
@@ -82,6 +82,11 @@
             });
         }
 
+        $('#price').on('keydown', function (e) {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
         function updateTable(response) {
             let table = $("#table_product");
             table.empty();
@@ -110,7 +115,7 @@
                         <div class="form-example-int form-example-st">
                             <div class="form-group">
                                 <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
                                 </div>
                             </div>
                         </div>
@@ -124,36 +129,56 @@
         });
 
         $(document).ready(function () {
+            // ✅ Fungsi debounce untuk membatasi frekuensi eksekusi pencarian
+            function debounce(func, delay) {
+                let timeout;
+                return function () {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
             const $search = $("#search");
             const $category = $(".category_search");
 
             function handleSearch() {
                 const searchValue = $search.val();
                 const categoryValue = $category.find("option:selected").val();
+
+                if (searchValue.trim() === "" && categoryValue === "") {
+                    getData(); // Reset ke semua data
+                    return;
+                }
+
                 getData(searchValue, categoryValue);
             }
 
-            $search.on("input", handleSearch);
+            $search.on("input", debounce(handleSearch, 200)); // kamu bisa naikkan delay jadi 300ms agar lebih smooth
             $category.on("change", handleSearch);
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
-                //remove _method
+                // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('merchant.products.store') }}');
+                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
             });
 
             $('#photo').on('change', function () {
-                let file = this.files[0];
-                let reader = new FileReader();
+                const file = this.files[0];
+                const reader = new FileReader();
                 reader.onload = function (e) {
                     $('#show_image').attr('src', e.target.result);
-                }
+                };
                 reader.readAsDataURL(file);
             });
         });
+
+        const inputFile = $('#photo');
+        const fileName = $('#fileName');
 
         let idForm = '#_form';
         $('#save').click(function (e) {
@@ -174,6 +199,7 @@
                     getData();
                     $(idForm).trigger('reset');
                     $('#show_image').attr('src', '');
+                    $('#fileName').text('Belum ada foto yang dipilih');
                     $.each($(idForm).find('input select'), function (index, node) {
                         node.value = '';
                     });
@@ -184,6 +210,10 @@
             });
         });
 
+        $('#photo').on('change', function () {
+            $('#fileName').text(this.files.length > 0 ? this.files[0].name : 'Belum ada foto yang dipilih');
+        });
+
         // Clear errors when typing
         $(idForm).find('input select').on('input change', function () {
             $('#' + this.id + '_error').text('').hide();
@@ -191,6 +221,8 @@
 
         $('#cancel').click(function () {
             $(idForm).trigger('reset');
+            $('.error').text('').hide();
+            $('#add').removeClass('hidden')
             $('#show_image').attr('src', '');
             $.each($(idForm).find('input select'), function (index, node) {
                 node.value = '';
@@ -203,6 +235,7 @@
             e.preventDefault();
             let id = $(this).data('id');
             let data = responseData.find((item) => item.id == id);
+            $('#add').addClass('hidden')
             $('#_form').toggle();
             $('#table').toggle();
             $('#_form').attr('action', `/merchant/products/${id}`);
@@ -224,6 +257,33 @@
     <style>
         .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
             width: 100% !important;
+        }
+        .custom-file-input {
+            border: 1px solid #ccc;
+            padding: 5px;
+            display: inline-block;
+            border-radius: 5px;
+            font-family: sans-serif;
+            width: 100%;
+            max-width: 550px;
+        }
+    
+        .custom-file-input input {
+            display: none;
+        }
+    
+        .file-label {
+            display: inline-block;
+            background-color: #f1f1f1;
+            border: 1px solid #aaa;
+            padding: 3px 8px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+    
+        .file-name {
+            color: #555;
+            font-size: 14px;
         }
     </style>
 @endpush

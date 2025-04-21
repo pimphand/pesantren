@@ -11,7 +11,7 @@
         </div>
     </div>
     @if(isset($buttonTitle) && $buttonTitle)
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <div id="add" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="breadcomb-report">
                 <button data-toggle="tooltip"  data-placement="left" title="{{$buttonTitle ?? ""}}"
                         class="btn _add_button">

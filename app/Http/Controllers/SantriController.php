@@ -50,7 +50,7 @@ class SantriController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        
     }
 
     /**

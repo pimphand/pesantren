@@ -5,4 +5,4 @@
             value="{{$item['id']}}" @if(isset($selected)) {{$selected == $item['id'] ? "selected" : ''}}  @endif>{{$item['name']}}</option>
     @endforeach
 </select>
-<code id="{{$name ?? ''}}_error"  class="error" style="display: none"></code>
+<code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>

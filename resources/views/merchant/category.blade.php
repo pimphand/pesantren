@@ -1,5 +1,5 @@
 @php
-    $columns = ['No', 'Nama', 'Action'];
+    $columns = ['No', 'Nama', 'Tindakan'];
     $form = [
         'name' => ['type' => 'text','title' => "Nama Kategori"],
     ];
@@ -9,7 +9,7 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'list kategori dan tambah kategori'"
+                  :description="'Daftar kategori dan tambah kategori'"
                   :buttonTitle="'Tambah Kategori'">
     </x-breadcrumb>
 @endsection
@@ -91,7 +91,7 @@
                         <div class="form-example-int form-example-st">
                             <div class="form-group">
                                 <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
                                 </div>
                             </div>
                         </div>
@@ -102,33 +102,50 @@
         });
 
         $(document).ready(function () {
+            // ✅ Fungsi debounce untuk membatasi frekuensi eksekusi pencarian
+            function debounce(func, delay) {
+                let timeout;
+                return function () {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
             const $search = $("#search");
             const $category = $(".category_search");
 
             function handleSearch() {
                 const searchValue = $search.val();
                 const categoryValue = $category.find("option:selected").val();
+
+                if (searchValue.trim() === "" && categoryValue === "") {
+                    getData(); // Reset ke semua data
+                    return;
+                }
+
                 getData(searchValue, categoryValue);
             }
 
-            $search.on("input", handleSearch);
+            $search.on("input", debounce(handleSearch, 300)); // kamu bisa naikkan delay jadi 300ms agar lebih smooth
             $category.on("change", handleSearch);
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
-                //remove _method
+                // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
                 $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
             });
 
             $('#photo').on('change', function () {
-                let file = this.files[0];
-                let reader = new FileReader();
+                const file = this.files[0];
+                const reader = new FileReader();
                 reader.onload = function (e) {
                     $('#show_image').attr('src', e.target.result);
-                }
+                };
                 reader.readAsDataURL(file);
             });
         });
@@ -171,7 +188,9 @@
 
         $('#cancel').click(function () {
             $(idForm).trigger('reset');
+            $('.error').text('').hide();
             $('#show_image').attr('src', '');
+            $('#add').removeClass('hidden')
             $.each($(idForm).find('input select'), function (index, node) {
                 node.value = '';
             });
@@ -184,6 +203,7 @@
             let id = $(this).data('id');
             console.log(id);
             let data = responseData.find((item) => item.id == id);
+            $('#add').addClass('hidden')
             $('#_form').toggle();
             $('#table').toggle();
             $('#_form').attr('action', `/merchant/categories/${id}`);

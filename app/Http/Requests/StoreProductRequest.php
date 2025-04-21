@@ -31,4 +31,15 @@ class StoreProductRequest extends FormRequest
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
+
+    public function messages(): array   
+    {
+        return [
+            'name.required' => 'Kolom nama produk harus diisi.',
+            'price.required' => 'Kolom harga harus diisi.',
+            'stock.required' => 'Kolom stok harus diisi.',
+            'category_id.required' => 'Kolom kategori harus diisi.',
+            'photo.image' => 'Kolom foto harus berupa gambar.',
+        ];
+    }
 }

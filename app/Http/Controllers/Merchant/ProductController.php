@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function index(): Factory|Application|View
     {
         return view('merchant.product', [
-            'title' => 'Product',
+            'title' => 'Produk',
             'categories' => auth()->user()->merchant->productCategory->select('name', 'id'),
         ]);
     }
@@ -33,20 +33,29 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): JsonResponse
     {
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store(
+                'products/' . auth()->user()->merchant->id,
+                'public'
+            );
+        }
+
         $product = Product::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('products')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
+            'photo' => asset('storage/'. $photoPath) ?? null,
         ]));
 
-        $this->createLog('Product', 'Update Product', $product, [
+        $this->createLog('Product', 'Create Product', $product, [
             'old_data' => null,
             'new_data' => $product->toArray(),
         ], 'create');
 
         return response()->json([
-            'message' => 'Product berhasil ditambahkan',
+            'message' => 'Produk berhasil ditambahkan',
         ]);
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -60,7 +69,7 @@ class ProductController extends Controller
 
         $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('products/'.auth()->user()->merchant->id, 'public')) : null,
+            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('products/'.auth()->user()->merchant->id, 'public')) : $product->photo,
         ]));
 
         $this->createLog('Product', 'Update Product', $product, [
@@ -69,7 +78,7 @@ class ProductController extends Controller
         ], 'update');
 
         return response()->json([
-            'message' => 'Product berhasil ditambahkan',
+            'message' => 'Produk berhasil diperbarui',
         ]);
     }
 
@@ -90,7 +99,7 @@ class ProductController extends Controller
             'new_data' => null
         ], 'delete');
         return response()->json([
-            'message' => 'Product deleted successfully',
+            'message' => 'Produk deleted successfully',
         ]);
     }
 

@@ -268,7 +268,7 @@
             form(url, 'delete', {}, function (response, error) {
                 if (response) {
                     getData();
-                    swal("Deleted!", "Data berhasil di hapus.", "success");
+                    swal("Hapus!", "Data berhasil di hapus.", "success");
                 } else {
                     swal("Gagal!", error.responseJSON.message, "error");
                 }

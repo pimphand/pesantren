@@ -19,7 +19,7 @@ class ProductCategoryController extends Controller
     public function index(): View
     {
         return view('merchant.category', [
-            'title' => 'Category',
+            'title' => 'Kategori',
         ]);
     }
 
@@ -71,7 +71,7 @@ class ProductCategoryController extends Controller
         ], 'update');
 
         return response()->json([
-            'message' => 'Kategori berhasil diubah',
+            'message' => 'Kategori berhasil diperbarui',
         ]);
     }
 
