@@ -1,13 +1,11 @@
 @php
     $merchant = auth()->user()->merchant;
-    $columns = ['Date','Invoice','Customer','Total','Item','Pembayaran','Action'];
+    $columns = ['Date', 'Invoice', 'Customer', 'Total', 'Item', 'Pembayaran', 'Action'];
 @endphp
 @extends('layouts.app')
 @section('breadcrumb')
-    <x-breadcrumb :title="$title"
-                  :icon="'notika-menu-list'"
-                  :description="'list '.$title.' dan tambah '.$title.''"
-                  :buttonTitle="'List '.$title.''">
+    <x-breadcrumb :title="$title" :icon="'notika-menu-list'" :description="'list ' . $title . ' dan tambah ' . $title . ''"
+        :buttonTitle="'List ' . $title . ''">
     </x-breadcrumb>
 @endsection
 
@@ -25,9 +23,6 @@
                 @endif
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="inbox-left-sd">
-                        <div class="compose-ml">
-                            <a class="btn waves-effect save" style="display: none" href="javascript:void(0)">Simpan</a>
-                        </div>
                         <div class="inbox-status">
                             <span class="inbox-status-title">List Item</span>
                             <ul class="inbox-st-nav inbox-ft" id="_item_list">
@@ -50,7 +45,8 @@
                         <hr>
                         <div class="compose-ml">
                             <a class="btn waves-effect save" style="display: none" href="javascript:void(0)">Simpan</a>
-                            <a class="btn waves-effect" id="showDraft" style="display: none" href="javascript:void(0)">List Draft</a>
+                            <a class="btn waves-effect" id="showDraft" style="display: none" href="javascript:void(0)">List
+                                Draft</a>
                         </div>
                     </div>
                 </div>
@@ -73,8 +69,7 @@
                         <div class="vw-ml-action-ls text-right mg-t-20">
                             <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
                                 <button class="btn btn-default btn-sm waves-effect" onclick="printLastTransaction()">
-                                    <i class="notika-icon notika-print"
-                                       aria-hidden="true">
+                                    <i class="notika-icon notika-print" aria-hidden="true">
                                     </i> Print Order Terakhir
                                 </button>
                                 <button class="btn btn-default btn-sm waves-effect" id="save-to-draft"><i
@@ -108,9 +103,8 @@
                         @if($merchant->is_pin)
                             <div class="form-group">
                                 <label for="pin">PIN:</label>
-                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)"
-                                       name="pin" min="100000" max="999999" maxlength="6"
-                                       placeholder="Masukkan PIN 6 Digit" required>
+                                <input type="password" class="form-control" id="pin" oninput="validatePin(this)" name="pin"
+                                    min="100000" max="999999" maxlength="6" placeholder="Masukkan PIN 6 Digit" required>
                                 <small class="form-text text-muted">Hanya angka 6 digit yang diperbolehkan.</small> <br>
                                 <code id="pin_error" class="error" style="display: none"></code>
                             </div>
@@ -178,11 +172,11 @@
                 $('#_products').empty();
                 response.data.forEach((product) => {
                     let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12 mb-2"
-                    data-id="${product.id}"
-                    data-price="${product.price}"
-                    data-name="${product.name}"
-                    data-stock="${product.stock}"
-                    data-original-stock="${product.stock}"></div>`);
+                        data-id="${product.id}"
+                        data-price="${product.price}"
+                        data-name="${product.name}"
+                        data-stock="${product.stock}"
+                        data-original-stock="${product.stock}"></div>`);
 
                     let colorSingle = $(`<div class="color-single" style="background-color: #00c292"></div>`);
                     colorSingle.append(`<h2>${product.name}</h2>`);
@@ -229,7 +223,7 @@
             if (product) {
                 product.qty += 1;
             } else {
-                cart.push({id: id, qty: 1, name: name, price: price});
+                cart.push({ id: id, qty: 1, name: name, price: price });
             }
 
             saveCart(cart);
@@ -278,7 +272,7 @@
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
             let tax = 0;
             @if($merchant->is_tax)
-                tax = total * ({{(int)$merchant->tax}} / 100);
+                tax = total * ({{(int) $merchant->tax}} / 100);
             @endif
             $('#_item_list').empty();
 
@@ -287,22 +281,22 @@
 
                 // Item name and price in one line
                 let itemHeader = $(`
-                    <div class="item-header">
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-price">Rp. ${currencyFormat(item.price)}</span>
-                    </div>
-                `);
+                        <div class="item-header">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-price">Rp. ${currencyFormat(item.price)}</span>
+                        </div>
+                    `);
                 li.append(itemHeader);
 
                 // Quantity input row
                 let quantityControls = $(`
-                    <div class="quantity-row">
-                        <button class="qty-btn minus" data-id="${item.id}">-</button>
-                        <input type="number" class="qty-input" data-id="${item.id}" value="${item.qty}" min="1">
-                        <button class="qty-btn plus" data-id="${item.id}">+</button>
-                        <a href="javascript:void(0)" class="delete-btn" onclick="removeFromCart('${item.id}')"><i class="notika-icon notika-trash" style="color:red"></i></a>
-                    </div>
-                `);
+                        <div class="quantity-row">
+                            <button class="qty-btn minus" data-id="${item.id}">-</button>
+                            <input type="number" class="qty-input" data-id="${item.id}" value="${item.qty}" min="1">
+                            <button class="qty-btn plus" data-id="${item.id}">+</button>
+                            <a href="javascript:void(0)" class="delete-btn" onclick="removeFromCart('${item.id}')"><i class="notika-icon notika-trash" style="color:red"></i></a>
+                        </div>
+                    `);
                 li.append(quantityControls);
 
                 $('#_item_list').append(li);
@@ -320,7 +314,7 @@
         }
 
         // Update event handlers for new buttons
-        $(document).on('click', '.qty-btn.minus', function() {
+        $(document).on('click', '.qty-btn.minus', function () {
             const id = $(this).data('id');
             let cart = getCart();
             const item = cart.find(item => item.id === id);
@@ -332,7 +326,7 @@
             }
         });
 
-        $(document).on('click', '.qty-btn.plus', function() {
+        $(document).on('click', '.qty-btn.plus', function () {
             const id = $(this).data('id');
             let cart = getCart();
             const item = cart.find(item => item.id === id);
@@ -344,7 +338,7 @@
             }
         });
 
-        $(document).on('change', '.qty-input', function() {
+        $(document).on('change', '.qty-input', function () {
             const id = $(this).data('id');
             const newQty = parseInt($(this).val());
 
@@ -375,8 +369,8 @@
 
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader",
-            {fps: 10, qrbox: {width: 250, height: 250}},
-            /* verbose= */ false);
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+                /* verbose= */ false);
         // html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         setTimeout(() => {
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
@@ -392,7 +386,7 @@
         }
 
         function getUserFromQrcode(decodedText) {
-            let url = "{{route('merchant.transactions.qr-code',':id')}}".replace(':id', decodedText);
+            let url = "{{route('merchant.transactions.qr-code', ':id')}}".replace(':id', decodedText);
             form(url, 'get', {}, function (response, error) {
                 if (response) {
                     $('#_form').show();
@@ -464,9 +458,9 @@
             $('_show_order_today').html('');
             form(urlCreate, 'get', null, function (response) {
                 $('#_show_order_today').html(`
-                    <span><strong>Pendapatan: Rp. ${currencyFormat(Number(response.total_amount))}</strong></span>
-                    <span><strong>Dari :  ${response.total_order} Order</strong></span>
-                `);
+                        <span><strong>Pendapatan: Rp. ${currencyFormat(Number(response.total_amount))}</strong></span>
+                        <span><strong>Dari :  ${response.total_order} Order</strong></span>
+                    `);
             });
         }
 
@@ -481,7 +475,7 @@
         function printLastTransaction(id = null) {
             let lastTransaction = localStorage.getItem('last_transaction');
 
-            let url = `{{route('merchant.transactions.printInvoice',':id')}}`.replace(':id', id ?? lastTransaction);
+            let url = `{{route('merchant.transactions.printInvoice', ':id')}}`.replace(':id', id ?? lastTransaction);
             console.log("Generated URL:", url); // Debugging
             const print = '#printData'
             form(url, 'get', null, function (response) {
@@ -524,8 +518,8 @@
                     tr.append(`<td class="${item.id}"></td>`);
                     tr.append(`<td>${item.payment.method}</td>`);
                     tr.append(`<td class="text-right">
-                <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a>
-            </td>`);
+                    <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a>
+                </td>`);
 
                     let quantity = 0;
                     let table = $('#table_transaction');
@@ -534,37 +528,37 @@
                     // Tambahkan baris tersembunyi untuk menampilkan detail item dalam tabel
                     let itemRow = $(`<tr class="item-row" id="items-${item.id}" style="display: none;"></tr>`);
                     let itemDetails = `<td colspan="7">
-                                <strong>Detail Items: ${item.invoice_number}</strong>
-                                <table class="table table-bordered mt-2">
-                                    <thead>
-                                        <tr>
-                                            <th>Nama Item</th>
-                                            <th>Harga</th>
-                                            <th>Jumlah</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
+                                    <strong>Detail Items: ${item.invoice_number}</strong>
+                                    <table class="table table-bordered mt-2">
+                                        <thead>
+                                            <tr>
+                                                <th>Nama Item</th>
+                                                <th>Harga</th>
+                                                <th>Jumlah</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
                     item.items.forEach((itm) => {
-                        quantity+=itm.quantity;
+                        quantity += itm.quantity;
                         itemDetails += `<tr>
-                                    <td>${itm.name}</td>
-                                    <td>Rp. ${currencyFormat(itm.price)}</td>
-                                    <td>${itm.quantity}</td>
-                                    <td>Rp. ${currencyFormat(itm.price * itm.quantity)}</td>
-                                </tr>`;
-                        if(item.tax){
+                                        <td>${itm.name}</td>
+                                        <td>Rp. ${currencyFormat(itm.price)}</td>
+                                        <td>${itm.quantity}</td>
+                                        <td>Rp. ${currencyFormat(itm.price * itm.quantity)}</td>
+                                    </tr>`;
+                        if (item.tax) {
                             itemDetails += `<tr>
-                                    <td>Pajak </td>
-                                    <td>Rp. ${currencyFormat(item.tax)}</td>
-                                    <td>1</td>
-                                    <td>Rp. ${currencyFormat(item.tax)}</td>
-                                </tr>`;
+                                        <td>Pajak </td>
+                                        <td>Rp. ${currencyFormat(item.tax)}</td>
+                                        <td>1</td>
+                                        <td>Rp. ${currencyFormat(item.tax)}</td>
+                                    </tr>`;
                         }
                     });
                     itemDetails += `</tbody>
-                                </table>
-                            </td>`;
+                                    </table>
+                                </td>`;
                     itemRow.append(itemDetails);
                     table.append(itemRow);
                     $('.' + item.id).html(`<button class="btn btn-success notika-btn-success waves-effect item-btn" data-id="${item.id}">${quantity} Item</button>`);
@@ -609,19 +603,19 @@
         // search
         $(document).ready(function () {
             $("#search_form").append(`
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="form-example-int form-example-st">
-                            <div class="form-group">
-                                <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                            <div class="form-example-int form-example-st">
+                                <div class="form-group">
+                                    <div class="nk-int-st">
+                                        <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            `);
+                `);
         });
         //End List Transaksi
 
@@ -648,12 +642,12 @@
         }
 
         // Call on page load
-        $(document).ready(function() {
+        $(document).ready(function () {
             updateDraftButtonVisibility();
         });
 
         // Update draft button visibility after saving to draft
-        $('#save-to-draft').click(function() {
+        $('#save-to-draft').click(function () {
             let cart = getCart();
             if (cart.length === 0) {
                 toast('Keranjang masih kosong!', 'error', 'Gagal!');
@@ -668,7 +662,7 @@
                 id: Date.now(), // Use timestamp as unique ID
                 cart: cart,
                 timestamp: new Date().getTime(),
-                name: `Draft ${drafts.length + 1}`
+                name: `Draft`
             };
 
             // Add new draft to array
@@ -686,7 +680,7 @@
         });
 
         // Show draft modal with list of drafts
-        $('#showDraft').click(function() {
+        $('#showDraft').click(function () {
             const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
             if (drafts.length === 0) {
                 toast('Tidak ada draft tersimpan!', 'warning', 'Peringatan!');
@@ -728,41 +722,41 @@
                 const totalPrice = draft.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
                 const draftCard = $(`
-                    <div class="draft-card">
-                        <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
-                            <div class="draft-title">${draft.name}</div>
-                            <div class="draft-time">${timeString}</div>
-                            <div class="draft-summary">
-                                <span>${totalItems} Item</span>
-                                <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
-                            </div>
-                        </div>
-                        <div id="collapse${draft.id}" class="collapse">
-                            <div class="draft-body">
-                                <div class="draft-items">
-                                    ${draft.cart.map(item => `
-                                        <div class="draft-item">
-                                            <span class="draft-item-name">${item.name}</span>
-                                            <span class="draft-item-qty">${item.qty}x</span>
-                                            <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                                <div class="draft-total">
-                                    Total: Rp. ${currencyFormat(totalPrice)}
-                                </div>
-                                <div class="draft-actions">
-                                    <button class="btn-draft delete delete-draft" data-id="${draft.id}">
-                                        <i class="notika-icon notika-trash"></i> Hapus
-                                    </button>
-                                    <button class="btn-draft use use-draft" data-id="${draft.id}">
-                                        <i class="notika-icon notika-checked"></i> Gunakan
-                                    </button>
+                        <div class="draft-card">
+                            <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
+                                <div class="draft-title">${draft.name}</div>
+                                <div class="draft-time">${timeString}</div>
+                                <div class="draft-summary">
+                                    <span>${totalItems} Item</span>
+                                    <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
                                 </div>
                             </div>
+                            <div id="collapse${draft.id}" class="collapse">
+                                <div class="draft-body">
+                                    <div class="draft-items">
+                                        ${draft.cart.map(item => `
+                                            <div class="draft-item">
+                                                <span class="draft-item-name">${item.name}</span>
+                                                <span class="draft-item-qty">${item.qty}x</span>
+                                                <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="draft-total">
+                                        Total: Rp. ${currencyFormat(totalPrice)}
+                                    </div>
+                                    <div class="draft-actions">
+                                        <button class="btn-draft delete delete-draft" data-id="${draft.id}">
+                                            <i class="notika-icon notika-trash"></i> Hapus
+                                        </button>
+                                        <button class="btn-draft use use-draft" data-id="${draft.id}">
+                                            <i class="notika-icon notika-checked"></i> Gunakan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                `);
+                    `);
 
                 $('#draftAccordion').append(draftCard);
             });
@@ -771,7 +765,7 @@
         });
 
         // Handle use draft button
-        $(document).on('click', '.use-draft', function() {
+        $(document).on('click', '.use-draft', function () {
             const draftId = $(this).data('id');
             const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
             const draft = drafts.find(d => d.id === draftId);
@@ -791,7 +785,7 @@
         });
 
         // Handle delete draft button
-        $(document).on('click', '.delete-draft', function() {
+        $(document).on('click', '.delete-draft', function () {
             const draftId = $(this).data('id');
             const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
 
@@ -800,7 +794,7 @@
             localStorage.setItem('drafts', JSON.stringify(updatedDrafts));
 
             // Remove the draft card from view
-            $(this).closest('.draft-card').fadeOut(300, function() {
+            $(this).closest('.draft-card').fadeOut(300, function () {
                 $(this).remove();
 
                 // If no drafts left, close the modal and hide the button
@@ -835,15 +829,20 @@
         }
 
         .color-single:hover {
-            transform: scale(1.05); /* Membesar sedikit saat hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Menambah bayangan */
+            transform: scale(1.05);
+            /* Membesar sedikit saat hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Menambah bayangan */
         }
 
         /* Efek Aktif Saat Diklik */
         .color-single.active {
-            border: 3px solid #000; /* Tambahkan border hitam saat aktif */
-            background-color: #d32f2f !important; /* Ubah warna saat aktif */
-            color: white !important; /* Ubah warna teks */
+            border: 3px solid #000;
+            /* Tambahkan border hitam saat aktif */
+            background-color: #d32f2f !important;
+            /* Ubah warna saat aktif */
+            color: white !important;
+            /* Ubah warna teks */
         }
 
         .info-box {
@@ -855,24 +854,29 @@
             padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
+
         .item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .item-name {
             font-size: 14px;
         }
+
         .item-price {
             font-size: 14px;
             color: #666;
         }
+
         .quantity-row {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .qty-btn {
             width: 28px;
             height: 28px;
@@ -886,6 +890,7 @@
             cursor: pointer;
             padding: 0;
         }
+
         .qty-input {
             width: 40px;
             height: 28px;
@@ -894,14 +899,17 @@
             text-align: center;
             font-size: 14px;
         }
+
         .qty-input::-webkit-inner-spin-button,
         .qty-input::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
+
         .qty-input {
             -moz-appearance: textfield;
         }
+
         .delete-btn {
             color: #dc3545;
             font-size: 20px;
@@ -909,6 +917,7 @@
             line-height: 1;
             margin-left: auto;
         }
+
         #_item_list {
             max-height: 400px;
             overflow-y: auto;
@@ -920,8 +929,9 @@
             border-radius: 8px;
             margin-bottom: 10px;
             background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
         .draft-header {
             padding: 15px;
             border-bottom: 1px solid #eee;
@@ -929,22 +939,27 @@
             border-radius: 8px 8px 0 0;
             cursor: pointer;
         }
+
         .draft-header:hover {
             background: #e9ecef;
         }
+
         .draft-body {
             padding: 15px;
         }
+
         .draft-title {
             font-size: 16px;
             font-weight: 500;
             margin: 0;
             color: #333;
         }
+
         .draft-time {
             font-size: 12px;
             color: #666;
         }
+
         .draft-summary {
             display: flex;
             justify-content: space-between;
@@ -952,9 +967,11 @@
             font-size: 14px;
             color: #666;
         }
+
         .draft-items {
             margin-top: 10px;
         }
+
         .draft-item {
             display: flex;
             justify-content: space-between;
@@ -962,22 +979,27 @@
             padding: 8px;
             border-bottom: 1px solid #eee;
         }
+
         .draft-item:last-child {
             border-bottom: none;
         }
+
         .draft-item-name {
             flex: 1;
         }
+
         .draft-item-qty {
             width: 60px;
             text-align: center;
             color: #666;
         }
+
         .draft-item-price {
             width: 120px;
             text-align: right;
             color: #666;
         }
+
         .draft-actions {
             display: flex;
             justify-content: flex-end;
@@ -986,21 +1008,25 @@
             padding-top: 15px;
             border-top: 1px solid #eee;
         }
+
         .btn-draft {
             padding: 6px 15px;
             border-radius: 4px;
             font-size: 14px;
         }
+
         .btn-draft.delete {
             background: #dc3545;
             color: white;
             border: none;
         }
+
         .btn-draft.use {
             background: #28a745;
             color: white;
             border: none;
         }
+
         .draft-total {
             font-size: 16px;
             font-weight: 500;
@@ -1010,4 +1036,3 @@
         }
     </style>
 @endpush
-
