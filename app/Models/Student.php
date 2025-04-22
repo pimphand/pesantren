@@ -13,7 +13,7 @@ class Student extends Model
     /** @use HasFactory<StudentFactory> */
     use HasFactory;
 
-    use HasUuids, SoftDeletes;
+    use HasUuids;
 
     protected $guarded = [];
 

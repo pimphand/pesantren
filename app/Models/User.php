@@ -11,13 +11,14 @@ use Illuminate\Notifications\Notifiable;
 use Laratrust\Contracts\LaratrustUser;
 use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements LaratrustUser
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    use HasRolesAndPermissions;
+    use HasRolesAndPermissions, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +27,7 @@ class User extends Authenticatable implements LaratrustUser
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'photo',
@@ -103,5 +105,15 @@ class User extends Authenticatable implements LaratrustUser
     public function merchant(): HasOne
     {
         return $this->hasOne(Merchant::class);
+    }
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class, 'user_id', 'id');
+    }
+    public function scopeWithRole(\Illuminate\Database\Eloquent\Builder $query, string $roleName)
+    {
+        return $query->whereHas('roles', function ($q) use ($roleName) {
+            $q->where('name', $roleName);
+        });
     }
 }

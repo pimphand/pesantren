@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained();
-            $table->foreignUuid('parent_id')->constrained('student_guardians', 'id');
             $table->string('admission_number')->index()->nullable();
             $table->string('class_now')->nullable();
             $table->string('class_last')->nullable();

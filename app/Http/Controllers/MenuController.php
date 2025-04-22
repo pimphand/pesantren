@@ -62,6 +62,11 @@ class MenuController extends Controller
                 'message' => 'Menu berhasil ditambah',
             ]);
         } else {
+            $permissionId = Permission::insertGetId([
+                'name'  => strtolower(str_replace(' ', '_', $request->name)) . '-read',
+                'display_name'  => 'Read ' . $request->name,
+                'description'   => 'Read ' . $request->name,
+            ]);
             Menu::create(array_merge($request->validated(),[
                 'permission_id' => $permissionId,
                 'menu_id' => NULL,

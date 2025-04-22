@@ -7,7 +7,10 @@ use App\Http\Resources\SantriResource;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Santri;
+use Illuminate\Support\Str;
+use App\Models\Student;
+use App\Http\Requests\StoreSantriRequest;
+use App\Http\Requests\UpdateSantriRequest;
 
 class SantriController extends Controller
 {
@@ -17,7 +20,7 @@ class SantriController extends Controller
     public function index()
     {
         return view('santri', [
-            'title' => 'Santri'
+            'title' => 'Santri',
         ]);
     }
 
@@ -32,15 +35,41 @@ class SantriController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSantriRequest $request)
     {
-        
+        $santri = User::create(array_merge($request->validated(), [
+            'uuid'     => Str::uuid(),
+            'parent_id'     => $request->parent_id,
+            'phone'    => $request->phone,
+            'password' => bcrypt($request->password),
+            'pin'      => bcrypt($request->pin),
+        ]))->addRole('santri');
+
+        $student = Student::create([
+            'user_id' => $santri->id,
+            'address' => $request->address ?? null,
+            'level' => $request->level ?? null,
+            'date_born' => $request->date_born ?? null,
+            'place_born' => $request->place_born ?? null,
+            'gender' => $request->gender ?? null,
+            'admission_number' => $request->nsm ?? null,
+            'national_admission_number' => $request->nisn ?? null,
+        ]);
+
+        $this->createLog('Santri', 'Create Santri', $santri, [
+            'old_data' => null,
+            'new_data' => $santri->toArray(),
+        ], 'create');
+
+        return response()->json([
+            'message' => 'Santri berhasil ditambahkan',
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $santri)
     {
         //
     }
@@ -48,7 +77,7 @@ class SantriController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $santri)
     {
         
     }
@@ -56,23 +85,57 @@ class SantriController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateSantriRequest $request, User $santri)
     {
-        //
+        $oldSantri = $santri->getOriginal();
+        $santri->update(array_merge($request->validated(), [
+            'password' => $request->password ? bcrypt($request->password) : $santri->password,
+            'phone' => $request->phone,
+            'parent_id'     => $request->parent_id,
+        ]));
+
+        $student = Student::where('user_id', $santri->id)->update([
+            'address' => $request->address ?? null,
+            'level' => $request->level ?? null,
+            'date_born' => $request->date_born ?? null,
+            'place_born' => $request->place_born ?? null,
+            'gender' => $request->gender ?? null,
+            'admission_number' => $request->nsm ?? null,
+            'national_admission_number' => $request->nisn ?? null,
+        ]);
+
+        $this->createLog('Santri', 'Update Santri', $santri, [
+            'old_data'  => $oldSantri,
+            'new_data'  => $santri->getChanges(),
+        ], 'update');
+
+        return response()->json([
+            'message' => 'Santri berhasil diperbarui',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $santri)
     {
-        //
+        $oldSantri = $santri->getOriginal();
+        $santri->delete();
+
+        $this->createLog('Santri', 'Delete Santri', $santri, [
+            'old_data' => $oldSantri,
+            'new_data' => $santri->toArray(),
+        ], 'delete');
+
+        return response()->json([
+            'message' => 'Santri berhasil dihapus',
+        ]);
     }
 
     public function data(): AnonymousResourceCollection
     {
         $santri = QueryBuilder::for(User::class)
-            ->whereNotNull('parent_id')
+            ->withRole('santri')
             ->allowedSorts(['name'])
             ->allowedFilters(['name'])
             ->defaultSort('-name')

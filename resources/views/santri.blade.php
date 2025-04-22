@@ -1,10 +1,26 @@
 @php
-    $columns = ['No', 'Nama', 'username', 'email', 'parent', 'Action'];
+    $columns = ['No', 'Nama', 'username', 'email', 'parent', 'Tindakan'];
     $form = [
         'name' => ['type' => 'text','title' => "Nama Santri"],
         'username' => ['type' => 'text','title' => "Username Santri"],
         'email'=> ['type' => 'email', 'title' => "Email Santri"]
     ];
+
+    $levels = [
+        'Madrasah Ibtidaiyah',
+        'Madrasah Tsanawiyah',
+        'Madrasah Aliyah',
+        'Perguruan Tinggi',
+    ];
+
+    $genders = [
+        'L',
+        'P',
+    ];
+
+    $date = date('Y-m-d');
+
+    $parents = \App\Models\User::withRole('orang_tua')->get();
 @endphp
 
 @extends('layouts.app')
@@ -30,12 +46,195 @@
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
-                                @foreach($form as $key => $value)
-                                    <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <x-input :type="$value['type']" :name="$key"
-                                                 :placeholder="$value['title']"/>
+                                <!-- Orang Tua -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <select class="form-control parent_id" id="parent_id" name="parent_id" data-live-search="false">
+                                        <option value="">Pilih Orang Tua</option>
+                                        @foreach($parents as $parent)
+                                            <option value="{{$parent->id}}" @if(isset($selected)) {{$selected == $parent->id ? "selected" : ''}}  @endif>{{$parent->username}}</option>
+                                        @endforeach
+                                    </select>
+                                    <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
+                                </div>
+
+                                <!-- Level -->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <select class="form-control level" id="level" name="level" data-live-search="false">
+                                        <option value="">Pilih Tingkatan</option>
+                                        @foreach($levels as $level)
+                                            <option
+                                                value="{{$level}}" @if(isset($selected)) {{$selected == $level ? "selected" : ''}}  @endif>{{$level}}</option>
+                                        @endforeach
+                                    </select>
+                                    <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <select class="form-control gender" id="gender" name="gender" data-live-search="false">
+                                        <option value="">Pilih Kelamin</option>
+                                        @foreach($genders as $gender)
+                                            <option value="{{$gender}}" @if(isset($selected)) {{$selected == $gender ? "selected" : ''}}  @endif>{{$gender == 'L' ? 'Laki-Laki' : 'Perempuan'}}</option>
+                                        @endforeach
+                                    </select>
+                                    <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
+                                </div>
+                                
+                                <!-- Name -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-support"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="name" id="name" type="text" 
+                                                class="form-control" placeholder="Nama Lengkap">
+                                        </div>
                                     </div>
-                                @endforeach
+                                </div>
+                                <!-- Username -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-username"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="username" id="username" 
+                                                   type="text" class="form-control"
+                                                   placeholder="Username">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Email -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-mail"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="email" id="email" type="text" 
+                                                class="form-control" placeholder="Email">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Phone -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-phone"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="phone" id="phone" type="text"
+                                                   class="form-control"
+                                                   placeholder="Nomor telepon">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- NSM -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-username"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="nsm" id="nsm" type="text" 
+                                                class="form-control" placeholder="Nomor Statistik Madrasah">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- NISN -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-username"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="nisn" id="nisn" type="text"
+                                                   class="form-control"
+                                                   placeholder="Nomor Induk Siswa Nasional">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Tempat Lahir -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-address"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="place_born" id="place_born" type="text" 
+                                                class="form-control" placeholder="Tempat Lahir">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Tanggal Lahir -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-calendar"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="date_born" id="date_born" type="date"
+                                                   max="{{ $date }}" class="form-control"
+                                                   placeholder="Tanggal Lahir">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Address -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-address"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="address" id="address" placeholder="Masukkan Alamat Lengkap"
+                                                   type="text" class="form-control">
+                                            </div>
+                                    </div>
+                                </div>
+                                <!-- Pin -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-key"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input oninput="validatePin(this)" name="pin" id="pin"
+                                                   min="100000" max="999999" maxlength="6"
+                                                   placeholder="Masukkan PIN 6 Digit"
+                                                   type="text" class="form-control">
+                                            </div>
+                                            <small style="color: red" id="note_pin"></small>
+                                    </div>
+                                </div>
+                                <!-- Password -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-key"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="password" minlength="8"
+                                                   placeholder="Password" type="text"
+                                                   class="form-control">
+                                            </div>
+                                            <small style="color: red" id="note_password"></small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-key"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="password_confirmation" id="password_confirmation"
+                                                    minlength="8"
+                                                   placeholder="Konfirmasi Password"
+                                                   type="text" class="form-control">
+                                            <small style="color: red"></small>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
                                     <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
                                 </div>
@@ -81,7 +280,6 @@
 
                 let actionTd = $("<td class='text-right'></td>");
 
-                actionTd.append(`<button class="btn btn-success edit" data-id="${santri.id}"><i class="notika-icon notika-print"></i></button>`);
                 actionTd.append(`<button class="btn btn-info edit" data-id="${santri.id}"><i class="notika-icon notika-edit"></i></button>`);
                 actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/santri/${santri.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
@@ -97,7 +295,7 @@
                         <div class="form-example-int form-example-st">
                             <div class="form-group">
                                 <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
                                 </div>
                             </div>
                         </div>
@@ -108,22 +306,41 @@
         });
 
         $(document).ready(function () {
+            // ✅ Fungsi debounce untuk membatasi frekuensi eksekusi pencarian
+            function debounce(func, delay) {
+                let timeout;
+                return function () {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
             const $search = $("#search");
             const $category = $(".category_search");
 
             function handleSearch() {
                 const searchValue = $search.val();
                 const categoryValue = $category.find("option:selected").val();
+
+                if (searchValue.trim() === "" && categoryValue === "") {
+                    getData(); // Reset ke semua data
+                    return;
+                }
+
                 getData(searchValue, categoryValue);
             }
 
-            $search.on("input", handleSearch);
+            $search.on("input", debounce(handleSearch, 300)); // kamu bisa naikkan delay jadi 300ms agar lebih smooth
             $category.on("change", handleSearch);
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
+                $('#note_password').html('');
+                $('#note_pin').html('');
                 //remove _method
                 $('#_form input[name="_method"]').remove();
                 $('#_form').attr('action', '{{ route('santri.store') }}');
@@ -159,6 +376,7 @@
                 } else {
                     getData();
                     $(idForm).trigger('reset');
+                    $('#add').removeClass('hidden')
                     $('#show_image').attr('src', '');
                     $.each($(idForm).find('input select'), function (index, node) {
                         node.value = '';
@@ -177,6 +395,7 @@
 
         $('#cancel').click(function () {
             $(idForm).trigger('reset');
+            $('#add').removeClass('hidden')
             $('#show_image').attr('src', '');
             $.each($(idForm).find('input select'), function (index, node) {
                 node.value = '';
@@ -188,14 +407,25 @@
         $(document).on('click', '.edit', function (e) {
             e.preventDefault();
             let id = $(this).data('id');
-            console.log(id);
             let data = responseData.find((item) => item.id == id);
+            $('#add').addClass('hidden')
+            $('#note_password').html('*kosongkan pin jika tidak di rubah');
+            $('#note_pin').html('*kosongkan pin jika tidak di rubah');
             $('#_form').toggle();
             $('#table').toggle();
             $('#_form').attr('action', `/santri/${id}`);
             $('#name').val(data.name)
             $('#username').val(data.username)
             $('#email').val(data.email)
+            $('#address').val(data.address)
+            $('#phone').val(data.phone)
+            $('#level').val(data.level)
+            $('#date_born').val(data.date_born)
+            $('#place_born').val(data.place_born)
+            $('#gender').val(data.gender)
+            $('#parent_id').val(data.parent_id)
+            $('#nsm').val(data.admission_number)
+            $('#nisn').val(data.national_admission_number)
             $('#id').val(data.id)
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
