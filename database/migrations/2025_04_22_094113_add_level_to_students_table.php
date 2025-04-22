@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('students', function (Blueprint $table) {
             $table->string('national_admission_number')->nullable();
             $table->string('level')->nullable();
-            $table->date('date_born')->nullable();
-            $table->string('place_born')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->string('place_of_birth')->nullable();
             $table->enum('gender', ['L', 'P'])->nullable();
         });
     }

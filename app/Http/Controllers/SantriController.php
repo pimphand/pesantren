@@ -47,10 +47,11 @@ class SantriController extends Controller
 
         $student = Student::create([
             'user_id' => $santri->id,
+            'class_now' => $request->class_now ?? null,
             'address' => $request->address ?? null,
             'level' => $request->level ?? null,
-            'date_born' => $request->date_born ?? null,
-            'place_born' => $request->place_born ?? null,
+            'date_of_birth' => $request->date_of_birth ?? null,
+            'place_of_birth' => $request->place_of_birth ?? null,
             'gender' => $request->gender ?? null,
             'admission_number' => $request->nsm ?? null,
             'national_admission_number' => $request->nisn ?? null,
@@ -96,9 +97,10 @@ class SantriController extends Controller
 
         $student = Student::where('user_id', $santri->id)->update([
             'address' => $request->address ?? null,
+            'class_now' => $request->class_now ?? null,
             'level' => $request->level ?? null,
-            'date_born' => $request->date_born ?? null,
-            'place_born' => $request->place_born ?? null,
+            'date_of_birth' => $request->date_of_birth ?? null,
+            'place_of_birth' => $request->place_of_birth ?? null,
             'gender' => $request->gender ?? null,
             'admission_number' => $request->nsm ?? null,
             'national_admission_number' => $request->nisn ?? null,

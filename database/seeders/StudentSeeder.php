@@ -21,8 +21,8 @@ class StudentSeeder extends Seeder
             'address' => 'kalasan rt4 rw 30, kalasan, sleman, yogyakarta',
             'photo' => null,
             'level' => 'Madrasah Aliyah',
-            'date_born' => date('2005-04-20'),
-            'place_born' => 'Sleman',
+            'date_of_birth' => date('2005-04-20'),
+            'place_of_birth' => 'Sleman',
             'gender' => 'L',
         ]);
     }

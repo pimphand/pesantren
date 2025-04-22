@@ -46,8 +46,63 @@
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
+                                
+                                <!-- Name -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-support"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="name" id="name" type="text" 
+                                                class="form-control" placeholder="Nama Lengkap">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Username -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-username"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="username" id="username" 
+                                                   type="text" class="form-control"
+                                                   placeholder="Username">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-mail"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="email" id="email" type="text" 
+                                                class="form-control" placeholder="Email">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-phone"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="phone" id="phone" type="text"
+                                                   class="form-control"
+                                                   placeholder="Nomor telepon">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Orang Tua -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
                                     <select class="form-control parent_id" id="parent_id" name="parent_id" data-live-search="false">
                                         <option value="">Pilih Orang Tua</option>
                                         @foreach($parents as $parent)
@@ -57,6 +112,19 @@
                                     <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
                                 </div>
 
+                                <!-- Kelas -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-support"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="class_now" id="class_now" type="text" 
+                                                class="form-control" placeholder="kelas">
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <!-- Level -->
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <select class="form-control level" id="level" name="level" data-live-search="false">
@@ -80,56 +148,6 @@
                                     <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
                                 </div>
                                 
-                                <!-- Name -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="name" id="name" type="text" 
-                                                class="form-control" placeholder="Nama Lengkap">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Username -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-username"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="username" id="username" 
-                                                   type="text" class="form-control"
-                                                   placeholder="Username">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Email -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-mail"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="email" id="email" type="text" 
-                                                class="form-control" placeholder="Email">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Phone -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-phone"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="phone" id="phone" type="text"
-                                                   class="form-control"
-                                                   placeholder="Nomor telepon">
-                                        </div>
-                                    </div>
-                                </div>
                                 <!-- NSM -->
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                     <div class="form-group ic-cmp-int">
@@ -162,7 +180,7 @@
                                             <i class="notika-icon notika-address"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="place_born" id="place_born" type="text" 
+                                            <input name="place_of_birth" id="place_of_birth" type="text" 
                                                 class="form-control" placeholder="Tempat Lahir">
                                         </div>
                                     </div>
@@ -174,9 +192,9 @@
                                             <i class="notika-icon notika-calendar"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="date_born" id="date_born" type="date"
-                                                   max="{{ $date }}" class="form-control"
-                                                   placeholder="Tanggal Lahir">
+                                            <input name="date_of_birth" id="date_of_birth" type="text"
+                                                    class="form-control"
+                                                    placeholder="Tanggal Lahir">
                                         </div>
                                     </div>
                                 </div>
@@ -252,6 +270,12 @@
 
 @push('js')
     <script src="{{ asset('assets/js/bootstrap-select/bootstrap-select.js') }}"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- jQuery UI Datepicker -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script>
         getData()
         let responseData = null;
@@ -336,6 +360,13 @@
             $category.on("change", handleSearch);
 
             $('._add_button').on('click', function () {
+                $("#date_of_birth").datepicker({
+                    dateFormat: "yy-mm-dd",
+                    maxDate: 0, // mencegah pilih tanggal di masa depan
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0" // misal lahir dalam 100 tahun terakhir
+                });
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
@@ -405,6 +436,13 @@
         });
 
         $(document).on('click', '.edit', function (e) {
+            $("#date_of_birth").datepicker({
+                dateFormat: "yy-mm-dd",
+                maxDate: 0, // mencegah pilih tanggal di masa depan
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0" // misal lahir dalam 100 tahun terakhir
+            });
             e.preventDefault();
             let id = $(this).data('id');
             let data = responseData.find((item) => item.id == id);
@@ -419,9 +457,10 @@
             $('#email').val(data.email)
             $('#address').val(data.address)
             $('#phone').val(data.phone)
+            $('#class_now').val(data.class_now)
             $('#level').val(data.level)
-            $('#date_born').val(data.date_born)
-            $('#place_born').val(data.place_born)
+            $('#date_of_birth').val(data.date_of_birth)
+            $('#place_of_birth').val(data.place_of_birth)
             $('#gender').val(data.gender)
             $('#parent_id').val(data.parent_id)
             $('#nsm').val(data.admission_number)
