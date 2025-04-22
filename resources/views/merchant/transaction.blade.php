@@ -50,6 +50,7 @@
                         <hr>
                         <div class="compose-ml">
                             <a class="btn waves-effect save" style="display: none" href="javascript:void(0)">Simpan</a>
+                            <a class="btn waves-effect" id="showDraft" style="display: none" href="javascript:void(0)">List Draft</a>
                         </div>
                     </div>
                 </div>
@@ -76,7 +77,7 @@
                                        aria-hidden="true">
                                     </i> Print Order Terakhir
                                 </button>
-                                <button class="btn btn-default btn-sm waves-effect"><i
+                                <button class="btn btn-default btn-sm waves-effect" id="save-to-draft"><i
                                         class="notika-icon notika-save"></i> Simpan Ke Draft
                                 </button>
                             </div>
@@ -126,6 +127,42 @@
         </div>
     </div>
     <div id="printData" style="display: none"></div>
+    <div class="modal fade" id="draftModal" data-backdrop="static">
+        <div class="modal-dialog modals-default">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Daftar Draft Keranjang</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="draftContent">
+                        <div class="accordion" id="draftAccordion"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draft Detail Modal -->
+    <div class="modal fade" id="draftDetailModal" data-backdrop="static">
+        <div class="modal-dialog modals-default">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Detail Draft</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Draft tersimpan: <span id="draftTime"></span></p>
+                    <div id="draftItems" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="deleteDraft">Hapus Draft</button>
+                    <button type="button" class="btn btn-primary" id="useDraft">Gunakan Draft</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -246,10 +283,28 @@
             $('#_item_list').empty();
 
             cart.forEach((item) => {
-                let li = $(`<li class="mb-2"></li>`);
-                li.append(`<span>${item.name}</span>`);
-                li.append(`<span class="pull-right">Rp. ${currencyFormat(item.price)} x ${item.qty}</span>`);
-                li.append(`<span class=""><a style="color: red" href="javascript:void(0)" onclick="decrementCart('${item.id}')">Hapus</a></span>`);
+                let li = $(`<li class="cart-item"></li>`);
+
+                // Item name and price in one line
+                let itemHeader = $(`
+                    <div class="item-header">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-price">Rp. ${currencyFormat(item.price)}</span>
+                    </div>
+                `);
+                li.append(itemHeader);
+
+                // Quantity input row
+                let quantityControls = $(`
+                    <div class="quantity-row">
+                        <button class="qty-btn minus" data-id="${item.id}">-</button>
+                        <input type="number" class="qty-input" data-id="${item.id}" value="${item.qty}" min="1">
+                        <button class="qty-btn plus" data-id="${item.id}">+</button>
+                        <a href="javascript:void(0)" class="delete-btn" onclick="removeFromCart('${item.id}')"><i class="notika-icon notika-trash" style="color:red"></i></a>
+                    </div>
+                `);
+                li.append(quantityControls);
+
                 $('#_item_list').append(li);
             });
 
@@ -263,6 +318,50 @@
                 $('.save').hide()
             }
         }
+
+        // Update event handlers for new buttons
+        $(document).on('click', '.qty-btn.minus', function() {
+            const id = $(this).data('id');
+            let cart = getCart();
+            const item = cart.find(item => item.id === id);
+
+            if (item && item.qty > 1) {
+                item.qty -= 1;
+                saveCart(cart);
+                showCart();
+            }
+        });
+
+        $(document).on('click', '.qty-btn.plus', function() {
+            const id = $(this).data('id');
+            let cart = getCart();
+            const item = cart.find(item => item.id === id);
+
+            if (item) {
+                item.qty += 1;
+                saveCart(cart);
+                showCart();
+            }
+        });
+
+        $(document).on('change', '.qty-input', function() {
+            const id = $(this).data('id');
+            const newQty = parseInt($(this).val());
+
+            if (newQty < 1) {
+                $(this).val(1);
+                return;
+            }
+
+            let cart = getCart();
+            const item = cart.find(item => item.id === id);
+
+            if (item) {
+                item.qty = newQty;
+                saveCart(cart);
+                showCart();
+            }
+        });
 
         $(document).on('click', '.save', function () {
             let cart = getCart();
@@ -282,6 +381,7 @@
         setTimeout(() => {
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         }, 3000); // 3000 milliseconds = 3 seconds
+
         function onScanFailure(error) {
         }
 
@@ -524,6 +624,194 @@
             `);
         });
         //End List Transaksi
+
+        // Function to check and update draft button visibility
+        function updateDraftButtonVisibility() {
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
+            const now = new Date().getTime();
+
+            // Filter out expired drafts
+            const validDrafts = drafts.filter(draft => {
+                const hoursDiff = (now - draft.timestamp) / (1000 * 60 * 60);
+                return hoursDiff <= 20;
+            });
+
+            // Update localStorage with only valid drafts
+            localStorage.setItem('drafts', JSON.stringify(validDrafts));
+
+            // Show/hide draft button based on valid drafts count
+            if (validDrafts.length > 0) {
+                $('#showDraft').show();
+            } else {
+                $('#showDraft').hide();
+            }
+        }
+
+        // Call on page load
+        $(document).ready(function() {
+            updateDraftButtonVisibility();
+        });
+
+        // Update draft button visibility after saving to draft
+        $('#save-to-draft').click(function() {
+            let cart = getCart();
+            if (cart.length === 0) {
+                toast('Keranjang masih kosong!', 'error', 'Gagal!');
+                return;
+            }
+
+            // Get existing drafts or initialize empty array
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || [];
+
+            // Create new draft
+            const newDraft = {
+                id: Date.now(), // Use timestamp as unique ID
+                cart: cart,
+                timestamp: new Date().getTime(),
+                name: `Draft ${drafts.length + 1}`
+            };
+
+            // Add new draft to array
+            drafts.push(newDraft);
+
+            // Save back to localStorage
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+
+            // Clear current cart
+            saveCart([]);
+            showCart();
+
+            toast('Keranjang berhasil dipindahkan ke draft!', 'success', 'Berhasil!');
+            updateDraftButtonVisibility();
+        });
+
+        // Show draft modal with list of drafts
+        $('#showDraft').click(function() {
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
+            if (drafts.length === 0) {
+                toast('Tidak ada draft tersimpan!', 'warning', 'Peringatan!');
+                $('#showDraft').hide();
+                return;
+            }
+
+            // Clear and update draft list
+            $('#draftAccordion').empty();
+
+            // Filter out expired drafts
+            const now = new Date().getTime();
+            const validDrafts = drafts.filter(draft => {
+                const hoursDiff = (now - draft.timestamp) / (1000 * 60 * 60);
+                return hoursDiff <= 20;
+            });
+
+            // Update localStorage with only valid drafts
+            localStorage.setItem('drafts', JSON.stringify(validDrafts));
+
+            if (validDrafts.length === 0) {
+                toast('Semua draft telah kadaluarsa!', 'warning', 'Peringatan!');
+                return;
+            }
+
+            // Display each draft
+            validDrafts.forEach((draft, index) => {
+                const draftDate = new Date(draft.timestamp);
+                const timeString = draftDate.toLocaleString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // Calculate totals
+                const totalItems = draft.cart.reduce((sum, item) => sum + item.qty, 0);
+                const totalPrice = draft.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+                const draftCard = $(`
+                    <div class="draft-card">
+                        <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
+                            <div class="draft-title">${draft.name}</div>
+                            <div class="draft-time">${timeString}</div>
+                            <div class="draft-summary">
+                                <span>${totalItems} Item</span>
+                                <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
+                            </div>
+                        </div>
+                        <div id="collapse${draft.id}" class="collapse">
+                            <div class="draft-body">
+                                <div class="draft-items">
+                                    ${draft.cart.map(item => `
+                                        <div class="draft-item">
+                                            <span class="draft-item-name">${item.name}</span>
+                                            <span class="draft-item-qty">${item.qty}x</span>
+                                            <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="draft-total">
+                                    Total: Rp. ${currencyFormat(totalPrice)}
+                                </div>
+                                <div class="draft-actions">
+                                    <button class="btn-draft delete delete-draft" data-id="${draft.id}">
+                                        <i class="notika-icon notika-trash"></i> Hapus
+                                    </button>
+                                    <button class="btn-draft use use-draft" data-id="${draft.id}">
+                                        <i class="notika-icon notika-checked"></i> Gunakan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+                $('#draftAccordion').append(draftCard);
+            });
+
+            $('#draftModal').modal('show');
+        });
+
+        // Handle use draft button
+        $(document).on('click', '.use-draft', function() {
+            const draftId = $(this).data('id');
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
+            const draft = drafts.find(d => d.id === draftId);
+
+            if (draft) {
+                saveCart(draft.cart);
+                showCart();
+
+                // Remove the used draft
+                const updatedDrafts = drafts.filter(d => d.id !== draftId);
+                localStorage.setItem('drafts', JSON.stringify(updatedDrafts));
+
+                toast('Draft berhasil digunakan!', 'success', 'Berhasil!');
+                $('#draftModal').modal('hide');
+                updateDraftButtonVisibility();
+            }
+        });
+
+        // Handle delete draft button
+        $(document).on('click', '.delete-draft', function() {
+            const draftId = $(this).data('id');
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || [];
+
+            // Remove the draft from storage
+            const updatedDrafts = drafts.filter(d => d.id !== draftId);
+            localStorage.setItem('drafts', JSON.stringify(updatedDrafts));
+
+            // Remove the draft card from view
+            $(this).closest('.draft-card').fadeOut(300, function() {
+                $(this).remove();
+
+                // If no drafts left, close the modal and hide the button
+                if (updatedDrafts.length === 0) {
+                    $('#draftModal').modal('hide');
+                    $('#showDraft').hide();
+                }
+            });
+
+            toast('Draft berhasil dihapus!', 'success', 'Berhasil!');
+        });
     </script>
 @endpush
 
@@ -561,6 +849,164 @@
         .info-box {
             background: #f9f9f9;
             border-left: 5px solid #007bff;
+        }
+
+        .cart-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .item-name {
+            font-size: 14px;
+        }
+        .item-price {
+            font-size: 14px;
+            color: #666;
+        }
+        .quantity-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+        }
+        .qty-input {
+            width: 40px;
+            height: 28px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .qty-input::-webkit-inner-spin-button,
+        .qty-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .qty-input {
+            -moz-appearance: textfield;
+        }
+        .delete-btn {
+            color: #dc3545;
+            font-size: 20px;
+            text-decoration: none;
+            line-height: 1;
+            margin-left: auto;
+        }
+        #_item_list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Draft Modal Styles */
+        .draft-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .draft-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+        .draft-header:hover {
+            background: #e9ecef;
+        }
+        .draft-body {
+            padding: 15px;
+        }
+        .draft-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+            color: #333;
+        }
+        .draft-time {
+            font-size: 12px;
+            color: #666;
+        }
+        .draft-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        .draft-items {
+            margin-top: 10px;
+        }
+        .draft-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .draft-item:last-child {
+            border-bottom: none;
+        }
+        .draft-item-name {
+            flex: 1;
+        }
+        .draft-item-qty {
+            width: 60px;
+            text-align: center;
+            color: #666;
+        }
+        .draft-item-price {
+            width: 120px;
+            text-align: right;
+            color: #666;
+        }
+        .draft-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .btn-draft {
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-draft.delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+        }
+        .btn-draft.use {
+            background: #28a745;
+            color: white;
+            border: none;
+        }
+        .draft-total {
+            font-size: 16px;
+            font-weight: 500;
+            text-align: right;
+            margin-top: 10px;
+            color: #333;
         }
     </style>
 @endpush
