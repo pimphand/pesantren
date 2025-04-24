@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductCategoryRequest extends FormRequest
 {
@@ -21,8 +22,27 @@ class StoreProductCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        $merchantId = request()->user()->merchant->id;
+
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('product_categories')->where(function ($query) use ($merchantId) {
+                    return $query->where('merchant_id', $merchantId)->whereNull('deleted_at');
+                })
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama kategori wajib diisi.',
+            'name.string' => 'Nama kategori wajib berupa string.',
+            'name.max' => 'Nama kategori maksimal 50 karakter.',
+            'name.unique' => 'Nama kategori sudah ada.',
         ];
     }
 }

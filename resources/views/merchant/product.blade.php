@@ -1,22 +1,19 @@
 @php
     $columns = ['No', 'Kategori', 'Nama Produk', 'Harga', 'Stok', 'Tindakan'];
     $form = [
-        'category_id' => ['type' => 'select','title' => "Kategori"],
-        'name' => ['type' => 'text','title' => "Nama Produk"],
-        'price' => ['type' => 'number','title' => "Harga"],
-        'stock' => ['type' => 'number','title' => "Stok"],
-        'photo' => ['type' => 'file','title' => "Foto"],
-        'description' => ['type' => 'textarea','title' => "Deskripsi"],
+        'category_id' => ['type' => 'select', 'title' => "Kategori"],
+        'name' => ['type' => 'text', 'title' => "Nama Produk"],
+        'price' => ['type' => 'number', 'title' => "Harga"],
+        'stock' => ['type' => 'number', 'title' => "Stok"],
+        'photo' => ['type' => 'file', 'title' => "Foto"],
+        'description' => ['type' => 'textarea', 'title' => "Deskripsi"],
     ];
 @endphp
 
 @extends('layouts.app')
 
 @section('breadcrumb')
-    <x-breadcrumb :title="$title"
-                  :description="'Daftar produk dan tambah produk'"
-                  :buttonTitle="'Tambah Produk'">
-    </x-breadcrumb>
+    <x-breadcrumb :title="$title" :description="'Daftar produk dan tambah produk'" :buttonTitle="'Tambah Produk'"></x-breadcrumb>
 @endsection
 
 @section('content')
@@ -36,18 +33,16 @@
                                 @foreach($form as $key => $value)
                                     @if($value['type'] == 'select')
                                         <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-select :name="$key" :title="'Kategori'" :options="$categories"/>
+                                            <x-select :name="$key" :title="'Kategori'" :options="$categories" />
                                         </div>
                                     @elseif($value['type'] == 'textarea')
                                         <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <textarea class="form-control" name="{{$key}}" id="{{$key}}"
-                                                      style="height: 100px;"
-                                                      placeholder="{{$value['title']}}"></textarea>
+                                            <textarea class="form-control" name="{{$key}}" id="{{$key}}" style="height: 100px;"
+                                                placeholder="{{$value['title']}}"></textarea>
                                         </div>
                                     @else
                                         <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-input :type="$value['type']" :name="$key"
-                                                     :placeholder="$value['title']"/>
+                                            <x-input :type="$value['type']" :name="$key" :placeholder="$value['title']" />
                                         </div>
                                     @endif
                                 @endforeach
@@ -71,13 +66,17 @@
     <script>
         getData()
         let responseData = null;
-        function getData(search = "", category = "") {
-            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+        function getData(search = "", category = "", page = 1) {
+            let url = "{{ route('merchant.products.data') }}?filter[name]=" + search + "&filter[category.id]=" + category + "&page=" + page;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
+
                 if (response.meta.total > response.meta.per_page) {
                     pagination(response);
+                } else {
+                    let pagination = $('#pagination');
+                    pagination.empty();
                 }
             });
         }
@@ -87,21 +86,22 @@
                 e.preventDefault();
             }
         });
+
         function updateTable(response) {
             let table = $("#table_product");
             table.empty();
             response.data.forEach((product, index) => {
                 let tr = $("<tr></tr>");
-                tr.append(`<td>${response.meta.from++}</td>`);
-                tr.append(`<td>${product.name}</td>`);
-                tr.append(`<td>${product.category}</td>`);
-                tr.append(`<td>${product.price}</td>`);
-                tr.append(`<td>${product.stock}</td>`);
+                tr.append("<td>" + response.meta.from++ + "</td>");
+                tr.append("<td>" + product.name + "</td>");
+                tr.append("<td>" + product.category + "</td>");
+                tr.append("<td>" + product.price + "</td>");
+                tr.append("<td>" + product.stock + "</td>");
 
                 let actionTd = $("<td class='text-right'></td>");
 
-                actionTd.append(`<button class="btn btn-info edit" data-id="${product.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/products/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append("<button class='btn btn-info edit' data-id='" + product.id + "'><i class='notika-icon notika-edit'></i></button>");
+                actionTd.append("<button class='btn btn-danger' onclick=\"deleteData('/merchant/products/" + product.id + "')\"><i class='notika-icon notika-trash'></i></button>");
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -109,23 +109,20 @@
         }
 
         $(document).ready(function () {
-            $("#search_form").append(`
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="form-example-int form-example-st">
-                            <div class="form-group">
-                                <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <x-select :name="'category_search'" :title="'Kategori'" :options="$categories"/>
-                    </div>
-                </div>
-            </div>
-            `);
+            $("#search_form").append("<div class='row'>" +
+                "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-12'>" +
+                "<div class='form-example-int form-example-st'>" +
+                "<div class='form-group'>" +
+                "<div class='nk-int-st'>" +
+                "<input type='text' class='form-control input-sm' placeholder='Cari' id='search'>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-12'>" +
+                "<x-select :name=\"'category_search'\" :title=\"'Kategori'\" :options=\"$categories\"/>" +
+                "</div>" +
+                "</div>");
         });
 
         $(document).ready(function () {
@@ -162,6 +159,7 @@
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
+                $('._add_button').hide();
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
                 $('#_form').attr('action', '{{ route('merchant.products.store') }}');
@@ -174,6 +172,34 @@
                     $('#show_image').attr('src', e.target.result);
                 };
                 reader.readAsDataURL(file);
+            });
+
+            // Prevent non-numeric input in number fields
+            $('input[type="number"]').on('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+
+            // Prevent paste of non-numeric values
+            $('input[type="number"]').on('paste', function (e) {
+                e.preventDefault();
+                let pastedData = e.originalEvent.clipboardData.getData('text');
+                let numericValue = pastedData.replace(/[^0-9]/g, '');
+                this.value = numericValue;
+            });
+
+            // Prevent drag and drop of non-numeric values
+            $('input[type="number"]').on('drop', function (e) {
+                e.preventDefault();
+                let droppedData = e.originalEvent.dataTransfer.getData('text');
+                let numericValue = droppedData.replace(/[^0-9]/g, '');
+                this.value = numericValue;
+            });
+
+            // Prevent 'e', '+', '-' characters in number fields
+            $('input[type="number"]').on('keydown', function (e) {
+                if (['e', 'E', '+', '-'].includes(e.key)) {
+                    e.preventDefault();
+                }
             });
         });
 
@@ -189,10 +215,29 @@
             if (formData.get('id')) {
                 formData.append('_method', 'PUT');
             }
-            form(url,'post', formData, function (response, error) {
+            form(url, 'post', formData, function (response, error) {
                 if (error) {
-                    swal("Gagal!", error.responseJSON.message, "error");
-                    $.each(error.responseJSON.errors, function (key, value) {
+                    if (error.status === 419) {
+                        // CSRF token mismatch, refresh the page
+                        swal({
+                            title: "Sesi Berakhir",
+                            text: "Silakan refresh halaman untuk melanjutkan",
+                            icon: "warning",
+                            button: "OK"
+                        }).then(() => {
+                            location.reload();
+                        });
+                        return;
+                    }
+
+                    let errorMessage = 'Terjadi kesalahan saat menyimpan data';
+                    swal({
+                        title: "Gagal!",
+                        text: errorMessage,
+                        icon: "error",
+                        button: "OK"
+                    });
+                    $.each(error.responseJSON.errors || {}, function (key, value) {
                         $('#' + key + '_error').text(value[0]).show();
                     });
                 } else {
@@ -205,7 +250,12 @@
                     });
                     $('#_form').toggle();
                     $('#table').toggle();
-                    swal("Berhasil!", response.message, "success");
+                    swal({
+                        title: "Berhasil!",
+                        text: response.message || 'Data berhasil disimpan',
+                        icon: "success",
+                        button: "OK"
+                    });
                 }
             });
         });
@@ -229,9 +279,10 @@
             });
             $('#_form').toggle();
             $('#table').toggle();
+            $('._add_button').show();
         });
 
-        $(document).on('click','.edit',function (e) {
+        $(document).on('click', '.edit', function (e) {
             e.preventDefault();
             let id = $(this).data('id');
             let data = responseData.find((item) => item.id == id);
@@ -258,6 +309,7 @@
         .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {
             width: 100% !important;
         }
+
         .custom-file-input {
             border: 1px solid #ccc;
             padding: 5px;
@@ -267,11 +319,11 @@
             width: 100%;
             max-width: 550px;
         }
-    
+
         .custom-file-input input {
             display: none;
         }
-    
+
         .file-label {
             display: inline-block;
             background-color: #f1f1f1;
@@ -280,11 +332,10 @@
             cursor: pointer;
             margin-right: 8px;
         }
-    
+
         .file-name {
             color: #555;
             font-size: 14px;
         }
     </style>
 @endpush
-

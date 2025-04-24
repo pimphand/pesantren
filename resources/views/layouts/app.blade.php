@@ -250,7 +250,12 @@
                 a.on("click", function (e) {
                     e.preventDefault();
                     if (link.url) {
-                        getData(link.url);
+                        // Extract page number from URL
+                        const url = new URL(link.url);
+                        const page = url.searchParams.get('page') || 1;
+                        const search = url.searchParams.get('filter[name]') || '';
+                        const category = url.searchParams.get('filter[category.id]') || '';
+                        getData(search, category, page);
                     }
                 });
 
