@@ -52,8 +52,8 @@
         getData()
         let responseData = null;
 
-        function getData(search = "", category = "") {
-            let url = `{{ route('merchant.categories.data') }}?filter[name]=${search}`;
+        function getData(search = "", category = "", page = 1) {
+            let url = `{{ route('merchant.categories.data') }}?filter[name]=${search}&page=${page}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -82,20 +82,17 @@
         }
 
         $(document).ready(function () {
-            $("#search_form").append(`
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                            <div class="form-example-int form-example-st">
-                                                <div class="form-group">
-                                                    <div class="nk-int-st">
-                                                        <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                `);
+            $("#search_form").append("<div class='row'>" +
+                "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-12'>" +
+                "<div class='form-example-int form-example-st'>" +
+                "<div class='form-group'>" +
+                "<div class='nk-int-st'>" +
+                "<input type='text' class='form-control input-sm' placeholder='Cari' id='search'>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>");
         });
 
         $(document).ready(function () {
