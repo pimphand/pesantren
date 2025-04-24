@@ -25,11 +25,12 @@ class StudentResource extends JsonResource
                 'photo' => $this->student->photo ?? null,
                 'phone' => $this->phone ?? null,
                 'level' => $this->student->level ?? null,
+                'class_now' => $this->student->class_now ?? null,
                 'admission_number' => $this->student->admission_number ?? null,
                 'national_admission_number' => $this->student->national_admission_number ?? null,
                 'place_of_birth' => $this->student->place_of_birth ?? null,
                 'date_of_birth' => $this->student->date_of_birth ?? null,
-                'gander' => $this->student->gander ?? null,
+                'gender' => $this->student->gander ?? null,
                 'address' => $this->student->address ?? null,
             ],
             'balance_histories' => $this->when(
