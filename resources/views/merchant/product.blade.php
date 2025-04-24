@@ -164,7 +164,7 @@
                 $('#_form').trigger('reset');
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
-                $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
+                $('#_form').attr('action', '{{ route('merchant.products.store') }}');
             });
 
             $('#photo').on('change', function () {

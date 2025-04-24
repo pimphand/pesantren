@@ -23,7 +23,7 @@ class SantriResource extends JsonResource
             'email' => $this->email,
             'balance' => $this->balance,
             'parent_id' => $this->parent_id,
-            'class_now' => $this->student->class_now,
+            'class_now' => $this->student->class_now ?? '',
             'parent' => $this->parentDetail->username ?? '',
             'address' => $this->student->address ?? '',
             'level' => $this->student->level ?? '',
