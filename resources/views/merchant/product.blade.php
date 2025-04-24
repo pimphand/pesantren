@@ -71,10 +71,12 @@
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
-                let pagination = $('#pagination');
-                pagination.empty();
+
                 if (response.meta.total > response.meta.per_page) {
                     pagination(response);
+                } else {
+                    let pagination = $('#pagination');
+                    pagination.empty();
                 }
             });
         }
