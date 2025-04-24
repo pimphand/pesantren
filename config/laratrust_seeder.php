@@ -17,6 +17,7 @@ return [
             'roles' => CRUD,
             'permissions' => CRUD,
             'santri' => CRUD,
+            'payment' => CRUD,
             'merchant' => CRUD,
             'panel_configuration' => 'r',
             'menu'  => 'c,r,u',

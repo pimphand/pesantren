@@ -17,6 +17,7 @@ class MenuSeeder extends Seeder
         $menus = [
             'Merchant',
             'Santri',
+            'Payment',
             'Transaction',
             'Mutasi',
             'Panel_Configuration',

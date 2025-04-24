@@ -89,32 +89,46 @@ class SantriController extends Controller
     public function update(UpdateSantriRequest $request, User $santri)
     {
         $oldSantri = $santri->getOriginal();
-        $santri->update(array_merge($request->validated(), [
-            'password' => $request->password ? bcrypt($request->password) : $santri->password,
-            'phone' => $request->phone,
-            'parent_id'     => $request->parent_id,
-        ]));
 
-        $student = Student::where('user_id', $santri->id)->update([
-            'address' => $request->address ?? null,
-            'class_now' => $request->class_now ?? null,
-            'level' => $request->level ?? null,
-            'date_of_birth' => $request->date_of_birth ?? null,
-            'place_of_birth' => $request->place_of_birth ?? null,
-            'gender' => $request->gender ?? null,
-            'admission_number' => $request->nsm ?? null,
-            'national_admission_number' => $request->nisn ?? null,
-        ]);
+        // Update data user
+        $santri->update(array_merge(
+            $request->validated(),
+            [
+                'password' => $request->password ? bcrypt($request->password) : $santri->password,
+                'phone' => $request->phone,
+                'parent_id' => $request->parent_id,
+            ]
+        ));
 
-        $this->createLog('Santri', 'Update Santri', $santri, [
-            'old_data'  => $oldSantri,
-            'new_data'  => $santri->getChanges(),
-        ], 'update');
+        // Update or create student data
+        $student = Student::updateOrCreate(
+            ['user_id' => $santri->id],
+            [
+                'address' => $request->address ?? null,
+                'class_now' => $request->class_now ?? null,
+                'level' => $request->level ?? null,
+                'date_of_birth' => $request->date_of_birth ?? null,
+                'place_of_birth' => $request->place_of_birth ?? null,
+                'gender' => $request->gender ?? null,
+                'admission_number' => $request->nsm ?? null,
+                'national_admission_number' => $request->nisn ?? null,
+            ]
+        );
+
+        // Logging perubahan
+        $this->createLog('Santri', 'Update Santri', $santri,
+            [
+                'old_data' => $oldSantri,
+                'new_data' => $santri->getChanges(),
+            ],
+            'update'
+        );
 
         return response()->json([
             'message' => 'Santri berhasil diperbarui',
         ]);
     }
+
 
     /**
      * Remove the specified resource from storage.

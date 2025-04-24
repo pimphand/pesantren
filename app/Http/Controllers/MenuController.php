@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Http\Resources\MenuResurce;
+use App\Http\Resources\MenuResource;
 use App\Http\Requests\UpdateMenuRequest;
 use App\Http\Requests\StoreMenuRequest;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -145,7 +145,7 @@ class MenuController extends Controller
             ->paginate(request()->input('per_page') ?? 10)
             ->appends(request()->query());
 
-        return MenuResurce::collection($categories);
+        return MenuResource::collection($categories);
     }
     public function dataSubmenu($menu): AnonymousResourceCollection
     {
@@ -157,6 +157,6 @@ class MenuController extends Controller
             ->paginate(request()->input('per_page') ?? 10)
             ->appends(request()->query());
 
-        return MenuResurce::collection($categories);
+        return MenuResource::collection($categories);
     }
 }

@@ -36,6 +36,11 @@ class Payment extends Model
         return $this->belongsTo(User::class, 'to_user_id', 'uuid');
     }
 
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);

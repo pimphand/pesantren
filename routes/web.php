@@ -10,6 +10,7 @@ use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SantriController;
+use App\Http\Controllers\PaymentController;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -80,6 +81,16 @@ Route::middleware(['auth'])->group(function () {
     });
     // end menu routes
 
+    
+    // merchant routes
+    Route::controller(MerchantController::class)->name('merchant_list.')->group(function () {
+        Route::get('/merchant_list', 'index')->name('index')->middleware('permission:merchant-read');
+        Route::post('/merchant_list', 'store')->name('store')->middleware('permission:merchant-create');
+        Route::get('/merchant_list-data', 'data')->name('data')->middleware('permission:merchant-read');
+        Route::put('/merchant_list/{merchant}', 'update')->name('update')->middleware('permission:merchant-update');
+        Route::delete('/merchant_list/{merchant}', 'destroy')->name('destroy')->middleware('permission:merchant-delete');
+    });
+    
     // Santri Routes
     Route::controller(SantriController::class)->name('santri.')->group(function () {
         Route::get('/santri', 'index')->name('index')->middleware('permission:santri-read');
@@ -90,12 +101,13 @@ Route::middleware(['auth'])->group(function () {
     });
     // End Santri Routes
 
-    // merchant routes
-    Route::controller(MerchantController::class)->name('merchant_list.')->group(function () {
-        Route::get('/merchant_list', 'index')->name('index')->middleware('permission:merchant-read');
-        Route::post('/merchant_list', 'store')->name('store')->middleware('permission:merchant-create');
-        Route::get('/merchant_list-data', 'data')->name('data')->middleware('permission:merchant-read');
-        Route::put('/merchant_list/{merchant}', 'update')->name('update')->middleware('permission:merchant-update');
-        Route::delete('/merchant_list/{merchant}', 'destroy')->name('destroy')->middleware('permission:merchant-delete');
+    // Payment Routes
+    Route::controller(PaymentController::class)->name('payment.')->group(function () {
+        Route::get('/payment', 'index')->name('index')->middleware('permission:payment-read');
+        Route::post('/payment', 'store')->name('store')->middleware('permission:payment-create');
+        Route::get('/payment-data', 'data')->name('data')->middleware('permission:payment-read');
+        Route::put('/payment/{payment}', 'update')->name('update')->middleware('permission:payment-update');
+        Route::delete('/payment/{payment}', 'destroy')->name('destroy')->middleware('permission:payment-delete');
     });
+    // End Payment Routes
 });
