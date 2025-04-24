@@ -30,7 +30,7 @@ class StudentResource extends JsonResource
                 'national_admission_number' => $this->student->national_admission_number ?? null,
                 'place_of_birth' => $this->student->place_of_birth ?? null,
                 'date_of_birth' => $this->student->date_of_birth ?? null,
-                'gender' => $this->student->gander ?? null,
+                'gender' => $this->student->gender ?? null,
                 'address' => $this->student->address ?? null,
             ],
             'balance_histories' => $this->when(

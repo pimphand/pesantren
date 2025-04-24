@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('level')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->string('place_of_birth')->nullable();
-            $table->enum('gender', ['L', 'P'])->nullable();
+            $table->string('gender')->nullable();
         });
     }
 

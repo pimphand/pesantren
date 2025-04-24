@@ -23,7 +23,7 @@ class StudentSeeder extends Seeder
             'level' => 'Madrasah Aliyah',
             'date_of_birth' => date('2005-04-20'),
             'place_of_birth' => 'Sleman',
-            'gender' => 'L',
+            'gender' => 'Laki-Laki',
         ]);
     }
 }

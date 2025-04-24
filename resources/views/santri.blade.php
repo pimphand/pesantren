@@ -14,8 +14,8 @@
     ];
 
     $genders = [
-        'L',
-        'P',
+        'Laki-Laki',
+        'Perempuan',
     ];
 
     $date = date('Y-m-d');
@@ -142,7 +142,7 @@
                                     <select class="form-control gender" id="gender" name="gender" data-live-search="false">
                                         <option value="">Pilih Kelamin</option>
                                         @foreach($genders as $gender)
-                                            <option value="{{$gender}}" @if(isset($selected)) {{$selected == $gender ? "selected" : ''}}  @endif>{{$gender == 'L' ? 'Laki-Laki' : 'Perempuan'}}</option>
+                                            <option value="{{$gender}}" @if(isset($selected)) {{$selected == $gender ? "selected" : ''}}  @endif>{{$gender}}</option>
                                         @endforeach
                                     </select>
                                     <code id="{{$name ?? ''}}_error"  class="error" style="display: none; background-color: transparent;"></code>
