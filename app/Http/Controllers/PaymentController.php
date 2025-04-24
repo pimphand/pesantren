@@ -71,14 +71,35 @@ class PaymentController extends Controller
                 $changeWallet = $payment->recipient->update([
                     'balance' => $wallet + $amount,
                 ]);
+
                 
                 $changeStatus = $payment->update([
                     'status' => $request->status
                 ]);
+
+                $mutation = $payment->parent->balanceHistories()->create([
+                    'type' => 'top up',
+                    'balance' => $wallet,
+                    'amount' => $wallet + $amount,
+                    'debit' => $amount,
+                    'reference_type' => Payment::class,
+                    'reference_id' => $payment->id,
+                    'description' => 'Pembayaran Top Up untuk ' . $payment->recipient->name,
+                ]);
+
+                $this->createLog('Payment', "Approve Payment", $payment, [
+                    'old_data' => $old,
+                    'new_data' => $payment->getChanges(),
+                ], 'update');
             } else {
                 $changeStatus = $payment->update([
                     'status' => $request->status
                 ]);
+
+                $this->createLog('Payment', "Approve Payment", $payment, [
+                    'old_data' => $old['status'],
+                    'new_data' => $payment->getChanges(),
+                ], 'update');
             }
         }
     }

@@ -266,7 +266,7 @@
                 $('#accept, #reject').show();
             } else if (data.status === 'paid') {
                 $('#status').addClass('btn btn-success');
-                $('#accept, #reject').hide();
+                // $('#accept, #reject').hide();
             } else {
                 $('#status').addClass('btn btn-danger');
                 $('#accept, #reject').hide();
