@@ -49,7 +49,7 @@ class MerchantSeeder extends Seeder
                 'merchant_id' => $merchant->id,
                 'status' => 'pending',
                 'total' => $product->price,
-                'invoice_number' => 'INV/2025/03/17/'.str_pad($i, 5, '0', STR_PAD_LEFT),
+                'invoice_number' => 'INV/2025/03/17/' . str_pad($i, 5, '0', STR_PAD_LEFT),
             ]);
 
             $order->orderItems()->create([
@@ -73,12 +73,11 @@ class MerchantSeeder extends Seeder
                 'amount' => $order->user->balance - $product->price,
                 'reference_id' => $order->id,
                 'reference_type' => Order::class,
-                'description' => 'Membeli Makanan di '.$order->merchant->name,
+                'description' => 'Membeli Makanan di ' . $order->merchant->name,
             ]);
 
             $order->user->balance -= $product->price;
             $order->user->save();
-
         }
 
         $order->user->balanceHistories()->create([
@@ -88,7 +87,20 @@ class MerchantSeeder extends Seeder
             'amount' => $order->user->balance - $product->price,
             'reference_id' => $order->id,
             'reference_type' => Order::class,
-            'description' => 'Membeli Makanan di '.$order->merchant->name,
+            'description' => 'Membeli Makanan di ' . $order->merchant->name,
         ]);
+
+        for ($i = 0; $i < 20; $i++) {
+            $product = Product::firstOrCreate([
+                'merchant_id' => $merchant->id,
+                'name' => 'Nasi Goreng ' . $i,
+            ], [
+                'price' => 15000,
+                'description' => 'Nasi goreng spesial ' . $i,
+                'photo' => 'nasi-goreng.jpg',
+                'stock' => 10,
+                'category_id' => $category->id,
+            ]);
+        }
     }
 }

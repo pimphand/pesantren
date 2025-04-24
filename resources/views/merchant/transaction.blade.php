@@ -167,27 +167,26 @@
         getProducts();
 
         function getProducts(search = '', category = '') {
-            let url = `{{ route('merchant.products.data') }}?filter[name]=${search}&filter[category.id]=${category}`;
+            let url = "{{ route('merchant.products.data') }}?filter[name]=" + search + "&filter[category.id]=" + category;
             form(url, 'get', null, function (response) {
                 $('#_products').empty();
                 response.data.forEach((product) => {
-                    let div = $(`<div class="products col-lg-3 col-md-3 col-sm-3 col-xs-12 mb-2"
-                        data-id="${product.id}"
-                        data-price="${product.price}"
-                        data-name="${product.name}"
-                        data-stock="${product.stock}"
-                        data-original-stock="${product.stock}"></div>`);
+                    let div = $("<div class='products col-lg-3 col-md-3 col-sm-3 col-xs-12 mb-2' " +
+                        "data-id='" + product.id + "' " +
+                        "data-price='" + product.price + "' " +
+                        "data-name='" + product.name + "' " +
+                        "data-stock='" + product.stock + "' " +
+                        "data-original-stock='" + product.stock + "'></div>");
 
-                    let colorSingle = $(`<div class="color-single" style="background-color: #00c292"></div>`);
-                    colorSingle.append(`<h2>${product.name}</h2>`);
-                    colorSingle.append(`<p>Rp. ${currencyFormat(product.price)}</p>`);
-                    colorSingle.append(`<span id="stock_${product.id}">Stok : ${product.stock}</span>`);
+                    let colorSingle = $("<div class='color-single' style='background-color: #00c292'></div>");
+                    colorSingle.append("<h2>" + product.name + "</h2>");
+                    colorSingle.append("<p>Rp. " + currencyFormat(product.price) + "</p>");
+                    colorSingle.append("<span id='stock_" + product.id + "'>Stok : " + product.stock + "</span>");
 
                     div.append(colorSingle);
                     $('#_products').append(div);
                 });
 
-                // Setelah produk ditampilkan, pastikan stok diperbarui
                 showCart();
             });
         }
@@ -277,33 +276,27 @@
             $('#_item_list').empty();
 
             cart.forEach((item) => {
-                let li = $(`<li class="cart-item"></li>`);
+                let li = $("<li class='cart-item'></li>");
 
-                // Item name and price in one line
-                let itemHeader = $(`
-                        <div class="item-header">
-                            <span class="item-name">${item.name}</span>
-                            <span class="item-price">Rp. ${currencyFormat(item.price)}</span>
-                        </div>
-                    `);
+                let itemHeader = $("<div class='item-header'>" +
+                    "<span class='item-name'>" + item.name + "</span>" +
+                    "<span class='item-price'>Rp. " + currencyFormat(item.price) + "</span>" +
+                    "</div>");
                 li.append(itemHeader);
 
-                // Quantity input row
-                let quantityControls = $(`
-                        <div class="quantity-row">
-                            <button class="qty-btn minus" data-id="${item.id}">-</button>
-                            <input type="number" class="qty-input" data-id="${item.id}" value="${item.qty}" min="1">
-                            <button class="qty-btn plus" data-id="${item.id}">+</button>
-                            <a href="javascript:void(0)" class="delete-btn" onclick="removeFromCart('${item.id}')"><i class="notika-icon notika-trash" style="color:red"></i></a>
-                        </div>
-                    `);
+                let quantityControls = $("<div class='quantity-row'>" +
+                    "<button class='qty-btn minus' data-id='" + item.id + "'>-</button>" +
+                    "<input type='number' class='qty-input' data-id='" + item.id + "' value='" + item.qty + "' min='1'>" +
+                    "<button class='qty-btn plus' data-id='" + item.id + "'>+</button>" +
+                    "<a href='javascript:void(0)' class='delete-btn' onclick=\"removeFromCart('" + item.id + "')\"><i class='notika-icon notika-trash' style='color:red'></i></a>" +
+                    "</div>");
                 li.append(quantityControls);
 
                 $('#_item_list').append(li);
             });
 
-            $('._total').text(`Rp. ${currencyFormat(total + tax)}`);
-            $('._tax').text(`Rp. ${currencyFormat(tax)}`);
+            $('._total').text("Rp. " + currencyFormat(total + tax));
+            $('._tax').text("Rp. " + currencyFormat(tax));
             updateStockDisplay();
 
             if (cart.length > 0) {
@@ -369,37 +362,42 @@
 
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-                /* verbose= */ false);
-        // html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            { fps: 60, qrbox: { width: 250, height: 250 } },
+            false
+        );
+
         setTimeout(() => {
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-        }, 3000); // 3000 milliseconds = 3 seconds
+
+            // Gunakan delay pendek untuk memastikan DOM siap
+            setTimeout(() => {
+                // Tombol izin kamera
+                $('#html5-qrcode-button-camera-permission').text('Minta Izin Kamera');
+
+                // Tombol pemilihan file
+                $('#html5-qrcode-button-file-selection').text('Pilih Gambar - Tidak ada gambar yang dipilih');
+
+                // Teks drop image
+                $('#html5-qrcode-button-file-selection')
+                    .closest('div')
+                    .find('div')
+                    .text('Atau seret gambar ke sini untuk dipindai');
+
+                // Tautan untuk mengganti metode pindai (kamera/file)
+                $('#html5-qrcode-anchor-scan-type-change').text('Gunakan Kamera Secara Langsung');
+
+            }, 100); // Delay untuk memastikan elemen sudah dimuat
+        }, 3000); // Tunggu 3 detik sebelum mulai
+
 
         function onScanFailure(error) {
+            // Handle failure if needed
         }
 
-        function onScanSuccess(decodedText, decodedResult) {
+        function onScanSuccess(decodedText) {
             if (decodedText) {
-                getUserFromQrcode(decodedText)
+                getUserFromQrcode(decodedText);
             }
-        }
-
-        function getUserFromQrcode(decodedText) {
-            let url = "{{route('merchant.transactions.qr-code', ':id')}}".replace(':id', decodedText);
-            form(url, 'get', {}, function (response, error) {
-                if (response) {
-                    $('#_form').show();
-                    $('#name').text(response.data.name);
-                    $('#balance').text("Rp. " + currencyFormat(response.data.balance));
-                    $('#user_id').val(response.data.id);
-                    html5QrcodeScanner.clear();
-                } else {
-                    $('#_form').hide();
-                    toast(error.responseJSON.message, 'error', 'Gagal!');
-                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                }
-            })
         }
 
         $('#saveTransaction').click(function () {
@@ -457,10 +455,7 @@
             let urlCreate = `{{route('merchant.transactions.data')}}?create=1`;
             $('_show_order_today').html('');
             form(urlCreate, 'get', null, function (response) {
-                $('#_show_order_today').html(`
-                        <span><strong>Pendapatan: Rp. ${currencyFormat(Number(response.total_amount))}</strong></span>
-                        <span><strong>Dari :  ${response.total_order} Order</strong></span>
-                    `);
+                $('#_show_order_today').html(`<span><strong>Pendapatan: Rp. ${currencyFormat(Number(response.total_amount))}</strong></span><span><strong>Dari :  ${response.total_order} Order</strong></span>`);
             });
         }
 
@@ -517,48 +512,46 @@
                     tr.append(`<td>Rp. ${currencyFormat(item.total)}</td>`);
                     tr.append(`<td class="${item.id}"></td>`);
                     tr.append(`<td>${item.payment.method}</td>`);
-                    tr.append(`<td class="text-right">
-                    <a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a>
-                </td>`);
+                    tr.append(`<td class="text-right"><a href="javascript:void(0)" onclick="printLastTransaction('${item.id}')" class="btn btn-primary btn-sm">Print</a></td>`);
 
                     let quantity = 0;
                     let table = $('#table_transaction');
                     table.append(tr);
 
                     // Tambahkan baris tersembunyi untuk menampilkan detail item dalam tabel
-                    let itemRow = $(`<tr class="item-row" id="items-${item.id}" style="display: none;"></tr>`);
-                    let itemDetails = `<td colspan="7">
-                                    <strong>Detail Items: ${item.invoice_number}</strong>
-                                    <table class="table table-bordered mt-2">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Item</th>
-                                                <th>Harga</th>
-                                                <th>Jumlah</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>`;
+                    let itemRow = $('<tr class="item-row" id="items-' + item.id + '" style="display: none;"></tr>');
+                    let itemDetails = '<td colspan="7">' +
+                        '<strong>Detail Items: ' + item.invoice_number + '</strong>' +
+                        '<table class="table table-bordered mt-2">' +
+                        '<thead>' +
+                        '<tr>' +
+                        '<th>Nama Item</th>' +
+                        '<th>Harga</th>' +
+                        '<th>Jumlah</th>' +
+                        '<th>Total</th>' +
+                        '</tr>' +
+                        '</thead>' +
+                        '<tbody>';
                     item.items.forEach((itm) => {
                         quantity += itm.quantity;
-                        itemDetails += `<tr>
-                                        <td>${itm.name}</td>
-                                        <td>Rp. ${currencyFormat(itm.price)}</td>
-                                        <td>${itm.quantity}</td>
-                                        <td>Rp. ${currencyFormat(itm.price * itm.quantity)}</td>
-                                    </tr>`;
+                        itemDetails += '<tr>' +
+                            '<td>' + itm.name + '</td>' +
+                            '<td>Rp. ' + currencyFormat(itm.price) + '</td>' +
+                            '<td>' + itm.quantity + '</td>' +
+                            '<td>Rp. ' + currencyFormat(itm.price * itm.quantity) + '</td>' +
+                            '</tr>';
                         if (item.tax) {
-                            itemDetails += `<tr>
-                                        <td>Pajak </td>
-                                        <td>Rp. ${currencyFormat(item.tax)}</td>
-                                        <td>1</td>
-                                        <td>Rp. ${currencyFormat(item.tax)}</td>
-                                    </tr>`;
+                            itemDetails += '<tr>' +
+                                '<td>Pajak </td>' +
+                                '<td>Rp. ' + currencyFormat(item.tax) + '</td>' +
+                                '<td>1</td>' +
+                                '<td>Rp. ' + currencyFormat(item.tax) + '</td>' +
+                                '</tr>';
                         }
                     });
-                    itemDetails += `</tbody>
-                                    </table>
-                                </td>`;
+                    itemDetails += '</tbody>' +
+                        '</table>' +
+                        '</td>';
                     itemRow.append(itemDetails);
                     table.append(itemRow);
                     $('.' + item.id).html(`<button class="btn btn-success notika-btn-success waves-effect item-btn" data-id="${item.id}">${quantity} Item</button>`);
@@ -602,20 +595,17 @@
 
         // search
         $(document).ready(function () {
-            $("#search_form").append(`
-                    <div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                            <div class="form-example-int form-example-st">
-                                <div class="form-group">
-                                    <div class="nk-int-st">
-                                        <input type="text" class="form-control input-sm" placeholder="search" id="search">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `);
+            $("#search_form").append("<div class='row'>" +
+                "<div class='col-lg-3 col-md-3 col-sm-3 col-xs-12'>" +
+                "<div class='form-example-int form-example-st'>" +
+                "<div class='form-group'>" +
+                "<div class='nk-int-st'>" +
+                "<input type='text' class='form-control input-sm' placeholder='search' id='search'>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>" +
+                "</div>");
         });
         //End List Transaksi
 
@@ -722,41 +712,41 @@
                 const totalPrice = draft.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
                 const draftCard = $(`
-                        <div class="draft-card">
-                            <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
-                                <div class="draft-title">${draft.name}</div>
-                                <div class="draft-time">${timeString}</div>
-                                <div class="draft-summary">
-                                    <span>${totalItems} Item</span>
-                                    <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
-                                </div>
-                            </div>
-                            <div id="collapse${draft.id}" class="collapse">
-                                <div class="draft-body">
-                                    <div class="draft-items">
-                                        ${draft.cart.map(item => `
-                                            <div class="draft-item">
-                                                <span class="draft-item-name">${item.name}</span>
-                                                <span class="draft-item-qty">${item.qty}x</span>
-                                                <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <div class="draft-total">
-                                        Total: Rp. ${currencyFormat(totalPrice)}
-                                    </div>
-                                    <div class="draft-actions">
-                                        <button class="btn-draft delete delete-draft" data-id="${draft.id}">
-                                            <i class="notika-icon notika-trash"></i> Hapus
-                                        </button>
-                                        <button class="btn-draft use use-draft" data-id="${draft.id}">
-                                            <i class="notika-icon notika-checked"></i> Gunakan
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `);
+                                                                                                                                                                                                                                                        <div class="draft-card">
+                                                                                                                                                                                                                                                            <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
+                                                                                                                                                                                                                                                                <div class="draft-title">${draft.name}</div>
+                                                                                                                                                                                                                                                                <div class="draft-time">${timeString}</div>
+                                                                                                                                                                                                                                                                <div class="draft-summary">
+                                                                                                                                                                                                                                                                    <span>${totalItems} Item</span>
+                                                                                                                                                                                                                                                                    <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                            <div id="collapse${draft.id}" class="collapse">
+                                                                                                                                                                                                                                                                <div class="draft-body">
+                                                                                                                                                                                                                                                                    <div class="draft-items">
+                                                                                                                                                                                                                                                                        ${draft.cart.map(item => `
+                                                                                                                                                                                                                                                                            <div class="draft-item">
+                                                                                                                                                                                                                                                                                <span class="draft-item-name">${item.name}</span>
+                                                                                                                                                                                                                                                                                <span class="draft-item-qty">${item.qty}x</span>
+                                                                                                                                                                                                                                                                                <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
+                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                        `).join('')}
+                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                    <div class="draft-total">
+                                                                                                                                                                                                                                                                        Total: Rp. ${currencyFormat(totalPrice)}
+                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                    <div class="draft-actions">
+                                                                                                                                                                                                                                                                        <button class="btn-draft delete delete-draft" data-id="${draft.id}">
+                                                                                                                                                                                                                                                                            <i class="notika-icon notika-trash"></i> Hapus
+                                                                                                                                                                                                                                                                        </button>
+                                                                                                                                                                                                                                                                        <button class="btn-draft use use-draft" data-id="${draft.id}">
+                                                                                                                                                                                                                                                                            <i class="notika-icon notika-checked"></i> Gunakan
+                                                                                                                                                                                                                                                                        </button>
+                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                    `);
 
                 $('#draftAccordion').append(draftCard);
             });
@@ -816,33 +806,58 @@
             width: 100% !important;
         }
 
-        /* Efek Hover */
+        /* Product Card Styles */
+        .products {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         .color-single {
             transition: all 0.3s ease;
             cursor: pointer;
-            padding: 9px;
-            padding-top: 9px;
-            padding-right: 2px;
-            padding-bottom: 9px;
-            padding-left: 2px;
+            padding: 15px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
+        .color-single h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            height: 44px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .color-single p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .color-single span {
+            font-size: 13px;
+            color: #666;
         }
 
         .color-single:hover {
-            transform: scale(1.05);
-            /* Membesar sedikit saat hover */
+            transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            /* Menambah bayangan */
         }
 
         /* Efek Aktif Saat Diklik */
         .color-single.active {
             border: 3px solid #000;
-            /* Tambahkan border hitam saat aktif */
             background-color: #d32f2f !important;
-            /* Ubah warna saat aktif */
             color: white !important;
-            /* Ubah warna teks */
         }
 
         .info-box {
