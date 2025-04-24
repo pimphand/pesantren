@@ -43,7 +43,7 @@ class ProductController extends Controller
 
         $product = Product::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => asset('storage/'. $photoPath) ?? null,
+            'photo' => asset('storage/' . $photoPath) ?? null,
         ]));
 
         $this->createLog('Product', 'Create Product', $product, [
@@ -69,7 +69,7 @@ class ProductController extends Controller
 
         $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('products/'.auth()->user()->merchant->id, 'public')) : $product->photo,
+            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('products/' . auth()->user()->merchant->id, 'public')) : $product->photo,
         ]));
 
         $this->createLog('Product', 'Update Product', $product, [

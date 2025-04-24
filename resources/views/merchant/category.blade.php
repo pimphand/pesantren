@@ -1,16 +1,14 @@
 @php
     $columns = ['No', 'Nama', 'Tindakan'];
     $form = [
-        'name' => ['type' => 'text','title' => "Nama Kategori"],
+        'name' => ['type' => 'text', 'title' => "Nama Kategori"],
     ];
 @endphp
 
 @extends('layouts.app')
 
 @section('breadcrumb')
-    <x-breadcrumb :title="$title"
-                  :description="'Daftar kategori dan tambah kategori'"
-                  :buttonTitle="'Tambah Kategori'">
+    <x-breadcrumb :title="$title" :description="'Daftar kategori dan tambah kategori'" :buttonTitle="'Tambah Kategori'">
     </x-breadcrumb>
 @endsection
 
@@ -30,8 +28,7 @@
                             <div class="row">
                                 @foreach($form as $key => $value)
                                     <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <x-input :type="$value['type']" :name="$key"
-                                                 :placeholder="$value['title']"/>
+                                        <x-input :type="$value['type']" :name="$key" :placeholder="$value['title']" />
                                     </div>
                                 @endforeach
                                 <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
@@ -86,19 +83,19 @@
 
         $(document).ready(function () {
             $("#search_form").append(`
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                        <div class="form-example-int form-example-st">
-                            <div class="form-group">
-                                <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                            <div class="form-example-int form-example-st">
+                                                <div class="form-group">
+                                                    <div class="nk-int-st">
+                                                        <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            `);
+                                `);
         });
 
         $(document).ready(function () {
@@ -135,6 +132,7 @@
                 $('#_form').toggle();
                 $('#table').toggle();
                 $('#_form').trigger('reset');
+                $('._add_button').hide();
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
                 $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
@@ -177,6 +175,7 @@
                     $('#_form').toggle();
                     $('#table').toggle();
                     swal("Berhasil!", response.message, "success");
+                    $('._add_button').show();
                 }
             });
         });
@@ -196,6 +195,7 @@
             });
             $('#_form').toggle();
             $('#table').toggle();
+            $('._add_button').show();
         });
 
         $(document).on('click', '.edit', function (e) {
@@ -222,4 +222,3 @@
         }
     </style>
 @endpush
-

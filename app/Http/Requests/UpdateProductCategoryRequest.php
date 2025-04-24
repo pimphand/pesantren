@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductCategoryRequest extends FormRequest
 {
@@ -18,12 +19,33 @@ class UpdateProductCategoryRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $merchantId = request()->user()->merchant->id;
+        $categoryId = request()->route('productCategory')->id;
+
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('product_categories')->where(function ($query) use ($merchantId, $categoryId) {
+                    return $query->where('merchant_id', $merchantId)
+                        ->where('id', '!=', $categoryId);
+                })
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama kategori wajib diisi.',
+            'name.string' => 'Nama kategori wajib berupa string.',
+            'name.max' => 'Nama kategori maksimal 50 karakter.',
+            'name.unique' => 'Nama kategori sudah ada.',
         ];
     }
 }
