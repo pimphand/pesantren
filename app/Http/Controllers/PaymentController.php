@@ -59,7 +59,28 @@ class PaymentController extends Controller
      */
     public function update(UpdatePaymentRequest $request, Payment $payment)
     {
-        
+        $old = [
+            'status' => $payment->status,
+            'amount' => $payment->amount,
+        ];
+        if($payment->recipient) {
+            if($request->status == 'paid') {
+                $amount = $request->amount;
+                $wallet = $payment->recipient->balance;
+
+                $changeWallet = $payment->recipient->update([
+                    'balance' => $wallet + $amount,
+                ]);
+                
+                $changeStatus = $payment->update([
+                    'status' => $request->status
+                ]);
+            } else {
+                $changeStatus = $payment->update([
+                    'status' => $request->status
+                ]);
+            }
+        }
     }
 
     /**

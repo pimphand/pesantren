@@ -21,6 +21,7 @@ class PaymentResource extends JsonResource
             'student' => $this->recipient->name ?? '',
             'amount' => $this->amount ?? '',
             'status' => $this->status ?? '',
+            'paid_at' => $this->paid_at ?? '',
             'bank' => $this->bank->name ?? '',
             'photo' => $this->proof_of_payment ?? '',
         ];

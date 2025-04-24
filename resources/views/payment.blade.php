@@ -31,7 +31,7 @@
                                             <i class="notika-icon notika-support"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="name"type="text" readonly
+                                            <input name="parent" id="parent" type="text" readonly
                                                 class="form-control" placeholder="Nama Orang Tua">
                                         </div>
                                     </div>
@@ -43,7 +43,7 @@
                                             <i class="notika-icon notika-username"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="username" type="text" readonly
+                                            <input name="student" id="student" type="text" readonly
                                                    class="form-control"
                                                    placeholder="Nama Santri">
                                         </div>
@@ -56,7 +56,7 @@
                                             <i class="notika-icon notika-mail"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="email" type="text" readonly
+                                            <input name="amount" id="amount" type="text" readonly
                                                 class="form-control" placeholder="Jumlah">
                                         </div>
                                     </div>
@@ -68,30 +68,36 @@
                                             <i class="notika-icon notika-phone"></i>
                                         </div>
                                         <div class="nk-int-st">
-                                            <input name="phone" type="text" readonly
-                                                   class="form-control"
+                                            <input name="bank" type="text" readonly
+                                                   class="form-control" id="bank"
                                                    placeholder="Nama Bank">
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Receipt -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <!-- Paid At -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
-                                            <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
+                                            <i class="notika-icon notika-alarm"></i>
                                         </div>
-                                    </div>  
-                                </div>
-                                <!-- Status -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
+                                        <div class="nk-int-st">
+                                            <input name="paid_at" id="paid_at" type="text" readonly
+                                                   class="form-control"
+                                                   placeholder="Waktu Pembayaran">
+                                        </div>
                                     </div>
                                 </div>
+                                <!-- Status -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <button class="btn dropdown-toggle" type="button" id="status" data-toggle="dropdown" aria-expanded="false"></button>
+                                </div>
+                                <!-- Receipt -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
                                     <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-primary" id="save">Simpan</button>
+                            <button type="button" class="btn btn-primary" id="accept">Terima</button>
+                            <button type="button" class="btn btn-warning" id="reject">Tolak</button>
                             <button type="button" class="btn btn-danger" id="cancel">Batal</button>
                         </div>
                     </div>
@@ -189,64 +195,102 @@
         });
 
         let idForm = '#_form';
-        $('#save').click(function (e) {
+        console.log(idForm);
+        
+        // Event untuk tombol Accept
+        $('#accept').click(function (e) {
             e.preventDefault();
+            handleFormSubmit('paid');
+        });
+
+        // Event untuk tombol Reject
+        $('#reject').click(function (e) {
+            e.preventDefault();
+            handleFormSubmit('canceled');
+        });
+
+        function handleFormSubmit(status) {
             $('.error').text('').hide();
             let url = $(idForm).attr('action');
             let formData = new FormData($(idForm)[0]);
-            console.log(formData.get('id'))
+
             if (formData.get('id')) {
                 formData.append('_method', 'PUT');
             }
+            formData.append('status', status);
+
             form(url, 'post', formData, function (response, error) {
                 if (error) {
-
                     swal("Gagal!", error.responseJSON.message, "error");
                     $.each(error.responseJSON.errors, function (key, value) {
                         $('#' + key + '_error').text(value[0]).show();
                     });
                 } else {
                     getData();
-                    $(idForm).trigger('reset');
-                    $('#show_image').attr('src', '');
-                    $.each($(idForm).find('input select'), function (index, node) {
-                        node.value = '';
-                    });
-                    $('#_form').toggle();
-                    $('#table').toggle();
+                    resetForm();
                     swal("Berhasil!", response.message, "success");
                 }
             });
+        }
+
+        // Event untuk tombol Cancel
+        $('#cancel').click(function () {
+            resetForm();
         });
 
-        // Clear errors when typing
-        $(idForm).find('input select').on('input change', function () {
+        // Bersihkan error saat input berubah
+        $(idForm).find('input, select').on('input change', function () {
             $('#' + this.id + '_error').text('').hide();
         });
 
-        $('#cancel').click(function () {
-            $(idForm).trigger('reset');
-            $('#show_image').attr('src', '');
-            $.each($(idForm).find('input select'), function (index, node) {
-                node.value = '';
-            });
-            $('#_form').toggle();
-            $('#table').toggle();
-        });
-
+        // Event untuk tombol Edit
         $(document).on('click', '.edit', function (e) {
             e.preventDefault();
+
             let id = $(this).data('id');
-            console.log(id);
-            let data = responseData.find((item) => item.id == id);
+            let data = responseData.find(item => item.id == id);
+
             $('#_form').toggle();
             $('#table').toggle();
+
             $('#_form').attr('action', `/payment/${id}`);
-            $('#name').val(data.name)
-            $('#id').val(data.id)
-            $('#show_image').attr('src', data.photo)
-            $('#_form').append('<input type="hidden" name="_method" value="PUT">');
-        })
+            $('#parent').val(data.parent);
+            $('#student').val(data.student);
+            $('#amount').val(data.amount);
+            $('#bank').val(data.bank);
+            $('#status').html(data.status.charAt(0).toUpperCase() + data.status.slice(1));
+
+            $('#status').removeClass();
+            if (data.status === 'pending') {
+                $('#status').addClass('btn btn-warning');
+                $('#accept, #reject').show();
+            } else if (data.status === 'paid') {
+                $('#status').addClass('btn btn-success');
+                $('#accept, #reject').hide();
+            } else {
+                $('#status').addClass('btn btn-danger');
+                $('#accept, #reject').hide();
+            }
+
+            $('#id').val(data.id);
+            $('#show_image').attr('src', data.photo);
+
+            // Tambah hidden input _method hanya jika belum ada
+            if (!$('#_form input[name="_method"]').length) {
+                $('#_form').append('<input type="hidden" name="_method" value="PUT">');
+            }
+        });
+
+        // Fungsi untuk mereset form
+        function resetForm() {
+            $(idForm).trigger('reset');
+            $('#show_image').attr('src', '');
+            $(idForm).find('input, select').each(function () {
+                this.value = '';
+            });
+            $('#_form').hide();
+            $('#table').show();
+        }
     </script>
 @endpush
 
