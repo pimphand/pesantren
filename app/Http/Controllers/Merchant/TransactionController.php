@@ -170,8 +170,8 @@ class TransactionController extends Controller
      */
     public function qrCode($id): \Illuminate\Http\JsonResponse
     {
-        $id = explode('|', $id);
-        $user = User::where('uuid', $id[0])->first();
+        $data = explode('|', $id);
+        $user = User::where('uuid', $data[0])->first();
         if (! $user) {
             return response()->json([
                 'message' => 'User tidak ditemukan',
