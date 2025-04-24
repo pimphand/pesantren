@@ -93,8 +93,8 @@
             response.data.forEach((product, index) => {
                 let tr = $("<tr></tr>");
                 tr.append("<td>" + response.meta.from++ + "</td>");
-                tr.append("<td>" + product.name + "</td>");
                 tr.append("<td>" + product.category + "</td>");
+                tr.append("<td>" + product.name + "</td>");
                 tr.append("<td>" + product.price + "</td>");
                 tr.append("<td>" + product.stock + "</td>");
 
