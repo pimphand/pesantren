@@ -33,14 +33,14 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $user->tokens()->delete();
+        // $user->tokens()->delete();
 
         $token = $user->createToken('login')->plainTextToken;
         $this->createLog('Login Api', 'Login Api', $user, $request->except(['password', 'pin']), 'login');
 
         return response()->json([
             'message' => 'Login successful',
-            'token' => 'Bearer '.$token,
+            'token' => 'Bearer ' . $token,
         ]);
     }
 
@@ -53,7 +53,7 @@ class AuthController extends Controller
     public function logout(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
-        if($user) {
+        if ($user) {
             $this->createLog('Logout Api', 'Logout Api', $user, [$user->email], 'logout');
             request()->user()->tokens()->delete();
         }
