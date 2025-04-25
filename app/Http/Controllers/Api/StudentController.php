@@ -40,7 +40,7 @@ class StudentController extends Controller
      * @response array{data: StudentResource, message: string}
      */
     #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
-    public function bankMutation(string $id): StudentResource
+    public function bankMutation(): StudentResource
     {
         $student = $this->user->children()->first();
         $student->load('balanceHistories');
