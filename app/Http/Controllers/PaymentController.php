@@ -77,7 +77,7 @@ class PaymentController extends Controller
                     'status' => $request->status
                 ]);
 
-                $mutation = $payment->parent->balanceHistories()->create([
+                $mutation = $payment->recipient->balanceHistories()->create([
                     'type' => 'top up',
                     'balance' => $wallet,
                     'amount' => $wallet + $amount,
