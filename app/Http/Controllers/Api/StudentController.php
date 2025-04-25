@@ -42,7 +42,7 @@ class StudentController extends Controller
     #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
     public function bankMutation(string $id): StudentResource
     {
-        $student = $this->user->children()->where('uuid', $id)->first();
+        $student = $this->user->children()->first();
         $student->load('balanceHistories');
 
         return StudentResource::make($student)->additional([
@@ -68,7 +68,7 @@ class StudentController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $this->user->password,
         ]);
 
-        $path ="storage/";
+        $path = "storage/";
         if ($request->hasFile('photo') && $this->user->parentDetail && $this->user->parentDetail->photo) {
             $photoPath = str_replace(asset($path), '', $this->user->parentDetail->photo);
             $fullPath = public_path($path . $photoPath);
@@ -127,7 +127,8 @@ class StudentController extends Controller
      * [HeaderParameter('Authorization', 'Bearer {token}')]
      */
     #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
-    public function qrCode($id) {
+    public function qrCode($id)
+    {
         $qrCode = \QrCode::format('svg')->size(200)->generate($id . '|' . \Carbon\Carbon::now()->timestamp);
         return response($qrCode)->header('Content-Type', 'image/svg+xml');
 
