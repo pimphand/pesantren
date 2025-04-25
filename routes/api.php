@@ -14,7 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Student Routes
     Route::prefix('students')->group(function () {
         Route::get('/', [StudentController::class, 'index']);
-        Route::get('{id}/bank-mutation', [StudentController::class, 'bankMutation']);
+        Route::get('bank-mutation', [StudentController::class, 'bankMutation']);
         Route::get('{id}/qrCode', [StudentController::class, 'qrCode']);
         Route::post('parent-update', [StudentController::class, 'updateProfile']);
     });
@@ -22,7 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Payment Routes
     Route::prefix('payments')->group(function () {
         Route::get('histories', [PaymentController::class, 'index']);
-        Route::post('top-up', [PaymentController::class, 'store']);
+        Route::get('generate-key', [PaymentController::class, 'generateKey']);
+        Route::post('top-up', [PaymentController::class, 'store'])->middleware('throttle:3,1');
         Route::get('top-up/{payment}', [PaymentController::class, 'show']);
         Route::get('banks', [PaymentController::class, 'banks']);
     });
