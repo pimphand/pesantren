@@ -8,16 +8,21 @@ use App\Http\Requests\UpdateProductCategoryRequest;
 use App\Http\Resources\ProductCategoryResource;
 use App\Models\ProductCategory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductCategoryController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
+        $this->authorize('viewAny', ProductCategory::class);
+
         return view('merchant.category', [
             'title' => 'Kategori',
         ]);
@@ -36,6 +41,8 @@ class ProductCategoryController extends Controller
      */
     public function store(StoreProductCategoryRequest $request): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('create', ProductCategory::class);
+
         $category = ProductCategory::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
         ]));
@@ -55,11 +62,8 @@ class ProductCategoryController extends Controller
      */
     public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory): \Illuminate\Http\JsonResponse
     {
-        if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
-            return response()->json([
-                'message' => 'Anda tidak memiliki akses ke produk ini',
-            ], 403);
-        }
+        $this->authorize('update', $productCategory);
+
         $oldCategory = $productCategory->getOriginal();
         $productCategory->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
@@ -80,13 +84,11 @@ class ProductCategoryController extends Controller
      */
     public function destroy(ProductCategory $productCategory): \Illuminate\Http\JsonResponse
     {
-        if ($productCategory->merchant_id !== auth()->user()->merchant->id) {
-            return response()->json([
-                'message' => 'Anda tidak memiliki akses ke produk ini',
-            ], 403);
-        }
+        $this->authorize('delete', $productCategory);
+
         $oldCategory = $productCategory->getOriginal();
         $productCategory->delete();
+
         $this->createLog('Product', 'Delete Product', $productCategory, [
             'old_data' => $oldCategory,
             'new_data' => null,
@@ -102,6 +104,8 @@ class ProductCategoryController extends Controller
      */
     public function data(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', ProductCategory::class);
+
         $categories = QueryBuilder::for(ProductCategory::class)
             ->where('merchant_id', auth()->user()->merchant->id)
             ->allowedSorts(['name'])

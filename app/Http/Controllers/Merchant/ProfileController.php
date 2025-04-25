@@ -10,8 +10,11 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 class ProfileController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
@@ -60,14 +63,10 @@ class ProfileController extends Controller
      */
     public function update(UpdateMerchantRequest $request, Merchant $merchant): \Illuminate\Http\JsonResponse
     {
-        if ($merchant->user_id !== auth()->user()->id) {
-            return response()->json([
-                'message' => 'Anda tidak memiliki akses ke merchant ini',
-            ], 403);
-        }
+        $this->authorize('update', $merchant);
 
-        $merchant->update(array_merge($request->validated(),[
-            'photo' => $request->hasFile('photo') ? asset('storage/'.$request->file('photo')->store('photo-', 'public')) : $merchant->photo,
+        $merchant->update(array_merge($request->validated(), [
+            'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('photo-', 'public')) : $merchant->photo,
             'is_pin' => $request->is_pin ? $request->is_pin : 0,
             'is_tax' => $request->is_tax ? $request->is_tax : 0,
             'tax' => $request->is_tax ? $request->tax : 0,

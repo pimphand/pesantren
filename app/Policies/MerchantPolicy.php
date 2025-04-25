@@ -12,7 +12,7 @@ class MerchantPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,7 +20,7 @@ class MerchantPolicy
      */
     public function view(User $user, Merchant $merchant): bool
     {
-        return false;
+        return $merchant->user_id === $user->id;
     }
 
     /**
@@ -28,7 +28,7 @@ class MerchantPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -36,7 +36,7 @@ class MerchantPolicy
      */
     public function update(User $user, Merchant $merchant): bool
     {
-        return false;
+        return $merchant->user_id === $user->id;
     }
 
     /**
@@ -44,7 +44,7 @@ class MerchantPolicy
      */
     public function delete(User $user, Merchant $merchant): bool
     {
-        return false;
+        return $merchant->user_id === $user->id;
     }
 
     /**
@@ -52,7 +52,7 @@ class MerchantPolicy
      */
     public function restore(User $user, Merchant $merchant): bool
     {
-        return false;
+        return $merchant->user_id === $user->id;
     }
 
     /**
@@ -60,6 +60,6 @@ class MerchantPolicy
      */
     public function forceDelete(User $user, Merchant $merchant): bool
     {
-        return false;
+        return $merchant->user_id === $user->id;
     }
 }

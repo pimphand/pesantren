@@ -12,16 +12,21 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index(): Factory|Application|View
     {
+        $this->authorize('viewAny', Product::class);
+
         return view('merchant.product', [
             'title' => 'Produk',
             'categories' => auth()->user()->merchant->productCategory->select('name', 'id'),
@@ -33,6 +38,8 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request): JsonResponse
     {
+        $this->authorize('create', Product::class);
+
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store(
@@ -56,16 +63,14 @@ class ProductController extends Controller
         ]);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $this->authorize('update', $product);
+
         $old = $product->getOriginal();
-        if ($product->merchant_id !== auth()->user()->merchant->id) {
-            return abort('403', 'Anda tidak memiliki akses ke produk ini');
-        }
 
         $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
@@ -87,17 +92,16 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): JsonResponse
     {
-        $old = $product->getOriginal();
-        if ($product->merchant_id !== auth()->user()->merchant->id) {
-            return abort('403', 'Anda tidak memiliki akses ke produk ini');
-        }
+        $this->authorize('delete', $product);
 
+        $old = $product->getOriginal();
         $product->delete();
 
         $this->createLog('Product', 'Delete Product', $product, [
             'old_data' => $old,
             'new_data' => null
         ], 'delete');
+
         return response()->json([
             'message' => 'Produk deleted successfully',
         ]);
@@ -108,6 +112,8 @@ class ProductController extends Controller
      */
     public function data(): AnonymousResourceCollection
     {
+        $this->authorize('viewAny', Product::class);
+
         $products = QueryBuilder::for(Product::class)
             ->with('category')
             ->where('merchant_id', auth()->user()->merchant->id)
@@ -116,7 +122,8 @@ class ProductController extends Controller
                 AllowedFilter::scope('description'),
                 AllowedFilter::exact('category.id'),
             ])
-            ->allowedSorts(['name', 'description', 'price', 'created_at'])
+            ->allowedSorts(['name', 'category.name', 'price'])
+            ->defaultSort('name')
             ->paginate(10)
             ->appends(request()->query());
 

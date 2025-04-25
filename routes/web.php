@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/transactions-data', 'data')->name('data')->middleware('permission:transaction-read');
             Route::get('/merchant-user-qr-code/{user}', 'qrCode')->name('qr-code')->middleware('permission:transaction-create');
             Route::get('/transactions-print-invoice/{order}', 'printInvoice')->name('printInvoice');
+            Route::get('/transaction/token', 'generateToken')->name('token');
         });
 
         Route::controller(ProfileController::class)->name('profile.')->group(function () {
@@ -81,7 +82,7 @@ Route::middleware(['auth'])->group(function () {
     });
     // end menu routes
 
-    
+
     // merchant routes
     Route::controller(MerchantController::class)->name('merchant_list.')->group(function () {
         Route::get('/merchant_list', 'index')->name('index')->middleware('permission:merchant-read');
@@ -90,7 +91,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/merchant_list/{merchant}', 'update')->name('update')->middleware('permission:merchant-update');
         Route::delete('/merchant_list/{merchant}', 'destroy')->name('destroy')->middleware('permission:merchant-delete');
     });
-    
+
     // Santri Routes
     Route::controller(SantriController::class)->name('santri.')->group(function () {
         Route::get('/santri', 'index')->name('index')->middleware('permission:santri-read');

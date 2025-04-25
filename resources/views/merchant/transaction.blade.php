@@ -163,6 +163,7 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="{{ asset('assets/js/bootstrap-select/bootstrap-select.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="{{ asset('js/transaction.js') }}"></script>
     <script>
         getProducts();
 
@@ -180,8 +181,8 @@
 
                     let colorSingle = $("<div class='color-single' style='background-color: #00c292'></div>");
                     colorSingle.append("<h2>" + product.name + "</h2>");
-                    colorSingle.append("<p>Rp. " + currencyFormat(product.price) + "</p>");
-                    colorSingle.append("<span id='stock_" + product.id + "'>Stok : " + product.stock + "</span>");
+                    colorSingle.append("<strong style='font-size: 15px;color: white'>Rp. " + currencyFormat(product.price) + "</strong>");
+                    colorSingle.append("<strong style='font-size: 15px;color: white' id='stock_" + product.id + "'>Stok : " + product.stock + "</strong>");
 
                     div.append(colorSingle);
                     $('#_products').append(div);
@@ -366,32 +367,132 @@
             false
         );
 
+
+        function scannerTranslator() {
+            const traducciones = [
+                // Html5QrcodeStrings
+                { original: "QR code parse error, error =", traduccion: "Kesalahan membaca kode QR, kesalahan =" },
+                { original: "Error getting userMedia, error =", traduccion: "Gagal mendapatkan userMedia, kesalahan =" },
+                { original: "The device doesn't support navigator.mediaDevices , only supported cameraIdOrConfig in this case is deviceId parameter (string).", traduccion: "Perangkat tidak mendukung navigator.mediaDevices, hanya parameter deviceId (string) yang didukung dalam kasus ini." },
+                { original: "Camera streaming not supported by the browser.", traduccion: "Streaming kamera tidak didukung oleh browser." },
+                { original: "Unable to query supported devices, unknown error.", traduccion: "Tidak dapat mendeteksi perangkat yang didukung, kesalahan tidak diketahui." },
+                { original: "Camera access is only supported in secure context like https or localhost.", traduccion: "Akses kamera hanya didukung dalam konteks yang aman seperti https atau localhost." },
+                { original: "Scanner paused", traduccion: "Pemindai dijeda" },
+
+                // Html5QrcodeScannerStrings
+                { original: "Scanning", traduccion: "Memindai" },
+                { original: "Idle", traduccion: "Diam" },
+                { original: "Error", traduccion: "Kesalahan" },
+                { original: "Permission", traduccion: "Izin" },
+                { original: "No Cameras", traduccion: "Tidak ada kamera" },
+                { original: "Last Match:", traduccion: "Kecocokan terakhir:" },
+                { original: "Code Scanner", traduccion: "Pemindai Kode" },
+                { original: "Request Camera Permissions", traduccion: "Meminta Izin Kamera" },
+                { original: "Requesting camera permissions...", traduccion: "Meminta izin kamera..." },
+                { original: "No camera found", traduccion: "Kamera tidak ditemukan" },
+                { original: "Stop Scanning", traduccion: "Hentikan Pemindaian" },
+                { original: "Start Scanning", traduccion: "Mulai Pemindaian" },
+                { original: "Switch On Torch", traduccion: "Nyalakan Senter" },
+                { original: "Switch Off Torch", traduccion: "Matikan Senter" },
+                { original: "Failed to turn on torch", traduccion: "Gagal menyalakan senter" },
+                { original: "Failed to turn off torch", traduccion: "Gagal mematikan senter" },
+                { original: "Launching Camera...", traduccion: "Menyalakan Kamera..." },
+                { original: "Scan an Image File", traduccion: "Pindai Berkas Gambar" },
+                { original: "Scan using camera directly", traduccion: "Pindai langsung dengan kamera" },
+                { original: "Select Camera", traduccion: "Pilih Kamera" },
+                { original: "Choose Image", traduccion: "Pilih Gambar" },
+                { original: "Choose Another", traduccion: "Pilih Gambar Lain" },
+                { original: "No image choosen", traduccion: "Tidak ada gambar yang dipilih" },
+                { original: "Anonymous Camera", traduccion: "Kamera Anonim" },
+                { original: "Or drop an image to scan", traduccion: "Atau seret gambar untuk dipindai" },
+                { original: "Or drop an image to scan (other files not supported)", traduccion: "Atau seret gambar untuk dipindai (berkas lain tidak didukung)" },
+                { original: "zoom", traduccion: "zoom" },
+                { original: "Loading image...", traduccion: "Memuat gambar..." },
+                { original: "Camera based scan", traduccion: "Pemindaian menggunakan kamera" },
+                { original: "Fule based scan", traduccion: "Pemindaian menggunakan berkas" },
+
+                // LibraryInfoStrings
+                { original: "Powered by ", traduccion: "Didukung oleh " },
+                { original: "Report issues", traduccion: "Laporkan masalah" },
+
+                // Others
+                { original: "NotAllowedError: Permission denied", traduccion: "NotAllowedError: Izin ditolak" }
+            ];
+
+            function traducirTexto(texto) {
+                const traduccion = traducciones.find(t => t.original === texto);
+                return traduccion ? traduccion.traduccion : texto;
+            }
+
+            function traducirNodosDeTexto(nodo) {
+                if (nodo.nodeType === Node.TEXT_NODE) {
+                    nodo.textContent = traducirTexto(nodo.textContent.trim());
+                } else {
+                    for (let i = 0; i < nodo.childNodes.length; i++) {
+                        traducirNodosDeTexto(nodo.childNodes[i]);
+                    }
+                }
+            }
+
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach((nodo) => {
+                            traducirNodosDeTexto(nodo);
+                        });
+                    }
+                });
+            });
+
+            const config = { childList: true, subtree: true };
+            observer.observe(document.body, config);
+
+            traducirNodosDeTexto(document.body);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            scannerTranslator(document.querySelector('#qr-reader'));
+        });
+
         setTimeout(() => {
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
-            // Gunakan delay pendek untuk memastikan DOM siap
-            setTimeout(() => {
-                // Tombol izin kamera
-                $('#html5-qrcode-button-camera-permission').text('Minta Izin Kamera');
+            // Fungsi untuk mengubah teks tombol
+            function updateButtonText() {
+                const button = document.querySelector('#html5-qrcode-button-file-selection');
+                if (button) {
+                    button.textContent = 'Pilih Gambar - Tidak ada gambar yang dipilih';
+                }
+            }
 
-                // Tombol pemilihan file
-                $('#html5-qrcode-button-file-selection').text('Pilih Gambar - Tidak ada gambar yang dipilih');
+            // Tambahkan event listener untuk memantau perubahan pada span
+            const scanTypeSpan = document.querySelector('#html5-qrcode-anchor-scan-type-change');
+            if (scanTypeSpan) {
+                scanTypeSpan.addEventListener('click', function () {
+                    // Tunggu sebentar untuk memastikan perubahan sudah terjadi
+                    setTimeout(updateButtonText, 100);
+                });
+            }
 
-                // Teks drop image
-                $('#html5-qrcode-button-file-selection')
-                    .closest('div')
-                    .find('div')
-                    .text('Atau seret gambar ke sini untuk dipindai');
+            // Tambahkan event listener untuk input file
+            const fileInput = document.querySelector('#html5-qrcode-private-filescan-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    const button = document.querySelector('#html5-qrcode-button-file-selection');
+                    if (button) {
+                        button.textContent = 'Pilih Gambar Lain';
+                    }
+                });
+            }
 
-                // Tautan untuk mengganti metode pindai (kamera/file)
-                $('#html5-qrcode-anchor-scan-type-change').text('Gunakan Kamera Secara Langsung');
-
-            }, 100); // Delay untuk memastikan elemen sudah dimuat
+            // Coba ubah teks awal
+            updateButtonText();
         }, 3000); // Tunggu 3 detik sebelum mulai
 
 
         function onScanFailure(error) {
-            // Handle failure if needed
+            $('#reader__header_message').text("Kode QR tidak valid");
+            toast("Kode QR tidak valid", 'error', 'Gagal!');
         }
 
         function onScanSuccess(decodedText) {
@@ -400,38 +501,108 @@
             }
         }
 
-        $('#saveTransaction').click(function () {
+        function getUserFromQrcode(decodedText) {
+            let url = "{{route('merchant.transactions.qr-code', ':id')}}".replace(':id', decodedText);
+            form(url, 'get', {}, function (response, error) {
+                if (response) {
+                    $('#_form').show();
+                    $('#name').text(response.data.name);
+                    $('#balance').text("Rp. " + currencyFormat(response.data.balance));
+                    $('#user_id').val(response.data.id);
+                    html5QrcodeScanner.clear();
+                } else {
+                    $('#_form').hide();
+                    toast(error.responseJSON.message, 'error', 'Gagal!');
+                    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                }
+            })
+        }
+
+        $('#saveTransaction').click(async function () {
             let cart = getCart();
             let user_id = $('#user_id').val();
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
-            let formData = new FormData();
-            formData.append('user_id', user_id);
-            formData.append('pin', $('#pin').val());
-            formData.append('total', total);
-            $.each(cart, function (index, item) {
-                formData.append(`items[${index}][product]`, item.id);
-                formData.append(`items[${index}][qty]`, item.qty);
-            });
+            try {
+                // Generate idempotency key
+                const idempotencyKey = 'trans-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
-            $('#pin_error').text('').hide();
-            form('{{route('merchant.transactions.store')}}', 'post', formData, function (response, error) {
-                if (response) {
-                    getToday()
-                    toast(response.message, 'success', 'Berhasil!');
-                    $('#myModalone').modal('hide');
+                // Check if there's a recent transaction with the same key
+                const recentTransactions = JSON.parse(localStorage.getItem('recentTransactions') || '[]');
+                const now = Date.now();
+                const recentTransaction = recentTransactions.find(t => t.key === idempotencyKey);
+
+                if (recentTransaction) {
+                    const timeDiff = now - recentTransaction.timestamp;
+                    if (timeDiff < 3000) { // 3 seconds cooldown
+                        toast('Mohon tunggu beberapa saat sebelum melakukan transaksi berikutnya', 'error', 'Gagal!');
+                        return;
+                    }
+                }
+
+                let formData = new FormData();
+                formData.append('user_id', user_id);
+                formData.append('pin', $('#pin').val());
+                formData.append('total', total);
+                $.each(cart, function (index, item) {
+                    formData.append(`items[${index}][product]`, item.id);
+                    formData.append(`items[${index}][qty]`, item.qty);
+                });
+
+                $('#pin_error').text('').hide();
+
+                const response = await fetch('{{ route("merchant.transactions.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Idempotency-Key': idempotencyKey,
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Store the transaction key and timestamp
+                    recentTransactions.push({
+                        key: idempotencyKey,
+                        timestamp: now
+                    });
+
+                    // Keep only the last 10 transactions
+                    if (recentTransactions.length > 10) {
+                        recentTransactions.shift();
+                    }
+
+                    localStorage.setItem('recentTransactions', JSON.stringify(recentTransactions));
+
+                    getToday();
+                    toast(result.message, 'success', 'Berhasil!');
                     saveCart([]);
                     showCart();
                     getProducts();
-                    $('#_form').hide();
+                    $('#myModalone').modal('hide');
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-                    //save to local storage
-                    localStorage.setItem('last_transaction', response.data);
+                    localStorage.setItem('last_transaction', result.data);
                 } else {
-                    $('#pin_error').text(error.responseJSON.message).show();
-                    toast(error.responseJSON.message, 'error', 'Gagal!');
+                    if (result.message === 'Transaction has already been processed') {
+                        getToday();
+                        toast('Transaksi berhasil diproses', 'success', 'Berhasil!');
+                        $('#myModalone').modal('hide');
+                        saveCart([]);
+                        showCart();
+                        getProducts();
+                        $('#_form').hide();
+                        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                        localStorage.setItem('last_transaction', result.data);
+                    } else {
+                        $('#pin_error').text(result.message).show();
+                        toast(result.message, 'error', 'Gagal!');
+                    }
                 }
-            })
+            } catch (error) {
+                toast('Terjadi kesalahan saat memproses transaksi', 'error', 'Gagal!');
+            }
         });
 
         $('#removeCustomer').click(function () {
@@ -712,42 +883,40 @@
                 const totalPrice = draft.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
                 const draftCard = $(`
-                                                                                                                                                                                                                                                        <div class="draft-card">
-                                                                                                                                                                                                                                                            <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
-                                                                                                                                                                                                                                                                <div class="draft-title">${draft.name}</div>
-                                                                                                                                                                                                                                                                <div class="draft-time">${timeString}</div>
-                                                                                                                                                                                                                                                                <div class="draft-summary">
-                                                                                                                                                                                                                                                                    <span>${totalItems} Item</span>
-                                                                                                                                                                                                                                                                    <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
-                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                            <div id="collapse${draft.id}" class="collapse">
-                                                                                                                                                                                                                                                                <div class="draft-body">
-                                                                                                                                                                                                                                                                    <div class="draft-items">
-                                                                                                                                                                                                                                                                        ${draft.cart.map(item => `
-                                                                                                                                                                                                                                                                            <div class="draft-item">
-                                                                                                                                                                                                                                                                                <span class="draft-item-name">${item.name}</span>
-                                                                                                                                                                                                                                                                                <span class="draft-item-qty">${item.qty}x</span>
-                                                                                                                                                                                                                                                                                <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
-                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                        `).join('')}
-                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                    <div class="draft-total">
-                                                                                                                                                                                                                                                                        Total: Rp. ${currencyFormat(totalPrice)}
-                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                    <div class="draft-actions">
-                                                                                                                                                                                                                                                                        <button class="btn-draft delete delete-draft" data-id="${draft.id}">
-                                                                                                                                                                                                                                                                            <i class="notika-icon notika-trash"></i> Hapus
-                                                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                                                        <button class="btn-draft use use-draft" data-id="${draft.id}">
-                                                                                                                                                                                                                                                                            <i class="notika-icon notika-checked"></i> Gunakan
-                                                                                                                                                                                                                                                                        </button>
-                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                    `);
-
+                                                                                                                                                                                                                                                                            <div class= "draft-card">
+                                                                                                                                                                                                                                                                                         <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
+                                                                                                                                                                                                                                                                                             <div class="draft-title">${draft.name}</div>
+                                                                                                                                                                                                                                                                                             <div class="draft-time">${timeString}</div>
+                                                                                                                                                                                                                                                                                             <div class="draft-summary">
+                                                                                                                                                                                                                                                                                                 <span>${totalItems} Item</span>
+                                                                                                                                                                                                                                                                                                 <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
+                                                                                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                         <div id="collapse${draft.id}" class="collapse">
+                                                                                                                                                                                                                                                                                             <div class="draft-body">
+                                                                                                                                                                                                                                                                                                 <div class="draft-items">
+                                                                                                                                                                                                                                                                                                     ${draft.cart.map(item => `
+                                                                                                                                                                                                                                                                                                         <div class="draft-item">
+                                                                                                                                                                                                                                                                                                             <span class="draft-item-name">${item.name}</span>
+                                                                                                                                                                                                                                                                                                             <span class="draft-item-qty">${item.qty}x</span>
+                                                                                                                                                                                                                                                                                                             <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
+                                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                                     `).join('')}
+                                                                                                                                                                                                                                                                                                 </div>
+                                                                                                                                                                                                                                                                                                 <div class="draft-total">
+                                                                                                                                                                                                                                                                                                     Total: Rp. ${currencyFormat(totalPrice)}
+                                                                                                                                                                                                                                                                                                 </div>
+                                                                                                                                                                                                                                                                                                 <div class="draft-actions">
+                                                                                                                                                                                                                                                                                                     <button class="btn-draft delete delete-draft" data-id="${draft.id}">
+                                                                                                                                                                                                                                                                                                         <i class="notika-icon notika-trash"></i> Hapus
+                                                                                                                                                                                                                                                                                                     </button>
+                                                                                                                                                                                                                                                                                                     <button class="btn-draft use use-draft" data-id="${draft.id}">
+                                                                                                                                                                                                                                                                                                         <i class="notika-icon notika-checked"></i> Gunakan
+                                                                                                                                                                                                                                                                                                     </button>
+                                                                                                                                                                                                                                                                                                 </div>
+                                                                                                                                                                                                                                                                                             </div>
+                                                                                                                                                                                                                                                                                         </div>
+                                                                                                                                                                                                                                                                                     </div>`);
                 $('#draftAccordion').append(draftCard);
             });
 

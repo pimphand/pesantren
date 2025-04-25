@@ -256,6 +256,7 @@
                         icon: "success",
                         button: "OK"
                     });
+                    $('._add_button').show();
                 }
             });
         });

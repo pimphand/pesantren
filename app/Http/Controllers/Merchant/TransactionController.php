@@ -14,13 +14,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Services\TokenService;
+use App\Models\IdempotencyKey;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TransactionController extends Controller
 {
 
+    use AuthorizesRequests;
     protected mixed $merchant;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->merchant = auth()->user()->merchant;
     }
 
@@ -41,6 +47,25 @@ class TransactionController extends Controller
     public function store(StoreTransactionRequest $request)
     {
         return DB::transaction(function () use ($request) {
+            // Get idempotency key from header
+            $idempotencyKey = $request->header('Idempotency-Key');
+            if (!$idempotencyKey) {
+                return response()->json([
+                    'message' => 'Idempotency-Key header is required'
+                ], 422);
+            }
+
+            // Check if this request has been processed before
+            $existingKey = IdempotencyKey::where('key', $idempotencyKey)
+                ->where('merchant_id', $this->merchant->id)
+                ->first();
+
+            if ($existingKey) {
+                // Return the previous response
+                return response()->json($existingKey->response_data);
+            }
+
+            // Process the transaction
             $user = User::where('uuid', $request->user_id)->first();
 
             if ($this->merchant->is_pin) {
@@ -72,7 +97,6 @@ class TransactionController extends Controller
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product']);
                 $oldStock = $product->stock;
-
                 $order->orderItems()->create([
                     'product_id' => $product->id,
                     'quantity' => $item['qty'],
@@ -134,20 +158,29 @@ class TransactionController extends Controller
                 'saldo_akhir' => $user->balance,
             ], 'update');
 
-            return response()->json([
+            // Prepare success response
+            $response = [
                 'message' => 'Transaksi berhasil',
                 'data' => $order->id,
+            ];
+
+            // Store the idempotency key and response
+            IdempotencyKey::create([
+                'key' => $idempotencyKey,
+                'merchant_id' => $this->merchant->id,
+                'request_data' => $request->all(),
+                'response_data' => $response,
+                'status' => 'success'
             ]);
+
+            return response()->json($response);
         });
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-
-    }
+    public function show(string $id) {}
 
     /**
      * Update the specified resource in storage.
@@ -219,6 +252,17 @@ class TransactionController extends Controller
     {
         return view('merchant.invoice', [
             'order' => $order->load('orderItems.product'),
+        ]);
+    }
+
+    /**
+     * Generate a new transaction token
+     */
+    public function generateToken(): \Illuminate\Http\JsonResponse
+    {
+        return response()->json([
+            'token' => TokenService::generateTransactionToken(),
+            'expires_at' => now()->addMinutes(5)->toDateTimeString(),
         ]);
     }
 }

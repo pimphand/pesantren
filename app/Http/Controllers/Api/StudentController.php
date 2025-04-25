@@ -43,10 +43,32 @@ class StudentController extends Controller
     public function bankMutation(): StudentResource
     {
         $student = $this->user->children()->first();
-        $student->load('balanceHistories');
+
+        // Pastikan student ada
+        if (!$student) {
+            return StudentResource::make(null)->additional([
+                'message' => 'Student not found',
+                'balanceHistories' => [],
+            ]);
+        }
+
+        // Cek apakah student memiliki balanceHistories
+        $balanceHistories = $student->balanceHistories()
+            ->latest()
+            ->paginate(request()->input('per_page', 10))
+            ->appends(request()->query());
+
+        // Jika tidak ada balanceHistories, kembalikan array kosong
+        if ($balanceHistories->isEmpty()) {
+            return StudentResource::make($student)->additional([
+                'message' => 'No balance history found',
+                'balanceHistories' => $balanceHistories,
+            ]);
+        }
 
         return StudentResource::make($student)->additional([
             'message' => 'success',
+            'balanceHistories' => $balanceHistories,
         ]);
     }
 

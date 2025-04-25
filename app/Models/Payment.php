@@ -29,7 +29,8 @@ class Payment extends Model
         'note',
         'verified_at',
         'verified_by',
-        'type'
+        'type',
+        'idempotency_key'
     ];
 
     public function recipient(): BelongsTo
