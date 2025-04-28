@@ -86,9 +86,10 @@ class SantriController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSantriRequest $request, User $santri)
+    public function update(UpdateSantriRequest $request, User $santri, Student $student): \Illuminate\Http\JsonResponse
     {
         $oldSantri = $santri->getOriginal();
+        $oldStudent = $student->getOriginal();
 
         // Update data user
         $santri->update(array_merge(
@@ -118,8 +119,14 @@ class SantriController extends Controller
         // Logging perubahan
         $this->createLog('Santri', 'Update Santri', $santri,
             [
-                'old_data' => $oldSantri,
-                'new_data' => $santri->getChanges(),
+                'old_data' => [
+                    'old_santri' => $oldSantri,
+                    'old_student' => $oldStudent,
+                ],
+                'new_data' => [
+                    'santri' => $santri->getChanges(),
+                    'student' => $student->getChanges(),
+                ],
             ],
             'update'
         );

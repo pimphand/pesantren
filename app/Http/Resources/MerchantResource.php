@@ -17,11 +17,17 @@ class MerchantResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'phone' => $this->phone,
-            'photo' => $this->photo,
-            'address' => $this->address,
-            'description' => $this->description,
-            'category' => $this->category,
+            'username' => $this->username,
+            'email' => $this->email,
+            'phone' => $this->phone ?? '-',
+            'photo' => $this->merchant->photo ?? '-',
+            'address' => $this->merchant->address ?? '-',
+            'description' => $this->merchant->description ?? '-',
+            'category' => $this->merchant->category ?? '-',
+            'is_pin' => $this->merchant->is_pin ?? '-',
+            'is_tax' => $this->merchant->is_tax ?? '-',
+            'tax' => $this->merchant->tax ?? '-',
+            'created_at' => $this->created_at ?? '-',
         ];
     }
 }
