@@ -64,7 +64,35 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Struktur halaman agar footer tetap di bawah */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
 
+        .normal-table-area {
+            min-height: 100%;
+            padding-bottom: 60px;
+            /* Height of footer */
+        }
+
+        .footer-copyright-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #2d3436;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .footer-copyright-area p {
+            margin: 0;
+        }
 
         .notika-menu-list:before {
             font-family: 'FontAwesome', serif;
