@@ -40,7 +40,7 @@ class SantriController extends Controller
         $santri = User::create(array_merge($request->validated(), [
             'uuid'     => Str::uuid(),
             'parent_id'     => $request->parent_id,
-            'phone'    => $request->phone,
+            'phone'    => $request->phone == '-' ? null : $request->phone,
             'password' => bcrypt($request->password),
             'pin'      => bcrypt($request->pin),
         ]))->addRole('santri');
@@ -96,10 +96,18 @@ class SantriController extends Controller
             $request->validated(),
             [
                 'password' => $request->password ? bcrypt($request->password) : $santri->password,
-                'phone' => $request->phone,
+                'phone' => $request->phone == '-' ? null : $request->phone,
                 'parent_id' => $request->parent_id,
-            ]
-        ));
+                ]
+            ));
+
+        if($request->hasFile('photo')) {
+            if($santri->photo) {
+                // Delete old photo
+                $oldPhoto = str_replace(url('/'), '', $santri->photo);
+                \Storage::disk('public')->delete($oldPhoto);
+            }
+        }
 
         // Update or create student data
         $student = Student::updateOrCreate(
@@ -113,6 +121,7 @@ class SantriController extends Controller
                 'gender' => $request->gender ?? null,
                 'admission_number' => $request->nsm ?? null,
                 'national_admission_number' => $request->nisn ?? null,
+                'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('users/' . $santri->id, 'public')) : $santri->photo,
             ]
         );
 

@@ -286,7 +286,7 @@
                         <div class="form-example-int form-example-st">
                             <div class="form-group">
                                 <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    <input type="text" class="form-control input-sm" placeholder="Cari" id="search">
                                 </div>
                             </div>
                         </div>
@@ -410,9 +410,9 @@
             $('#id').val(data.id);
             
             if($('#is_tax').is(':checked')) {
-                $('#tax_input').show();
+                $('#parent_tax').show();
             } else {
-                $('#tax_input').hide();
+                $('#parent_tax').hide();
             }
 
             // hide fields
