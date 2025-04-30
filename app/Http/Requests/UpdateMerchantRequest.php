@@ -23,15 +23,12 @@ class UpdateMerchantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15|unique:merchants,phone,'.$this->merchant->id,
-            'address' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'description' => 'required|string',
-            'category' => 'required|string',
-            'is_pin' => 'nullable',
-            'is_tax' => 'nullable',
-            'tax' => 'required_if:is_tax,1|numeric|min:1|max:100',
+            'name' => ['required', 'string', 'max:255', 'unique:users,name,' . $this->id],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $this->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->id],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:255', 'unique:users,phone,' . $this->id],
+            'pin' => ['nullable', 'string', 'min:6', 'max:6', 'confirmed'],
         ];
     }
 }

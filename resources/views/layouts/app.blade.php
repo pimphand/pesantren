@@ -123,6 +123,17 @@
             content: "\f2bb";
             /* Ikon dot-circle-o */
         }
+        .notika-credit-card:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f09d";
+            /* Ikon credit-card dari FontAwesome */
+        }
+
+        .notika-image:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f03e";
+            /* Ikon gambar (image) dari FontAwesome */
+        }
 
         .notika-key:before {
             font-family: 'FontAwesome', serif;
@@ -172,37 +183,39 @@
 <body>
 
     <div class="normal-table-area">
-        {{--Header--}}
+        {{-- Header --}}
         <x-header></x-header>
-        {{--End Header--}}
-        <!-- Main Menu area start-->
+        {{-- End Header --}}
+        
+        <!-- Main Menu area start -->
         <x-menu></x-menu>
-        <!-- Main Menu area End-->
-        <!-- Breadcomb area Start-->
+        <!-- Main Menu area End -->
+        
+        <!-- Breadcrumb area Start -->
         <div class="breadcomb-area">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="breadcomb-list">
-
                             @yield('breadcrumb')
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Breadcomb area End-->
-        <!-- Button area Start-->
-        @yield('content')
+        <!-- Breadcrumb area End -->
+        
+        <!-- Content area Start -->
+        <div class="content-area">
+            @yield('content')
+        </div>
+        <!-- Content area End -->
+        <!-- Footer area Start -->
+        <div class="footer-copyright-area fixed bottom-0 left-0 w-full bg-gray-800 text-white py-3">
+            <p>&copy; {{ date('Y') }}. All rights reserved.</p>
+        </div>
+        <!-- Footer area End -->
     </div>
-
-    <!-- Button area End-->
-    <!-- Start Footer area-->
-    <div class="footer-copyright-area  fixed bottom-0 left-0 w-full bg-gray-800 text-white py-3">
-        <p>Copyright © <?php echo date('Y'); ?>. All rights reserved.</p>
-    </div>
-
 
     <!-- End Footer area-->
     <!-- jquery============================================ -->
