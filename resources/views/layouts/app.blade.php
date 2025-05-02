@@ -65,6 +65,24 @@
     <style>
         /* Struktur halaman agar footer tetap di bawah */
 
+        .notika-bank:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f19c"; /* Icon for location from FontAwesome */
+        }
+
+        .notika-double-check:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f560"; /* Icon for location from FontAwesome */
+        }
+        .notika-check:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f00c"; /* Icon for location from FontAwesome */
+        }
+        
+        .notika-hands-holding-child:before {
+            font-family: 'FontAwesome', serif;
+            content: "\e4fa"; /* Icon for location from FontAwesome */
+        }
 
         .notika-menu-list:before {
             font-family: 'FontAwesome', serif;
@@ -89,7 +107,29 @@
             content: "\f3c5";
             /* Ikon dot-circle-o */
         }
+        .normal-table-area {
+            min-height: 100%;
+            padding-bottom: 60px;
+            /* Height of footer */
+        }
 
+        .footer-copyright-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #00c292;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .footer-copyright-area p {
+            margin: 0;
+        }
         .notika-username:before {
             font-family: 'FontAwesome', serif;
             content: "\f2bb";

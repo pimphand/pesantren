@@ -1,4 +1,5 @@
 @php
+$currentUrl = request()->path(); // contoh: "merchant/products"
 $menus = \App\Models\Menu::whereNull('menu_id')
     ->where('status', true)
     ->orderBy('order_menu')
@@ -23,23 +24,34 @@ $menus = \App\Models\Menu::whereNull('menu_id')
                         <li><a href="{{route('merchant.transactions.index')}}"><i
                                     class="fa-solid fa-money-bill-transfer"></i> Transaksi</a></li>
                         <li><a href="{{route('merchant.profile.index')}}"><i class="notika-icon notika-support"></i> Profile</a></li>
-                    @else
+                        @else
                         <li>
-                            <a href="{{ route('dashboard') }}">
+                            <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                 <i class="notika-icon notika-house"></i> Dashboard
                             </a>
                         </li>
 
                         @foreach ($menus as $menu)
                             @php
-        $permissionName = $menu->permission->name ?? null;
+                                $permissionName = $menu->permission->name ?? null;
+                                $hasChildren = $menu->children->isNotEmpty();
+                                $isActive = false;
+                
+                                if ($hasChildren) {
+                                    $isActive = $menu->children->contains(function ($child) use ($currentUrl) {
+                                        return Str::startsWith($currentUrl, ltrim($child->url, '/'));
+                                    });
+                                } else {
+                                    $isActive = Str::startsWith($currentUrl, ltrim($menu->url, '/'));
+                                }
                             @endphp
 
                             @if ($permissionName && auth()->user()->isAbleTo($permissionName))
                                 <li>
                                     <a
-                                        data-toggle="{{ $menu->children->isNotEmpty() ? 'tab' : '' }}"
-                                        href="{{ $menu->children->isNotEmpty() ? '#menu-' . $menu->id : URL($menu->url) }}">
+                                        href="{{ $hasChildren ? '#menu-' . $menu->id : url($menu->url) }}"
+                                        data-toggle="{{ $hasChildren ? 'tab' : '' }}"
+                                        class="{{ $isActive ? 'active' : '' }}">
                                         <i class="{{ $menu->icon ?? 'fa-solid fa-layer-group' }}"></i> {{ $menu->name }}
                                     </a>
                                 </li>
@@ -47,25 +59,30 @@ $menus = \App\Models\Menu::whereNull('menu_id')
                         @endforeach
                     @endif
                 </ul>
-                {{-- Tab Content (Child Menu) --}}
+
                 <div class="tab-content custom-menu-content">
                     @foreach ($menus as $menu)
                         @php
-    $permissionName = $menu->permission->name ?? null;
+                            $permissionName = $menu->permission->name ?? null;
+                            $isTabActive = $menu->children->contains(function ($child) use ($currentUrl) {
+                                return Str::startsWith($currentUrl, ltrim($child->url, '/'));
+                            });
                         @endphp
-
+                
                         @if ($permissionName && auth()->user()->isAbleTo($permissionName) && $menu->children->isNotEmpty())
-                            <div id="menu-{{ $menu->id }}" class="tab-pane notika-tab-menu-bg animated flipInX">
+                            <div id="menu-{{ $menu->id }}" class="tab-pane notika-tab-menu-bg animated flipInX {{ $isTabActive ? 'active' : '' }}">
                                 <ul class="notika-main-menu-dropdown">
                                     @foreach ($menu->children as $child)
                                         @php
-            $childPermission = $child->permission->name ?? null;
-            // dd($childPermission);
+                                            $childPermission = $child->permission->name ?? null;
+                                            $childActive = Str::startsWith($currentUrl, ltrim($child->url, '/'));
                                         @endphp
-
+                
                                         @if ($childPermission && auth()->user()->isAbleTo($childPermission))
                                             <li>
-                                                <a href="{{ URL($child->url) }}">{{ $child->name }}</a>
+                                                <a href="{{ url($child->url) }}" class="{{ $childActive ? 'active' : '' }}">
+                                                    {{ $child->name }}
+                                                </a>
                                             </li>
                                         @endif
                                     @endforeach

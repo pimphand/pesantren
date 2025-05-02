@@ -1,5 +1,5 @@
 @php
-    $columns = ['No', 'Nama', 'Url' ,'Action'];
+    $columns = ['No', 'Nama', 'Url' ,'Tindakan'];
     $form = [
         'name' => ['type' => 'text','title' => "Nama"],
         'url' => ['type' => 'text','title' => "Url"],

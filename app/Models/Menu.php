@@ -24,7 +24,7 @@ class Menu extends Model
 
     public function children(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Menu::class, 'menu_id')->orderBy('order_menu');
+        return $this->hasMany(Menu::class, 'menu_id')->where('status', true)->orderBy('order_menu');
     }
 
     public function permission()
