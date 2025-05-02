@@ -64,49 +64,109 @@
 @push('js')
     <script src="{{ asset('assets/js/bootstrap-select/bootstrap-select.js') }}"></script>
     <script>
+        let currentSort = {
+            column: null,      // nilai: 'name', 'category', 'price', 'stock'
+            direction: 'asc'   // atau 'desc'
+        };
+        let currentPage = 1;  // Tambahkan variabel untuk menyimpan halaman saat ini
+
         getData()
         let responseData = null;
         function getData(search = "", category = "", page = 1) {
+            currentPage = page; // Simpan nomor halaman saat ini
             let url = "{{ route('merchant.products.data') }}?filter[name]=" + search + "&filter[category.id]=" + category + "&page=" + page;
             form(url, 'get', null, function (response) {
-                updateTable(response);
                 responseData = response.data;
-
-                if (response.meta.total > response.meta.per_page) {
-                    pagination(response);
-                } else {
-                    let pagination = $('#pagination');
-                    pagination.empty();
-                }
+                updateTable(response);
+                pagination(response);
             });
         }
-
-        $('#price').on('keydown', function (e) {
-            if (['e', 'E', '+', '-'].includes(e.key)) {
-                e.preventDefault();
-            }
-        });
 
         function updateTable(response) {
             let table = $("#table_product");
             table.empty();
+
+            // Sort data if needed
+            if (currentSort.column !== null) {
+                response.data.sort((a, b) => {
+                    let aVal, bVal;
+
+                    // Handle different column types
+                    switch (currentSort.column) {
+                        case 'no':
+                            // Use the index for sorting
+                            aVal = response.data.indexOf(a);
+                            bVal = response.data.indexOf(b);
+                            break;
+                        case 'kategori':
+                            aVal = a.category;
+                            bVal = b.category;
+                            break;
+                        case 'nama produk':
+                            aVal = a.name;
+                            bVal = b.name;
+                            break;
+                        case 'harga':
+                            aVal = parseFloat(a.price);
+                            bVal = parseFloat(b.price);
+                            break;
+                        case 'stok':
+                            aVal = parseInt(a.stock);
+                            bVal = parseInt(b.stock);
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            // Reset numbering based on current page
+            let startNumber = (response.meta.current_page - 1) * response.meta.per_page + 1;
             response.data.forEach((product, index) => {
                 let tr = $("<tr></tr>");
-                tr.append("<td>" + response.meta.from++ + "</td>");
+                tr.append("<td>" + startNumber + "</td>");
                 tr.append("<td>" + product.category + "</td>");
                 tr.append("<td>" + product.name + "</td>");
                 tr.append("<td>" + product.price + "</td>");
                 tr.append("<td>" + product.stock + "</td>");
 
                 let actionTd = $("<td class='text-right'></td>");
-
                 actionTd.append("<button class='btn btn-info edit' data-id='" + product.id + "'><i class='notika-icon notika-edit'></i></button>");
                 actionTd.append("<button class='btn btn-danger' onclick=\"deleteData('/merchant/products/" + product.id + "')\"><i class='notika-icon notika-trash'></i></button>");
 
                 tr.append(actionTd);
                 table.append(tr);
+                startNumber++;
             });
+
+            if (response.meta.total > response.meta.per_page) {
+                pagination(response);
+            } else {
+                let pagination = $('#pagination');
+                pagination.empty();
+            }
         }
+
+        // Listen for table sort events
+        document.addEventListener('DOMContentLoaded', function () {
+            const table = document.getElementById('table');
+            table.addEventListener('table-sort', function (e) {
+                const { column, direction } = e.detail;
+                currentSort.column = column;
+                currentSort.direction = direction;
+                getData("", "", currentPage); // Gunakan currentPage saat ini
+            });
+        });
+
+        $('#price').on('keydown', function (e) {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
 
         $(document).ready(function () {
             $("#search_form").append("<div class='row'>" +
@@ -301,6 +361,7 @@
             //add method
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
+
     </script>
 @endpush
 

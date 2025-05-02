@@ -37,10 +37,19 @@ class TransactionController extends Controller
     {
         return view('merchant.transaction', [
             'title' => 'Transaksi',
-            'categories' => $this->merchant->productCategory->select('name', 'id'),
         ]);
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function create()
+    {
+        return view('merchant.pos', [
+            'title' => '    Transaksi',
+            'categories' => $this->merchant->productCategory->select('name', 'id'),
+        ]);
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -232,7 +241,8 @@ class TransactionController extends Controller
                 'payment_status',
                 'created_at',
                 'updated_at',
-            ])->orderBy('created_at', 'desc');
+            ])
+            ->defaultSort('-created_at');
         if ($request->create) {
             return [
                 'total_order' => $orders->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])->count(),

@@ -123,6 +123,7 @@
             content: "\f2bb";
             /* Ikon dot-circle-o */
         }
+
         .notika-credit-card:before {
             font-family: 'FontAwesome', serif;
             content: "\f09d";
@@ -186,11 +187,11 @@
         {{-- Header --}}
         <x-header></x-header>
         {{-- End Header --}}
-        
+
         <!-- Main Menu area start -->
         <x-menu></x-menu>
         <!-- Main Menu area End -->
-        
+
         <!-- Breadcrumb area Start -->
         <div class="breadcomb-area">
             <div class="container">
@@ -204,7 +205,7 @@
             </div>
         </div>
         <!-- Breadcrumb area End -->
-        
+
         <!-- Content area Start -->
         <div class="content-area">
             @yield('content')

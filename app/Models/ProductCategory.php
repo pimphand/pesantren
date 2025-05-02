@@ -23,6 +23,9 @@ class ProductCategory extends Model
         'name',
         'description',
         'merchant_id',
+        'created_by',
+        'updated_by',
+        'deleted_by',
     ];
 
     public function merchant(): \Illuminate\Database\Eloquent\Relations\BelongsTo
