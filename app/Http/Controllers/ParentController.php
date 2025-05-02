@@ -9,6 +9,8 @@ use App\Http\Resources\ParentResource;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Str;
+
 
 
 class ParentController extends Controller

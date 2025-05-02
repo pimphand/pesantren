@@ -14,7 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Student Routes
     Route::prefix('students')->group(function () {
         Route::get('/', [StudentController::class, 'index']);
-        Route::get('bank-mutation', [StudentController::class, 'bankMutation']);
+        Route::get('{id}/bank-mutation', [StudentController::class, 'bankMutation']);
         Route::get('{id}/qrCode', [StudentController::class, 'qrCode']);
         Route::post('parent-update', [StudentController::class, 'updateProfile']);
     });

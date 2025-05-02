@@ -40,9 +40,9 @@ class StudentController extends Controller
      * @response array{data: StudentResource, message: string}
      */
     #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
-    public function bankMutation(): StudentResource
+    public function bankMutation($id): StudentResource
     {
-        $student = $this->user->children()->first();
+        $student = $this->user->children()->whereUuid($id)->first();
 
         // Pastikan student ada
         if (!$student) {
