@@ -51,6 +51,7 @@ class ProductController extends Controller
         $product = Product::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
             'photo' => asset('storage/' . $photoPath) ?? null,
+            'created_by' => auth()->user()->id,
         ]));
 
         $this->createLog('Product', 'Create Product', $product, [
@@ -74,6 +75,7 @@ class ProductController extends Controller
 
         $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
+            'updated_by' => auth()->user()->id,
             'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('products/' . auth()->user()->merchant->id, 'public')) : $product->photo,
         ]));
 
@@ -95,6 +97,9 @@ class ProductController extends Controller
         $this->authorize('delete', $product);
 
         $old = $product->getOriginal();
+        $product->update([
+            'deleted_by' => auth()->user()->id,
+        ]);
         $product->delete();
 
         $this->createLog('Product', 'Delete Product', $product, [

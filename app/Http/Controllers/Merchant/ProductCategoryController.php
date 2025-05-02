@@ -45,6 +45,7 @@ class ProductCategoryController extends Controller
 
         $category = ProductCategory::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
+            'created_by' => auth()->user()->id,
         ]));
 
         $this->createLog('Product', 'Create Product', $category, [
@@ -67,6 +68,7 @@ class ProductCategoryController extends Controller
         $oldCategory = $productCategory->getOriginal();
         $productCategory->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
+            'updated_by' => auth()->user()->id,
         ]));
 
         $this->createLog('Product', 'Update Product', $productCategory, [
@@ -87,6 +89,9 @@ class ProductCategoryController extends Controller
         $this->authorize('delete', $productCategory);
 
         $oldCategory = $productCategory->getOriginal();
+        $productCategory->update([
+            'deleted_by' => auth()->user()->id,
+        ]);
         $productCategory->delete();
 
         $this->createLog('Product', 'Delete Product', $productCategory, [
@@ -106,11 +111,9 @@ class ProductCategoryController extends Controller
     {
         $this->authorize('viewAny', ProductCategory::class);
 
-        $categories = QueryBuilder::for(ProductCategory::class)
+        $categories = QueryBuilder::for(ProductCategory::orderBy('created_at', 'desc'))
+            ->with('createdBy:id,name', 'updatedBy:id,name', 'deletedBy:id,name')
             ->where('merchant_id', auth()->user()->merchant->id)
-            ->allowedSorts(['name'])
-            ->allowedFilters(['name'])
-            ->defaultSort('-name')
             ->paginate(request()->input('per_page') ?? 10)
             ->appends(request()->query());
 
