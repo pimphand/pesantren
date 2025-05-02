@@ -577,6 +577,7 @@
                     showCart();
                     getProducts();
                     $('#myModalone').modal('hide');
+                    $('#removeCustomer').click();
                     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                     localStorage.setItem('last_transaction', result.data);
                 } else {
@@ -590,6 +591,7 @@
                         $('#_form').hide();
                         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
                         localStorage.setItem('last_transaction', result.data);
+                        $('#removeCustomer').click();
                     } else {
                         $('#pin_error').text(result.message).show();
                         toast(result.message, 'error', 'Gagal!');
@@ -865,40 +867,40 @@
                 const totalPrice = draft.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
                 const draftCard = $(`
-                                                                                                                                                                                                                                                                                                <div class= "draft-card">
-                                                                                                                                                                                                                                                                                                             <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
-                                                                                                                                                                                                                                                                                                                 <div class="draft-title">${draft.name}</div>
-                                                                                                                                                                                                                                                                                                                 <div class="draft-time">${timeString}</div>
-                                                                                                                                                                                                                                                                                                                 <div class="draft-summary">
-                                                                                                                                                                                                                                                                                                                     <span>${totalItems} Item</span>
-                                                                                                                                                                                                                                                                                                                     <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
-                                                                                                                                                                                                                                                                                                                 </div>
-                                                                                                                                                                                                                                                                                                             </div>
-                                                                                                                                                                                                                                                                                                             <div id="collapse${draft.id}" class="collapse">
-                                                                                                                                                                                                                                                                                                                 <div class="draft-body">
-                                                                                                                                                                                                                                                                                                                     <div class="draft-items">
-                                                                                                                                                                                                                                                                                                                         ${draft.cart.map(item => `
-                                                                                                                                                                                                                                                                                                                             <div class="draft-item">
-                                                                                                                                                                                                                                                                                                                                 <span class="draft-item-name">${item.name}</span>
-                                                                                                                                                                                                                                                                                                                                 <span class="draft-item-qty">${item.qty}x</span>
-                                                                                                                                                                                                                                                                                                                                 <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
-                                                                                                                                                                                                                                                                                                                             </div>
-                                                                                                                                                                                                                                                                                                                         `).join('')}
-                                                                                                                                                                                                                                                                                                                     </div>
-                                                                                                                                                                                                                                                                                                                     <div class="draft-total">
-                                                                                                                                                                                                                                                                                                                         Total: Rp. ${currencyFormat(totalPrice)}
-                                                                                                                                                                                                                                                                                                                     </div>
-                                                                                                                                                                                                                                                                                                                     <div class="draft-actions">
-                                                                                                                                                                                                                                                                                                                         <button class="btn-draft delete delete-draft" data-id="${draft.id}">
-                                                                                                                                                                                                                                                                                                                             <i class="notika-icon notika-trash"></i> Hapus
-                                                                                                                                                                                                                                                                                                                         </button>
-                                                                                                                                                                                                                                                                                                                         <button class="btn-draft use use-draft" data-id="${draft.id}">
-                                                                                                                                                                                                                                                                                                                             <i class="notika-icon notika-checked"></i> Gunakan
-                                                                                                                                                                                                                                                                                                                         </button>
-                                                                                                                                                                                                                                                                                                                     </div>
-                                                                                                                                                                                                                                                                                                                 </div>
-                                                                                                                                                                                                                                                                                                             </div>
-                                                                                                                                                                                                                                                                                                         </div>`);
+                    <div class= "draft-card">
+                                 <div class="draft-header" data-toggle="collapse" data-target="#collapse${draft.id}">
+                                     <div class="draft-title">${draft.name}</div>
+                                     <div class="draft-time">${timeString}</div>
+                                     <div class="draft-summary">
+                                         <span>${totalItems} Item</span>
+                                         <span>Total: Rp. ${currencyFormat(totalPrice)}</span>
+                                     </div>
+                                 </div>
+                                 <div id="collapse${draft.id}" class="collapse">
+                                     <div class="draft-body">
+                                         <div class="draft-items">
+                                             ${draft.cart.map(item => `
+                                                 <div class="draft-item">
+                                                     <span class="draft-item-name">${item.name}</span>
+                                                     <span class="draft-item-qty">${item.qty}x</span>
+                                                     <span class="draft-item-price">Rp. ${currencyFormat(item.price * item.qty)}</span>
+                                                 </div>
+                                             `).join('')}
+                                         </div>
+                                         <div class="draft-total">
+                                             Total: Rp. ${currencyFormat(totalPrice)}
+                                         </div>
+                                         <div class="draft-actions">
+                                             <button class="btn-draft delete delete-draft" data-id="${draft.id}">
+                                                 <i class="notika-icon notika-trash"></i> Hapus
+                                             </button>
+                                             <button class="btn-draft use use-draft" data-id="${draft.id}">
+                                                 <i class="notika-icon notika-checked"></i> Gunakan
+                                             </button>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>`);
                 $('#draftAccordion').append(draftCard);
             });
 

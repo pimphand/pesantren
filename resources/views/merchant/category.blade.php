@@ -49,8 +49,8 @@
         getData()
         let responseData = null;
 
-        function getData(search = "", category = "", page = 1, sort = "") {
-            let url = `{{ route('merchant.categories.data') }}?filter[name]=${search}&page=${page}&sort=${sort}`;
+        function getData(search = "", category = "", page = 1) {
+            let url = `{{ route('merchant.categories.data') }}?filter[name]=${search}&page=${page}`;
             form(url, 'get', null, function (response) {
                 updateTable(response);
                 responseData = response.data;
@@ -60,25 +60,19 @@
             });
         }
 
-
         function updateTable(response) {
             let table = $("#table_product");
             table.empty();
 
-            response.data.forEach((category, index) => {
+            response.data.forEach((product, index) => {
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
-                tr.append(`<td>${category.name}</td>`);
-                tr.append(`<td>${category.created_by?.name || '-'}</td>`);
-                tr.append(`<td>${formatDate(category.created_at)}</td>`);
-                tr.append(`<td>${formatDate(category.updated_at)}</td>`);
-                tr.append(`<td>${category.updated_by?.name || '-'}</td>`);
-
+                tr.append(`<td>${product.name}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");
 
-                actionTd.append(`<button class="btn btn-info edit" data-id="${category.id}"><i class="notika-icon notika-edit"></i></button>`);
-                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${category.id}')"><i class="notika-icon notika-trash"></i></button>`);
+                actionTd.append(`<button class="btn btn-info edit" data-id="${product.id}"><i class="notika-icon notika-edit"></i></button>`);
+                actionTd.append(`<button class="btn btn-danger" onclick="deleteData('/merchant/categories/${product.id}')"><i class="notika-icon notika-trash"></i></button>`);
 
                 tr.append(actionTd);
                 table.append(tr);
@@ -131,7 +125,7 @@
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
-                $('#table').toggle();
+                $('#table_product').toggle();
                 $('#_form').trigger('reset');
                 $('._add_button').hide();
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
@@ -162,7 +156,7 @@
                         node.value = '';
                     });
                     $('#_form').toggle();
-                    $('#table').toggle();
+                    $('#table_product').toggle();
                     swal("Berhasil!", response.message, "success");
                     $('._add_button').show();
                 }
@@ -182,7 +176,7 @@
                 node.value = '';
             });
             $('#_form').toggle();
-            $('#table').toggle();
+            $('#table_product').toggle();
             $('._add_button').show();
         });
 
@@ -192,69 +186,12 @@
             let data = responseData.find((item) => item.id == id);
             $('#add').addClass('hidden')
             $('#_form').toggle();
-            $('#table').toggle();
+            $('#table_product').toggle();
             $('#_form').attr('action', `/merchant/categories/${id}`);
             $('#name').val(data.name)
             $('#id').val(data.id)
             $('#_form').append('<input type="hidden" name="_method" value="PUT">');
         })
-
-        //sorting
-        $(document).ready(function () {
-            const sortMap = {
-                "no": "created_at",
-                "nama": "name",
-                "pembuat": "createdBy.name",
-                "tanggal dibuat": "created_at",
-                "pengubah": "updatedBy.name",
-                "tanggal diperbarui": "updated_at"
-            };
-
-            let currentSort = {
-                field: '',
-                direction: 'asc'
-            };
-
-            function updateSortIcons() {
-                $('thead th.sortable').each(function () {
-                    const $th = $(this);
-                    const field = $th.data('sort');
-                    $th.find('i').remove();
-
-                    if (field === currentSort.field) {
-                        $th.append(`<i class="notika-icon ${currentSort.direction === 'asc' ? 'notika-up-arrow' : 'notika-down-arrow'}"></i>`);
-                    } else {
-                        $th.append('<i class="notika-icon notika-sort"></i>');
-                    }
-                });
-            }
-
-            // Initialize sort icons
-            updateSortIcons();
-
-            $('thead th.sortable').each(function () {
-                const $th = $(this);
-                const field = $th.data('sort');
-
-                $th.on('click', function () {
-                    const sortField = sortMap[field.toLowerCase()];
-
-                    if (currentSort.field === sortField) {
-                        // Toggle direction if clicking the same field
-                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        // Set new field and default to ascending
-                        currentSort.field = sortField;
-                        currentSort.direction = 'asc';
-                    }
-
-                    const sortParam = currentSort.direction === 'desc' ? `-${sortField}` : sortField;
-                    getData('', '', 1, sortParam);
-                    updateSortIcons();
-                });
-            });
-        });
-
     </script>
 @endpush
 
