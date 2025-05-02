@@ -31,9 +31,6 @@
                                         <x-input :type="$value['type']" :name="$key" :placeholder="$value['title']" />
                                     </div>
                                 @endforeach
-                                <div class="col-lg-12 col-md-12 col-sm-12 text-center mt-2">
-                                    <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
-                                </div>
                             </div>
                             <button type="button" class="btn btn-primary" id="save">Simpan</button>
                             <button type="button" class="btn btn-danger" id="cancel">Batal</button>
@@ -66,6 +63,7 @@
         function updateTable(response) {
             let table = $("#table_product");
             table.empty();
+
             response.data.forEach((product, index) => {
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
@@ -122,26 +120,17 @@
                 getData(searchValue, categoryValue);
             }
 
-            $search.on("input", debounce(handleSearch, 300)); // kamu bisa naikkan delay jadi 300ms agar lebih smooth
+            $search.on("input", debounce(handleSearch, 300));
             $category.on("change", handleSearch);
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
-                $('#table').toggle();
+                $('#table_product').toggle();
                 $('#_form').trigger('reset');
                 $('._add_button').hide();
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
                 $('#_form input[name="_method"]').remove();
                 $('#_form').attr('action', '{{ route('merchant.categories.store') }}');
-            });
-
-            $('#photo').on('change', function () {
-                const file = this.files[0];
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#show_image').attr('src', e.target.result);
-                };
-                reader.readAsDataURL(file);
             });
         });
 
@@ -151,13 +140,11 @@
             $('.error').text('').hide();
             let url = $(idForm).attr('action');
             let formData = new FormData($(idForm)[0]);
-            console.log(formData.get('id'))
             if (formData.get('id')) {
                 formData.append('_method', 'PUT');
             }
             form(url, 'post', formData, function (response, error) {
                 if (error) {
-
                     swal("Gagal!", error.responseJSON.message, "error");
                     $.each(error.responseJSON.errors, function (key, value) {
                         $('#' + key + '_error').text(value[0]).show();
@@ -165,12 +152,11 @@
                 } else {
                     getData();
                     $(idForm).trigger('reset');
-                    $('#show_image').attr('src', '');
                     $.each($(idForm).find('input select'), function (index, node) {
                         node.value = '';
                     });
                     $('#_form').toggle();
-                    $('#table').toggle();
+                    $('#table_product').toggle();
                     swal("Berhasil!", response.message, "success");
                     $('._add_button').show();
                 }
@@ -185,24 +171,22 @@
         $('#cancel').click(function () {
             $(idForm).trigger('reset');
             $('.error').text('').hide();
-            $('#show_image').attr('src', '');
             $('#add').removeClass('hidden')
             $.each($(idForm).find('input select'), function (index, node) {
                 node.value = '';
             });
             $('#_form').toggle();
-            $('#table').toggle();
+            $('#table_product').toggle();
             $('._add_button').show();
         });
 
         $(document).on('click', '.edit', function (e) {
             e.preventDefault();
             let id = $(this).data('id');
-            console.log(id);
             let data = responseData.find((item) => item.id == id);
             $('#add').addClass('hidden')
             $('#_form').toggle();
-            $('#table').toggle();
+            $('#table_product').toggle();
             $('#_form').attr('action', `/merchant/categories/${id}`);
             $('#name').val(data.name)
             $('#id').val(data.id)

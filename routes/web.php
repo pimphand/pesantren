@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/merchant-user-qr-code/{user}', 'qrCode')->name('qr-code')->middleware('permission:transaction-create');
             Route::get('/transactions-print-invoice/{order}', 'printInvoice')->name('printInvoice');
             Route::get('/transaction/token', 'generateToken')->name('token');
+            Route::get('/transaction/create', 'create')->name('create')->middleware('permission:transaction-create');
         });
 
         Route::controller(ProfileController::class)->name('profile.')->group(function () {

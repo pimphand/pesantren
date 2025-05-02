@@ -65,34 +65,7 @@
     <style>
         /* Struktur halaman agar footer tetap di bawah */
 
-        .notika-map-pin:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f276"; /* Icon for location from FontAwesome */
-        }
-        .notika-camera:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f030"; /* Icon for camera from FontAwesome */
-        }
-        .notika-hands-holding-child:before {
-            font-family: 'FontAwesome', serif;
-            content: "\e4fa"; /* Updated to a valid FontAwesome icon (user icon) */
-        }
-        .notika-man-woman:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f228";
-            /* Ikon man-woman dari FontAwesome */
-        }
 
-        .notika-location2:before {
-            content: "\f041";
-            font-family: 'FontAwesome', serif;
-        }
-            /* Ikon lokasi dari FontAwesome */
-        .notika-list2:before {
-            font-family: 'FontAwesome', serif;
-            content: "\f03a";
-            /* Ikon daftar (list) dari FontAwesome */
-        }
         .notika-menu-list:before {
             font-family: 'FontAwesome', serif;
             content: "\f03a";
@@ -122,6 +95,7 @@
             content: "\f2bb";
             /* Ikon dot-circle-o */
         }
+
         .notika-credit-card:before {
             font-family: 'FontAwesome', serif;
             content: "\f09d";
@@ -185,11 +159,11 @@
         {{-- Header --}}
         <x-header></x-header>
         {{-- End Header --}}
-        
+
         <!-- Main Menu area start -->
         <x-menu></x-menu>
         <!-- Main Menu area End -->
-        
+
         <!-- Breadcrumb area Start -->
         <div class="breadcomb-area">
             <div class="container">
@@ -203,7 +177,7 @@
             </div>
         </div>
         <!-- Breadcrumb area End -->
-        
+
         <!-- Content area Start -->
         <div class="content-area">
             @yield('content')
