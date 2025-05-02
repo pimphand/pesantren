@@ -16,48 +16,79 @@ class MenuSeeder extends Seeder
     {
         $menus = [
             'Merchant',
-            'Santri',
+            'Kesiswaan',
             'Payment',
             'Transaction',
             'Mutasi',
             'Panel_Configuration',
             'Menu',
+            'Santri',
+            'Orang Tua',
         ];
         
         foreach ($menus as $key => $value) {
             $permission = Permission::where('name', 'ILIKE', '%read%')
-                ->where('name', 'ILIKE', "%$value%")
-                ->first();
-                if($permission) {
-                    $route = strtolower(str_replace(' ', '_', $value));
-                    if($value == 'Merchant') {
-                        $route = strtolower(str_replace(' ', '_', $value)).'_list';
-                    }
+            ->where('name', 'ILIKE', "%$value%")
+            ->first();
             
-                    Menu::create([
-                        'permission_id' => $permission->id,
-                        'name' => $value,
-                        'url' => $route,
-                        'menu_id' => ($value == 'Menu') ? 5 : null,
-                        'order_menu' => $key + 1,
-                        'icon' => null,
-                    ]);
-                } else {
-                    $permissionId = Permission::insertGetId([
-                        'name'  => strtolower(str_replace(' ', '_', $value)) . '-read',
-                        'display_name'  => 'Read ' . $value,
-                        'description'   => 'Read ' . $value,
-                    ]);
+            if ($permission) {
+            $route = strtolower(str_replace(' ', '_', $value));
+            if ($value == 'Merchant') {
+                $route = strtolower(str_replace(' ', '_', $value)) . '_list';
+            }
+            
+            $menuId = null;
+            if ($value == 'Menu') {
+                $panelConfig = Menu::where('name', 'Panel_Configuration')->first();
+                $menuId = $panelConfig ? $panelConfig->id : null;
+            }
+            if ($value == 'Santri') {
+                $kesiswaanConfig = Menu::where('name', 'Kesiswaan')->first();
+                $menuId = $kesiswaanConfig ? $kesiswaanConfig->id : null;
+            }
+            if ($value == 'Orang Tua') {
+                $kesiswaanConfig = Menu::where('name', 'Kesiswaan')->first();
+                $menuId = $kesiswaanConfig ? $kesiswaanConfig->id : null;
+            }
 
-                    Menu::create([
-                        'permission_id' => $permissionId,
-                        'name' => $value,
-                        'url' => strtolower(str_replace(' ', '_', $value)),
-                        'menu_id' => ($value == 'Menu') ? 5 : null,
-                        'order_menu' => $key + 1,
-                        'icon' => null,
-                    ]);
-                }
+            Menu::create([
+                'permission_id' => $permission->id,
+                'name' => $value,
+                'url' => $route,
+                'menu_id' => $menuId,
+                'order_menu' => $key + 1,
+                'icon' => null,
+            ]);
+            } else {
+            $permissionId = Permission::insertGetId([
+                'name'  => strtolower(str_replace(' ', '_', $value)) . '-read',
+                'display_name'  => 'Read ' . $value,
+                'description'   => 'Read ' . $value,
+            ]);
+
+            $menuId = null;
+            if ($value == 'Menu') {
+                $panelConfig = Menu::where('name', 'Panel_Configuration')->first();
+                $menuId = $panelConfig ? $panelConfig->id : null;
+            }
+            if ($value == 'Santri') {
+                $kesiswaanConfig = Menu::where('name', 'Kesiswaan')->first();
+                $menuId = $kesiswaanConfig ? $kesiswaanConfig->id : null;
+            }
+            if ($value == 'Orang Tua') {
+                $kesiswaanConfig = Menu::where('name', 'Kesiswaan')->first();
+                $menuId = $kesiswaanConfig ? $kesiswaanConfig->id : null;
+            }
+
+            Menu::create([
+                'permission_id' => $permissionId,
+                'name' => $value,
+                'url' => strtolower(str_replace(' ', '_', $value)),
+                'menu_id' => $menuId,
+                'order_menu' => $key + 1,
+                'icon' => null,
+            ]);
+            }
         }
         
     }

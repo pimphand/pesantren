@@ -22,8 +22,12 @@ class PaymentResource extends JsonResource
             'amount' => $this->amount ?? '',
             'status' => $this->status ?? '',
             'paid_at' => $this->paid_at ?? '',
+            'verified_at' => $this->verified_at ?? '',
+            'verified_by' => $this->verified_by ?? '',
             'bank' => $this->bank->name ?? '',
             'photo' => $this->proof_of_payment ?? '',
+            'created_at' => $this->created_at ?? '',
+            'updated_at' => $this->updated_at ?? '',
         ];
     }
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SantriController;
+use App\Http\Controllers\ParentController;
 use App\Http\Controllers\PaymentController;
 use Dedoc\Scramble\Scramble;
 use Illuminate\Http\Request;
@@ -102,6 +103,16 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/santri/{santri}', 'destroy')->name('destroy')->middleware('permission:santri-delete');
     });
     // End Santri Routes
+    
+    // Orang Tua Routes
+    Route::controller(ParentController::class)->name('orang_tua.')->group(function () {
+        Route::get('/orang_tua', 'index')->name('index')->middleware('permission:santri-read');
+        Route::post('/orang_tua', 'store')->name('store')->middleware('permission:santri-create');
+        Route::get('/orang_tua-data', 'data')->name('data')->middleware('permission:santri-read');
+        Route::put('/orang_tua/{orang_tua}', 'update')->name('update')->middleware('permission:santri-update');
+        Route::delete('/orang_tua/{orang_tua}', 'destroy')->name('destroy')->middleware('permission:santri-delete');
+    });
+    // End Orang Tua Routes
 
     // Payment Routes
     Route::controller(PaymentController::class)->name('payment.')->group(function () {

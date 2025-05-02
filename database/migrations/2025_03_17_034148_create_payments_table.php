@@ -19,7 +19,6 @@ return new class extends Migration
             $table->uuid('to_user_id')->nullable()->comment('User receiving payment, if applicable');
             $table->bigInteger('amount')->default(0);
             $table->string('status')->default('pending')->comment('paid, expired, canceled, failed');
-            $table->string('idempotency_key')->unique()->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamp('canceled_at')->nullable();

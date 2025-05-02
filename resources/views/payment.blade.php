@@ -1,5 +1,5 @@
 @php
-    $columns = ['No', 'Nama Orang Tua', 'Nama Santri', 'Jumlah', 'Status', 'Tindakan'];
+    $columns = ['No', 'Nama Orang Tua', 'Nama Santri', 'Jumlah', 'Status', 'Tanggal dibuat', 'Tindakan'];
 @endphp
 
 @extends('layouts.app')
@@ -25,10 +25,10 @@
                             </div>
                             <div class="row">
                                 <!-- Name parent-->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
+                                            <i class="notika-icon notika-hands-holding-child"></i>
                                         </div>
                                         <div class="nk-int-st">
                                             <input name="parent" id="parent" type="text" readonly
@@ -37,10 +37,10 @@
                                     </div>
                                 </div>
                                 <!-- Name Student -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-username"></i>
+                                            <i class="notika-icon notika-support"></i>
                                         </div>
                                         <div class="nk-int-st">
                                             <input name="student" id="student" type="text" readonly
@@ -50,7 +50,7 @@
                                     </div>
                                 </div>
                                 <!-- Amount -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
                                             <i class="notika-icon notika-mail"></i>
@@ -62,10 +62,10 @@
                                     </div>
                                 </div>
                                 <!-- Bank -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-phone"></i>
+                                            <i class="notika-icon notika-bank"></i>
                                         </div>
                                         <div class="nk-int-st">
                                             <input name="bank" type="text" readonly
@@ -75,15 +75,28 @@
                                     </div>
                                 </div>
                                 <!-- Paid At -->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group ic-cmp-int">
                                         <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-alarm"></i>
+                                            <i class="notika-icon notika-check"></i>
                                         </div>
                                         <div class="nk-int-st">
                                             <input name="paid_at" id="paid_at" type="text" readonly
                                                    class="form-control"
                                                    placeholder="Waktu Pembayaran">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Verified At -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-double-check"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input name="verified_at" id="verified_at" type="text" readonly
+                                                   class="form-control"
+                                                   placeholder="Waktu Verifikasi">
                                         </div>
                                     </div>
                                 </div>
@@ -129,18 +142,43 @@
             let table = $("#table_payment");
             table.empty();
             response.data.forEach((payment, index) => {
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+
+                const datetime = new Date(payment.created_at).toLocaleString('id-ID', options);
+
+                // Tentukan class berdasarkan status
+                let statusClass = 'btn';
+                if (payment.status === 'pending') {
+                    statusClass += ' btn-warning';
+                } else if (payment.status === 'paid') {
+                    statusClass += ' btn-success';
+                } else {
+                    statusClass += ' btn-danger';
+                }
+
+                // Buat baris tabel
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
                 tr.append(`<td>${payment.parent}</td>`);
                 tr.append(`<td>${payment.student}</td>`);
                 tr.append(`<td>${payment.amount}</td>`);
-                tr.append(`<td>${payment.status}</td>`);
+                tr.append(`<td><button class="${statusClass} dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">${payment.status}</button></td>`);
+                tr.append(`<td>${datetime}</td>`);
 
+                // Tombol aksi
                 let actionTd = $("<td class='text-right'></td>");
-
                 actionTd.append(`<button class="btn btn-success edit" data-id="${payment.id}"><i class="notika-icon notika-eye"></i></button>`);
 
                 tr.append(actionTd);
+
+                // Tambahkan ke tabel
                 table.append(tr);
             });
         }
@@ -152,7 +190,7 @@
                         <div class="form-example-int form-example-st">
                             <div class="form-group">
                                 <div class="nk-int-st">
-                                    <input type="text" class="form-control input-sm" placeholder="search" id="search">
+                                    <input type="text" class="form-control input-sm" placeholder="cari" id="search">
                                 </div>
                             </div>
                         </div>
@@ -206,7 +244,7 @@
         // Event untuk tombol Reject
         $('#reject').click(function (e) {
             e.preventDefault();
-            handleFormSubmit('canceled');
+            handleFormSubmit('rejected');
         });
 
         function handleFormSubmit(status) {
@@ -250,36 +288,63 @@
             let id = $(this).data('id');
             let data = responseData.find(item => item.id == id);
 
-            $('#_form').toggle();
-            $('#table').toggle();
+            if (!data) {
+                alert('Data tidak ditemukan.');
+                return;
+            }
 
+            // Format tanggal dan waktu ke Bahasa Indonesia
+            const options = {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+
+            const datetime_paid = new Date(data.paid_at).toLocaleString('id-ID', options);
+            const datetime_verified = new Date(data.verified_at).toLocaleString('id-ID', options);
+
+            // Tampilkan form, sembunyikan tabel
+            $('#_form').show();
+            $('#table').hide();
+
+            // Set form action dan isi field
             $('#_form').attr('action', `/payment/${id}`);
             $('#parent').val(data.parent);
             $('#student').val(data.student);
             $('#amount').val(data.amount);
             $('#bank').val(data.bank);
-            $('#status').html(data.status.charAt(0).toUpperCase() + data.status.slice(1));
-
-            $('#status').removeClass();
-            if (data.status === 'pending') {
-                $('#status').addClass('btn btn-warning');
-                $('#accept, #reject').show();
-            } else if (data.status === 'paid') {
-                $('#status').addClass('btn btn-success');
-                // $('#accept, #reject').hide();
-            } else {
-                $('#status').addClass('btn btn-danger');
-                $('#accept, #reject').hide();
-            }
-
+            $('#paid_at').val(datetime_paid);
+            $('#verified_at').val(datetime_verified);
+            $('#verified_by').val(data.verified_by);
             $('#id').val(data.id);
             $('#show_image').attr('src', data.photo);
 
-            // Tambah hidden input _method hanya jika belum ada
+            // Update status tampilan
+            let statusCapitalized = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+            $('#status').text(statusCapitalized).removeClass().addClass('btn');
+
+            if (data.status === 'pending') {
+                $('#status').addClass('btn-warning');
+                $('#accept, #reject').show();
+            } else if (data.status === 'paid') {
+                $('#status').addClass('btn-success');
+                $('#cancel').html('kembali');
+                $('#accept, #reject').hide();
+            } else {
+                $('#status').addClass('btn-danger');
+                $('#cancel').html('kembali'); // Added line to handle 'canceled' status
+                $('#accept, #reject').hide();
+            }
+
+            // Tambahkan _method=PUT jika belum ada
             if (!$('#_form input[name="_method"]').length) {
                 $('#_form').append('<input type="hidden" name="_method" value="PUT">');
             }
         });
+
 
         // Fungsi untuk mereset form
         function resetForm() {
