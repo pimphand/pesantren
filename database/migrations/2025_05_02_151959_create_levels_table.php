@@ -16,15 +16,11 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->timestamps();
         });
-        Schema::table('students', function (Blueprint $table) {
-            $table->renameColumn('level', 'level_id');
-        });
     
 
         // Tambahkan foreign key constraint
         Schema::table('students', function (Blueprint $table) {
-            $table->uuid('level_id')->nullable()->change(); // make nullable just in case
-            $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
+            $table->foreignUuid('level_id')->nullable()->constrained('levels')->onDelete('cascade');
         });
     }
 
