@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('payment_type')->comment('Top up, Transaction, etc');
             $table->foreignId('user_id')->constrained();
             $table->foreignUuid('order_id')->nullable()->constrained();
+            $table->string('idempotency_key')->unique()->nullable();
             $table->uuid('to_user_id')->nullable()->comment('User receiving payment, if applicable');
             $table->bigInteger('amount')->default(0);
             $table->string('status')->default('pending')->comment('paid, expired, canceled, failed');

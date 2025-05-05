@@ -38,6 +38,7 @@ class SantriController extends Controller
     public function store(StoreSantriRequest $request)
     {
         $santri = User::create(array_merge($request->validated(), [
+            'name' => $request->name,
             'uuid'     => Str::uuid(),
             'parent_id'     => $request->parent_id,
             'phone'    => $request->phone == '-' ? null : $request->phone,
