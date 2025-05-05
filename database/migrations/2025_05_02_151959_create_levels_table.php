@@ -20,9 +20,7 @@ return new class extends Migration
             $table->renameColumn('level', 'level_id');
         });
     
-        // Ubah tipe kolom ke UUID pakai raw SQL
-        DB::statement('ALTER TABLE students ALTER COLUMN level_id TYPE uuid USING level_id::uuid');
-    
+
         // Tambahkan foreign key constraint
         Schema::table('students', function (Blueprint $table) {
             $table->uuid('level_id')->nullable()->change(); // make nullable just in case
