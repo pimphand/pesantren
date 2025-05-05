@@ -47,7 +47,7 @@ $menus = \App\Models\Menu::whereNull('menu_id')
                             @endphp
 
                             @if ($permissionName && auth()->user()->isAbleTo($permissionName))
-                                <li>
+                                <li class="{{ $isActive ? 'active' : '' }}">
                                     <a
                                         href="{{ $hasChildren ? '#menu-' . $menu->id : url($menu->url) }}"
                                         data-toggle="{{ $hasChildren ? 'tab' : '' }}"

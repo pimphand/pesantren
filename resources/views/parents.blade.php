@@ -9,8 +9,8 @@
 
 @section('breadcrumb')
     <x-breadcrumb :title="$title"
-                  :description="'Daftar Parent dan tambah Parent'"
-                  :buttonTitle="'Tambah Parent'">
+                  :description="'Daftar Orang Tua dan tambah Orang Tua'"
+                  :buttonTitle="'Tambah Orang Tua'">
     </x-breadcrumb>
 @endsection
 
@@ -24,83 +24,68 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="form-element-list">
                             <div class="basic-tb-hd">
-                                <h2>User Parent</h2>
+                                <h2>Detail Orang Tua</h2>
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
                                 <!-- Name -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="name" style="font-weight: normal;">Nama</label>
                                         <div class="nk-int-st">
-                                            <input name="name" id="name" type="text"
-                                                class="form-control" placeholder="Nama Toko">
+                                            <input name="name" id="name" type="text" class="form-control" placeholder="Nama Orang Tua" required>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Username -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-username"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="username" style="font-weight: normal;">Username</label>
                                         <div class="nk-int-st">
-                                            <input name="username" id="username" type="text"
-                                                   class="form-control" placeholder="Username toko">
+                                            <input name="username" id="username" type="text" class="form-control" placeholder="Username Orang Tua" required>
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Email -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-mail"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="email" style="font-weight: normal;">Email</label>
                                         <div class="nk-int-st">
-                                            <input name="email" type="text" id="email"
-                                                class="form-control" placeholder="Email toko">
+                                            <input name="email" type="text" id="email" class="form-control" placeholder="Email Orang Tua" required>
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Phone -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-phone"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Nomor Telepon</label>
                                         <div class="nk-int-st">
-                                            <input name="phone" id="phone" type="text"
-                                                   class="form-control" placeholder="Nomor telepon">
+                                            <input name="phone" id="phone" type="text" class="form-control" placeholder="Nomor Telepon Orang Tua" required>
                                         </div>
                                     </div>
                                 </div>
+
                                 <!-- Password -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_password">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-settings"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="password" style="font-weight: normal;">Password</label>
                                         <div class="nk-int-st">
-                                            <input name="password" id="password"
-                                                   placeholder="Password" type="password"
-                                                   class="form-control">
-                                            </div>
-                                            <small id="note_password" style="color: red"></small>
+                                            <input name="password" id="password" type="password" class="form-control" placeholder="Password" required>
+                                        </div>
+                                        <small id="note_password" style="color: red;"></small>
                                     </div>
                                 </div>
+
+                                <!-- Password Confirmation -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_password_confirmation">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-settings"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="password_confirmation" style="font-weight: normal;">Konfirmasi Password</label>
                                         <div class="nk-int-st">
-                                            <input name="password_confirmation"
-                                                   placeholder="Konfirmasi Password" id="password_confirmation"
-                                                   type="password" class="form-control">
-                                            <small id="note_password_confirmation" style="color: red"></small>
+                                            <input name="password_confirmation" id="password_confirmation" type="password" class="form-control" placeholder="Konfirmasi Password" required>
                                         </div>
+                                        <small id="note_password_confirmation" style="color: red;"></small>
                                     </div>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center mt-2">

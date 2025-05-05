@@ -21,12 +21,20 @@ class UpdateSantriRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = \App\Models\User::findOrFail($this->id);
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $this->id],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->id],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'name' => ['required', 'string', 'max:255', 'unique:users,name,' . $this->id],
+            'parent_id' => ['required', 'string', 'max:255'],
             'pin' => ['nullable', 'string', 'min:6', 'max:6'],
+            'phone' => ['nullable', 'string', 'max:255', 'unique:users,phone,' . $this->id],
+            'class_now' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'level' => ['required', 'string', 'max:255'],
+            'date_of_birth' => ['required', 'date'],
+            'place_of_birth' => ['required', 'string', 'max:255'],
+            'gender' => ['required', 'string'],
+            'nsm' => ['required', 'string', 'max:255', 'unique:students,admission_number,' . $user->student->id],
+            'nisn' => ['required', 'string', 'max:255', 'unique:students,national_admission_number,' . $user->student->id],
         ];
     }
 }

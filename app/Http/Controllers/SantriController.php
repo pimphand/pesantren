@@ -41,7 +41,9 @@ class SantriController extends Controller
             'uuid'     => Str::uuid(),
             'parent_id'     => $request->parent_id,
             'phone'    => $request->phone == '-' ? null : $request->phone,
-            'password' => bcrypt($request->password),
+            'username' => $request->name,
+            'email' => $request->name . '@gmail.com',
+            'password' => bcrypt($request->name),
             'pin'      => bcrypt($request->pin),
         ]))->addRole('santri');
 
@@ -49,7 +51,7 @@ class SantriController extends Controller
             'user_id' => $santri->id,
             'class_now' => $request->class_now ?? null,
             'address' => $request->address ?? null,
-            'level' => $request->level ?? null,
+            'level_id' => $request->level ?? null,
             'date_of_birth' => $request->date_of_birth ?? null,
             'place_of_birth' => $request->place_of_birth ?? null,
             'gender' => $request->gender ?? null,
@@ -115,7 +117,7 @@ class SantriController extends Controller
             [
                 'address' => $request->address ?? null,
                 'class_now' => $request->class_now ?? null,
-                'level' => $request->level ?? null,
+                'level_id' => $request->level ?? null,
                 'date_of_birth' => $request->date_of_birth ?? null,
                 'place_of_birth' => $request->place_of_birth ?? null,
                 'gender' => $request->gender ?? null,

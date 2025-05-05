@@ -21,4 +21,8 @@ class Student extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function level(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Level::class);
+    }
 }

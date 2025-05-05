@@ -65,23 +65,27 @@
     <style>
         /* Struktur halaman agar footer tetap di bawah */
 
+        .notika-shop:before {
+            font-family: 'FontAwesome', serif;
+            content: "\f54f"; /* Icon for shop from FontAwesome */
+        }
         .notika-bank:before {
             font-family: 'FontAwesome', serif;
-            content: "\f19c"; /* Icon for location from FontAwesome */
+            content: "\f19c"; /* Icon for bank from FontAwesome */
         }
 
         .notika-double-check:before {
             font-family: 'FontAwesome', serif;
-            content: "\f560"; /* Icon for location from FontAwesome */
+            content: "\f560"; /* Icon for double check from FontAwesome */
         }
         .notika-check:before {
             font-family: 'FontAwesome', serif;
-            content: "\f00c"; /* Icon for location from FontAwesome */
+            content: "\f00c"; /* Icon for check from FontAwesome */
         }
         
         .notika-hands-holding-child:before {
             font-family: 'FontAwesome', serif;
-            content: "\e4fa"; /* Icon for location from FontAwesome */
+            content: "\e4fa"; /* Icon for hands holding child from FontAwesome */
         }
 
         .notika-menu-list:before {

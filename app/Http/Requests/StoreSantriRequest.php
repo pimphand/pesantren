@@ -22,13 +22,19 @@ class StoreSantriRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'pin' => $this->input('is_pin') === 'on'
-                ? ['required', 'string', 'min:6', 'max:6', 'confirmed']
-                : ['nullable', 'string', 'min:6', 'max:6', 'confirmed'],
+            'name' => ['required', 'string', 'max:255', 'unique:students,name'],
+            'parent_id' => ['required', 'string', 'max:255'],
+            'pin' => ['required', 'string', 'min:6', 'max:6', 'confirmed'],
+            'phone' => ['nullable', 'string', 'max:255', 'unique:students,phone'],
+            'class_now' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string', 'max:255'],
+            'level_id' => ['required', 'string', 'max:255'],
+            'date_of_birth' => ['required', 'date'],
+            'place_of_birth' => ['required', 'string', 'max:255'],
+            'gender' => ['required', 'string', 'in:male,female'],
+            'nsm' => ['required', 'string', 'max:255', 'unique:students,admission_number'],
+            'nisn' => ['required', 'string', 'max:255', 'unique:students,national_admission_number'],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ];
     }
 }
