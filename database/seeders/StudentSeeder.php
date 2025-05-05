@@ -15,7 +15,7 @@ class StudentSeeder extends Seeder
     public function run(): void
     {
         $santri = User::where('name', 'santri')->first();
-        $level = Level::where('name', 'Madrasah Ibtidaiyah')->first();
+        $level = Level::first();
         Student::create([
             'user_id' => $santri->id,
             'admission_number'  => random_int(1, 5),
