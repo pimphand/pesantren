@@ -21,16 +21,88 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="form-element-list">
                             <div class="basic-tb-hd">
+                                <h2>Detail Merchant</h2>
+                                <p>Silakan isi detail merchant di bawah ini.</p>
+                            </div>
+                            <div class="row">
+                                <!-- Name -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="name" style="font-weight: normal;">Nama<i class="text-danger">*</i></label>
+                                        <div class="nk-int-st">
+                                            <input name="name" id="name" type="text"
+                                                class="form-control" placeholder="Nama Toko">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Phone -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Nomor Telepon</label>
+                                        <div class="nk-int-st">
+                                            <input name="phone" id="phone" type="text"
+                                                   class="form-control" placeholder="Nomor telepon">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Kategory -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="category" style="font-weight: normal;">Kategori Merchant<i class="text-danger">*</i></label>
+                                        <div class="nk-int-st">
+                                            <input name="category" id="category" type="text"
+                                                   class="form-control" placeholder="Kategori Merchant (Contoh: kantin, laundry, dll)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Address -->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group">
+                                        <label for="address" style="font-weight: normal;">Alamat<i class="text-danger">*</i></label>
+                                        <div class="nk-int-st">
+                                            <input name="address" id="address" placeholder="Masukkan Alamat Lengkap"
+                                                   type="text" class="form-control">
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="nk-int-st">
+                                            <input type="checkbox" name="is_tax" id="is_tax" value="1"
+                                                class="i-checks"> <i></i> Tambahkan Pajak
+                                            transaksi</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_tax">
+                                    <div class="form-group">
+                                        <label for="tax_input" style="font-weight: normal;">Pajak<i class="text-danger">*</i></label>
+                                        <div class="nk-int-st">
+                                            <input type="number" disabled name="tax_input" id="tax_input" class="form-control" placeholder="Masukkan Pajak Transaksi">
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group ic-cmp-int">
+                                        <div class="form-ic-cmp">
+                                            <i class="notika-icon notika-image"></i>
+                                        </div>
+                                        <div class="nk-int-st">
+                                            <input type="file" name="photo" id="photo" class="form-control">
+                                            <small id="note_photo" style="color: red">*Kosongkan jika tidak ingin mengubah foto</small>
+                                        </div>
+                                    </div>
+                                </div> --}}
+                            </div>
+                            <div class="basic-tb-hd">
                                 <h2>User Merchant</h2>
                                 <p>Silakan isi form di bawah ini.</p>
                             </div>
                             <div class="row">
                                 <!-- Username -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-username"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="username" style="font-weight: normal;">Username<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input name="username" id="username" type="text"
                                                    class="form-control" placeholder="Username toko">
@@ -39,10 +111,8 @@
                                 </div>
                                 <!-- Email -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-mail"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="email" style="font-weight: normal;">Email<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input name="email" type="text" id="email"
                                                 class="form-control" placeholder="Email toko">
@@ -51,10 +121,8 @@
                                 </div>
                                 <!-- Password -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_password">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-settings"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="password" style="font-weight: normal;">Password<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input name="password" id="password"
                                                    placeholder="Password" type="password"
@@ -64,10 +132,8 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_password_confirmation">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-settings"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="password_confirmation" style="font-weight: normal;">Konfirmasi Password<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input name="password_confirmation"
                                                    placeholder="Konfirmasi Password" id="password_confirmation"
@@ -88,10 +154,8 @@
                                 </div>
                                 <!-- PIN -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_pin">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-key"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="pin_input" style="font-weight: normal;">PIN<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input
                                                 oninput="validateNumericPin(this)"
@@ -110,10 +174,8 @@
 
                                 <!-- Konfirmasi PIN -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_pin_confirmation">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-key"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="pin_confirmation_input" style="font-weight: normal;">Konfirmasi PIN<i class="text-danger">*</i></label>
                                         <div class="nk-int-st">
                                             <input
                                                 oninput="validateNumericPin(this)"
@@ -132,90 +194,6 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center mt-2">
                                     <img src="" id="show_image" alt="" style="max-height: 300px; max-width: 300px">
                                 </div>
-                            </div>
-                            <div class="basic-tb-hd">
-                                <h2>Detail Merchant</h2>
-                                <p>Silakan isi detail merchant di bawah ini.</p>
-                            </div>
-                            <div class="row">
-                                <!-- Name -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="name" id="name" type="text"
-                                                class="form-control" placeholder="Nama Toko">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Phone -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-phone"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="phone" id="phone" type="text"
-                                                   class="form-control" placeholder="Nomor telepon">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Kategory -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-app"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="category" id="category" type="text"
-                                                   class="form-control" placeholder="Kategori Merchant (Contoh: kantin, laundry, dll)">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Address -->
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-address"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input name="address" id="address" placeholder="Masukkan Alamat Lengkap"
-                                                   type="text" class="form-control">
-                                            </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="nk-int-st">
-                                            <input type="checkbox" name="is_tax" id="is_tax" value="1"
-                                                class="i-checks"> <i></i> Tambahkan Pajak
-                                            transaksi</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="parent_tax">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-credit-card"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input type="number" disabled name="tax_input" id="tax_input" class="form-control" placeholder="Masukkan Pajak Transaksi">
-                                        </div>
-                                    </div>
-                                </div>
-                                {{-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-image"></i>
-                                        </div>
-                                        <div class="nk-int-st">
-                                            <input type="file" name="photo" id="photo" class="form-control">
-                                            <small id="note_photo" style="color: red">*Kosongkan jika tidak ingin mengubah foto</small>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
                             <button type="button" class="btn btn-primary" id="save">Simpan</button>
                             <button type="button" class="btn btn-success" id="edit">Edit</button>
@@ -315,6 +293,8 @@
                 $('#_form').trigger('reset');
                 $('#note_password, #note_pin, #note_pin_confirmation, #note_photo').html('');
                 $('#edit, ._add_button').hide();
+                $('#is_pin_checkbox').attr('disabled', false);
+                $('#is_tax_checkbox').attr('disabled', false);
 
                 $('#is_pin_checkbox').on('change', function () {
                     const isChecked = this.checked;
@@ -442,16 +422,17 @@
 
             $('#note_password').html('*kosongkan password jika tidak di rubah');
             $('#note_password_confirmation').html('*Pastikan password cocok dan hanya diisi jika ingin mengubah');
-            $('#note_pin').html('*Kosongkan PIN jika tidak ingin mengubahnya');
-            $('#note_pin_confirmation').html('*Pastikan PIN cocok dan hanya diisi jika ingin mengubah');
-            // $('#note_photo').html('');
 
             if($('#is_pin_checkbox').is(':checked')) {
                 $('#pin_input').prop('disabled', false);
                 $('#pin_confirmation_input').prop('disabled', false);
+                $('#note_pin').html('*Kosongkan PIN jika tidak ingin mengubahnya');
+                $('#note_pin_confirmation').html('*Pastikan PIN cocok dan hanya diisi jika ingin mengubah');
             } else {
                 $('#pin_input').prop('disabled', true);
                 $('#pin_confirmation_input').prop('disabled', true);
+                $('#note_pin').html(''); // Clear the note when not using PIN
+                $('#note_pin_confirmation').html(''); // Clear the note when not using PIN
             }
 
             if($('#is_tax').is(':checked')) {
@@ -464,6 +445,13 @@
                 const isChecked = this.checked;
                 $('#pin_input').prop('disabled', !isChecked);
                 $('#pin_confirmation_input').prop('disabled', !isChecked);
+                if(isChecked) {
+                    $('#note_pin').html('*Kosongkan PIN jika tidak ingin mengubahnya');
+                    $('#note_pin_confirmation').html('*Pastikan PIN cocok dan hanya diisi jika ingin mengubah');
+                } else {
+                    $('#note_pin').html(''); // Clear the note when not using PIN
+                    $('#note_pin_confirmation').html(''); // Clear the note when not using PIN
+                }
             });
             $('#is_tax').on('change', function () {
                 const isTaxChecked = this.checked;

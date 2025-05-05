@@ -26,10 +26,8 @@
                             <div class="row">
                                 <!-- Name parent-->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-hands-holding-child"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Nama Orang Tua</label>
                                         <div class="nk-int-st">
                                             <input name="parent" id="parent" type="text" readonly
                                                 class="form-control" placeholder="Nama Orang Tua">
@@ -38,10 +36,8 @@
                                 </div>
                                 <!-- Name Student -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-support"></i>
-                                        </div>
+                                    <label for="phone" style="font-weight: normal;">Nama Santri</label>
+                                    <div class="form-group">
                                         <div class="nk-int-st">
                                             <input name="student" id="student" type="text" readonly
                                                    class="form-control"
@@ -51,10 +47,8 @@
                                 </div>
                                 <!-- Amount -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-mail"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Total Pembayaran</label>                                        
                                         <div class="nk-int-st">
                                             <input name="amount" id="amount" type="text" readonly
                                                 class="form-control" placeholder="Jumlah">
@@ -63,10 +57,8 @@
                                 </div>
                                 <!-- Bank -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-bank"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Nama Bank</label>
                                         <div class="nk-int-st">
                                             <input name="bank" type="text" readonly
                                                    class="form-control" id="bank"
@@ -76,10 +68,8 @@
                                 </div>
                                 <!-- Paid At -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-check"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Waktu Pembayaran</label>
                                         <div class="nk-int-st">
                                             <input name="paid_at" id="paid_at" type="text" readonly
                                                    class="form-control"
@@ -89,10 +79,8 @@
                                 </div>
                                 <!-- Verified At -->
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group ic-cmp-int">
-                                        <div class="form-ic-cmp">
-                                            <i class="notika-icon notika-double-check"></i>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="phone" style="font-weight: normal;">Waktu Verifikasi</label>
                                         <div class="nk-int-st">
                                             <input name="verified_at" id="verified_at" type="text" readonly
                                                    class="form-control"
