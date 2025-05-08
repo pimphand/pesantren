@@ -46,6 +46,8 @@ class ProductCategoryController extends Controller
         $category = ProductCategory::create(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
             'created_by' => auth()->user()->id,
+            'updated_at' => null, // Set updated_at to null for new records
+            'updated_by' => null, // Set updated_by to null for new records
         ]));
 
         $this->createLog('Product', 'Create Product', $category, [
@@ -69,6 +71,7 @@ class ProductCategoryController extends Controller
         $productCategory->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
             'updated_by' => auth()->user()->id,
+            'updated_at' => now(), // Reverting back to using now() for updated_at
         ]));
 
         $this->createLog('Product', 'Update Product', $productCategory, [

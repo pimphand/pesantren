@@ -517,29 +517,28 @@
             let cart = getCart();
             let user_id = $('#user_id').val();
             let total = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+            let now = Date.now();
 
             try {
-                // Generate idempotency key
-                const idempotencyKey = 'trans-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-
-                // Check if there's a recent transaction with the same key
+                // Ambil data transaksi terakhir dari localStorage
                 const recentTransactions = JSON.parse(localStorage.getItem('recentTransactions') || '[]');
-                const now = Date.now();
-                const recentTransaction = recentTransactions.find(t => t.key === idempotencyKey);
 
-                if (recentTransaction) {
-                    const timeDiff = now - recentTransaction.timestamp;
-                    if (timeDiff < 3000) { // 3 seconds cooldown
-                        toast('Mohon tunggu beberapa saat sebelum melakukan transaksi berikutnya', 'error', 'Gagal!');
-                        return;
-                    }
+                // Cek apakah ada transaksi dalam 3 detik terakhir
+                const lastTransaction = recentTransactions[recentTransactions.length - 1];
+                if (lastTransaction && (now - lastTransaction.timestamp < 3000)) {
+                    toast('Mohon tunggu beberapa saat sebelum melakukan transaksi berikutnya', 'error', 'Gagal!');
+                    return;
                 }
+
+                // Generate idempotency key setelah lolos validasi
+                const idempotencyKey = 'trans-' + now + '-' + Math.random().toString(36).substr(2, 9);
 
                 let formData = new FormData();
                 formData.append('user_id', user_id);
                 formData.append('pin', $('#pin').val());
                 formData.append('total', total);
-                $.each(cart, function (index, item) {
+
+                cart.forEach((item, index) => {
                     formData.append(`items[${index}][product]`, item.id);
                     formData.append(`items[${index}][qty]`, item.qty);
                 });
@@ -558,17 +557,11 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Store the transaction key and timestamp
-                    recentTransactions.push({
-                        key: idempotencyKey,
-                        timestamp: now
-                    });
-
-                    // Keep only the last 10 transactions
+                    // Simpan idempotency key dan timestamp
+                    recentTransactions.push({ key: idempotencyKey, timestamp: now });
                     if (recentTransactions.length > 10) {
-                        recentTransactions.shift();
+                        recentTransactions.shift(); // Simpan hanya 10 transaksi terakhir
                     }
-
                     localStorage.setItem('recentTransactions', JSON.stringify(recentTransactions));
 
                     getToday();
@@ -598,6 +591,7 @@
                     }
                 }
             } catch (error) {
+                console.error(error);
                 toast('Terjadi kesalahan saat memproses transaksi', 'error', 'Gagal!');
             }
         });

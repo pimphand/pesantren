@@ -91,6 +91,10 @@ class PaymentController extends Controller
                     'old_data' => $old,
                     'new_data' => $payment->getChanges(),
                 ], 'update');
+
+                return response()->json([
+                    'message' => 'Pembayaran Berhasil',
+                ]);
             } else {
                 $changeStatus = $payment->update([
                     'status' => $request->status
@@ -100,6 +104,10 @@ class PaymentController extends Controller
                     'old_data' => $old['status'],
                     'new_data' => $payment->getChanges(),
                 ], 'update');
+                
+                return response()->json([
+                    'message' => 'Pembayaran Ditolak',
+                ]);
             }
         }
     }

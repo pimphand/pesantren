@@ -151,7 +151,8 @@ class StudentController extends Controller
     #[HeaderParameter('Authorization', self::BEARER_TOKEN_HEADER)]
     public function qrCode($id)
     {
-        $qrCode = \QrCode::format('svg')->size(200)->generate($id . '|' . \Carbon\Carbon::now()->timestamp);
+        // $qrCode = \QrCode::format('svg')->size(200)->generate($id . '|' . \Carbon\Carbon::now()->timestamp);
+        $qrCode = \QrCode::format('svg')->size(200)->generate($id);
         return response($qrCode)->header('Content-Type', 'image/svg+xml');
 
         return response()->json([

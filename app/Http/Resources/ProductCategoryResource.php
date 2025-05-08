@@ -14,6 +14,16 @@ class ProductCategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        // Check if the user has permission to view the resource
+        $userCreated = \App\Models\User::find($this->created_by);
+        $userUpdated = \App\Models\User::find($this->updated_by);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'created_by' => $userCreated ? $userCreated->name : null,
+            'updated_by' => $userUpdated ? $userUpdated->name : null,
+            'created_at' => $this->created_at ?? null,
+            'updated_at' => $this->updated_at ?? null,
+        ];
     }
 }

@@ -1,7 +1,7 @@
 @php
-    $columns = ['No', 'Nama', 'Pembuat', 'Tanggal Dibuat', 'Tanggal Diperbarui', 'Pengubah', 'Tindakan'];
+    $columns = ['No', 'Nama', 'Pembuat', 'Tanggal Dibuat', 'Pengubah', 'Tanggal Diperbarui', 'Tindakan'];
     $form = [
-        'name' => ['type' => 'text', 'title' => "Nama Kategori"],
+        'name' => ['type' => 'text', 'title' => "Nama Kategori", 'label' => "Nama Kategori", 'placeholder' => "Masukkan nama kategori"],
     ];
 @endphp
 
@@ -28,7 +28,7 @@
                             <div class="row">
                                 @foreach($form as $key => $value)
                                     <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <x-input :type="$value['type']" :name="$key" :placeholder="$value['title']" />
+                                        <x-input :type="$value['type']" :name="$key" :placeholder="$value['placeholder']" :label="$value['label']" />
                                     </div>
                                 @endforeach
                             </div>
@@ -37,7 +37,7 @@
                         </div>
                     </div>
                 </form>
-                <x-table :title="$title" :id="'table_product'" :columns="$columns"></x-table>
+                <x-table :title="$title" :id="'table_category'" :columns="$columns"></x-table>
             </div>
         </div>
     </div>
@@ -60,14 +60,35 @@
             });
         }
 
+        const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+
         function updateTable(response) {
-            let table = $("#table_product");
-            table.empty();
+            let table = $("#table_category");
+            table.empty();save
 
             response.data.forEach((product, index) => {
+                let datetimeCreated = '-';
+                let datetimeUpdated = '-';
+                if(product.created_by !== null) {
+                    datetimeCreated = new Date(product.created_at).toLocaleString('id-ID', options);
+                }
+                if(product.updated_by !== null) {
+                    datetimeUpdated = new Date(product.updated_at).toLocaleString('id-ID', options);
+                }
                 let tr = $("<tr></tr>");
                 tr.append(`<td>${response.meta.from++}</td>`);
                 tr.append(`<td>${product.name}</td>`);
+                tr.append(`<td>${product.created_by === null ? '-' : product.created_by}</td>`);
+                tr.append(`<td>${datetimeCreated === '-' ? '-' : datetimeCreated}</td>`);
+                tr.append(`<td>${product.updated_by === null ? '-' : product.updated_by}</td>`);
+                tr.append(`<td>${datetimeUpdated === '-' ? '-' : datetimeUpdated}</td>`);
 
                 let actionTd = $("<td class='text-right'></td>");
 
@@ -125,7 +146,7 @@
 
             $('._add_button').on('click', function () {
                 $('#_form').toggle();
-                $('#table_product').toggle();
+                $('#table').toggle();
                 $('#_form').trigger('reset');
                 $('._add_button').hide();
                 // Hapus input _method (biasanya ada saat edit PUT/PATCH)
@@ -151,14 +172,14 @@
                     });
                 } else {
                     getData();
+                    $('#add').removeClass('hidden')
                     $(idForm).trigger('reset');
                     $.each($(idForm).find('input select'), function (index, node) {
                         node.value = '';
                     });
                     $('#_form').toggle();
-                    $('#table_product').toggle();
+                    $('#table').toggle();
                     swal("Berhasil!", response.message, "success");
-                    $('._add_button').show();
                 }
             });
         });
@@ -176,7 +197,7 @@
                 node.value = '';
             });
             $('#_form').toggle();
-            $('#table_product').toggle();
+            $('#table').toggle();
             $('._add_button').show();
         });
 
@@ -186,7 +207,7 @@
             let data = responseData.find((item) => item.id == id);
             $('#add').addClass('hidden')
             $('#_form').toggle();
-            $('#table_product').toggle();
+            $('#table').toggle();
             $('#_form').attr('action', `/merchant/categories/${id}`);
             $('#name').val(data.name)
             $('#id').val(data.id)
