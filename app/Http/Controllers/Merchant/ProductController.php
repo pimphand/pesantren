@@ -52,6 +52,8 @@ class ProductController extends Controller
             'merchant_id' => auth()->user()->merchant->id,
             'photo' => asset('storage/' . $photoPath) ?? null,
             'created_by' => auth()->user()->id,
+            'updated_by' => null,
+            'updated_at' => null,
         ]));
 
         $this->createLog('Product', 'Create Product', $product, [
@@ -75,8 +77,9 @@ class ProductController extends Controller
 
         $product->update(array_merge($request->validated(), [
             'merchant_id' => auth()->user()->merchant->id,
-            'updated_by' => auth()->user()->id,
             'photo' => $request->hasFile('photo') ? asset('storage/' . $request->file('photo')->store('products/' . auth()->user()->merchant->id, 'public')) : $product->photo,
+            'updated_by' => auth()->user()->id,
+            'updated_at' => now(),
         ]));
 
         $this->createLog('Product', 'Update Product', $product, [
@@ -99,6 +102,7 @@ class ProductController extends Controller
         $old = $product->getOriginal();
         $product->update([
             'deleted_by' => auth()->user()->id,
+            'deleted_at' => now(),
         ]);
         $product->delete();
 
@@ -108,7 +112,7 @@ class ProductController extends Controller
         ], 'delete');
 
         return response()->json([
-            'message' => 'Produk deleted successfully',
+            'message' => 'Produk berhasil dihapus',
         ]);
     }
 

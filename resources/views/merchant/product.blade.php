@@ -1,12 +1,12 @@
 @php
     $columns = ['No', 'Kategori', 'Nama Produk', 'Harga', 'Stok', 'Tindakan'];
     $form = [
-        'category_id' => ['type' => 'select', 'title' => "Kategori"],
-        'name' => ['type' => 'text', 'title' => "Nama Produk"],
-        'price' => ['type' => 'number', 'title' => "Harga"],
-        'stock' => ['type' => 'number', 'title' => "Stok"],
-        'photo' => ['type' => 'file', 'title' => "Foto"],
-        'description' => ['type' => 'textarea', 'title' => "Deskripsi"],
+        'category_id' => ['type' => 'select', 'title' => "Kategori", 'label' => "Kategori", 'placeholder' => "Pilih kategori"],
+        'name' => ['type' => 'text', 'title' => "Nama Produk", 'label'  => "Nama Produk", 'placeholder' => "Masukkan nama produk"],
+        'price' => ['type' => 'number', 'title' => "Harga", 'label' => "Harga", 'placeholder' => "Masukkan harga produk"],
+        'stock' => ['type' => 'number', 'title' => "Stok", 'label' => "Stok", 'placeholder' => "Masukkan stok produk"],
+        'photo' => ['type' => 'file', 'title' => "Foto", 'label' => "Foto", 'placeholder' => "Pilih foto produk"],
+        'description' => ['type' => 'textarea', 'title' => "Deskripsi", 'placeholder' => "Masukkan deskripsi produk"],
     ];
 @endphp
 
@@ -32,17 +32,20 @@
                             <div class="row">
                                 @foreach($form as $key => $value)
                                     @if($value['type'] == 'select')
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-select :name="$key" :title="'Kategori'" :options="$categories" />
+                                        <div class="col-lg-12 col-md-12 col-sm-12 mb-2">
+                                            <label for="{{$key}}" style="font-weight: normal;">Kategori</label>
+                                            <x-select :name="$key" :title="'Kategori'" :options="$categories" :label="$value['label']"/>
                                         </div>
                                     @elseif($value['type'] == 'textarea')
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <label for="{{$key}}" style="font-weight: normal;">Deskripsi</label>
                                             <textarea class="form-control" name="{{$key}}" id="{{$key}}" style="height: 100px;"
-                                                placeholder="{{$value['title']}}"></textarea>
+                                                placeholder="{{$value['placeholder']}}"></textarea>
                                         </div>
                                     @else
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <x-input :type="$value['type']" :name="$key" :placeholder="$value['title']" />
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <label for="{{$key}}" style="font-weight: normal;">{{$value['label']}}</label>
+                                            <x-input :type="$value['type']" :name="$key" :placeholder="$value['placeholder']" />
                                         </div>
                                     @endif
                                 @endforeach

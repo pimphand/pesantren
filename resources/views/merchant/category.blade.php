@@ -28,7 +28,8 @@
                             <div class="row">
                                 @foreach($form as $key => $value)
                                     <div class="col-lg-12 col-md-12 col-sm-12">
-                                        <x-input :type="$value['type']" :name="$key" :placeholder="$value['placeholder']" :label="$value['label']" />
+                                        <label for="{{$key}}" style="font-weight: normal;">{{$value['label']}}</label>
+                                        <x-input :type="$value['type']" :name="$key" :placeholder="$value['placeholder']" />
                                     </div>
                                 @endforeach
                             </div>

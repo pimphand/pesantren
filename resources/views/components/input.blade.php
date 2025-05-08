@@ -7,7 +7,6 @@
             <input type="{{$type ?? 'text'}}" {{ isset($type) && $type === 'number' ? 'min=0' : '' }} name="{{$name}}" id="{{$name}}" accept=".jpg,.jpeg,.png" class="form-control hidden-file-input" placeholder="{{$placeholder ?? "Enter text here"}}">
         </div>
         @else
-            <label for="{{$name}}">{{$label ?? 'label'}}</label>
             <input type="{{$type ?? 'text'}}" {{ isset($type) && $type === 'number' ? 'min=0' : '' }} name="{{$name}}" id="{{$name}}" accept=".jpg,.jpeg,.png" class="form-control" placeholder="{{$placeholder ?? "Enter text here"}}">
         @endif
     </div>

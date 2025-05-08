@@ -4,8 +4,7 @@
 @endphp
 @extends('layouts.app')
 @section('breadcrumb')
-    <x-breadcrumb :title="$title" :icon="'notika-menu-list'" :description="'list ' . $title . ' dan tambah ' . $title . ''"
-        :buttonTitle="'List ' . $title . ''">
+    <x-breadcrumb :title="$title" :icon="'notika-menu-list'" :description="'list ' . $title . ' dan tambah ' . $title . ''">
     </x-breadcrumb>
 @endsection
 

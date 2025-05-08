@@ -33,7 +33,8 @@ class UpdateProductCategoryRequest extends FormRequest
                 'max:255',
                 Rule::unique('product_categories')->where(function ($query) use ($merchantId, $categoryId) {
                     return $query->where('merchant_id', $merchantId)
-                        ->where('id', '!=', $categoryId);
+                        ->where('id', '!=', $categoryId)
+                        ->where('deleted_at', null);
                 })
             ],
         ];
