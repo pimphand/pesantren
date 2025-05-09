@@ -11,7 +11,8 @@ class Level extends Model
     /** @use HasFactory<\Database\Factories\LevelFactory> */
     use HasFactory;
     use HasUuids;
-
+    
+    protected $guarded = [];
     
     protected $fillable = [
         'id',
@@ -19,8 +20,4 @@ class Level extends Model
         'created_at',
         'updated_at',
     ];
-    public function students()
-    {
-        return $this->hasMany(Student::class);
-    }
 }

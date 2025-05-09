@@ -106,7 +106,7 @@ class PaymentController extends Controller
 
             if (request()->hasFile('proof_of_payment')) {
                 $payment->paid_at = now();
-                $payment->proof_of_payment = asset('storage/' . request()->file('proof_of_payment')->store('proof-of-payment', 'public'));
+                $payment->proof_of_payment = public_path('storage/' . request()->file('proof_of_payment')->store('proof-of-payment', 'public'));
                 $payment->save();
             }
 

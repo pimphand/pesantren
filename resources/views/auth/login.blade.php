@@ -55,6 +55,16 @@
         .text-start {
             text-align: left !important;
         }
+        .nk-int-st input[type="email"] {
+            box-shadow: none;
+            border-top: 0px solid #ccc;
+            border-left: 0px solid #ccc;
+            border-right: 0px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            padding: 0px;
+            resize: none;
+            border-radius:0px;
+        }
     </style>
 </head>
 

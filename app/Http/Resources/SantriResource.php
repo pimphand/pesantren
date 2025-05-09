@@ -27,7 +27,7 @@ class SantriResource extends JsonResource
             'photo' => $this->student->photo ?? '-',
             'parent' => $this->parentDetail->username ?? '-',
             'address' => $this->student->address ?? '-',
-            'level' => $this->student->level->id ?? '-',
+            'level' => $this->student->level_id ?? '-',
             'date_of_birth' => $this->student->date_of_birth ?? '-',
             'place_of_birth' => $this->student->place_of_birth ?? '-',
             'gender' => $this->student->gender ?? '-',
